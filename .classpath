@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="res"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="lib" path="C:/Users/Fernando/Documents/Programming Projects/Eclipse Projects/Java/Game Engine Project - Based on APCS 2014-2015 Final Project/lib/lwjgl/jar/lwjgl.jar" sourcepath="C:/Users/Fernando/Documents/Programming Projects/Eclipse Projects/Java/Game Engine Project - Based on APCS 2014-2015 Final Project/lib/lwjgl/src.zip">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/C:/Users/Fernando/Documents/Programming%20Projects/Eclipse%20Projects/Java/Game%20Engine%20Project%20-%20Based%20on%20APCS%202014-2015%20Final%20Project/lib/lwjgl/doc/javadoc.zip!/"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="C:/Users/Fernando/Documents/Programming Projects/Eclipse Projects/Java/Game Engine Project - Based on APCS 2014-2015 Final Project/lib/lwjgl/native"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/Fernando/Documents/Programming Projects/Eclipse Projects/Java/Game Engine Project - Based on APCS 2014-2015 Final Project/lib/jbox2d/jar/jbox2d-library-2.2.1.1.jar" sourcepath="C:/Users/Fernando/Documents/Programming Projects/Eclipse Projects/Java/Game Engine Project - Based on APCS 2014-2015 Final Project/lib/jbox2d/src/jbox2d-library-2.2.1.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/C:/Users/Fernando/Documents/Programming%20Projects/Eclipse%20Projects/Java/Game%20Engine%20Project%20-%20Based%20on%20APCS%202014-2015%20Final%20Project/lib/jbox2d/doc/javadoc.zip!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
