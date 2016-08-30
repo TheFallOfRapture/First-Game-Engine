@@ -94,7 +94,6 @@ public class ShootingGame extends Game {
 	@Override
 	public void render() {
 		// TODO Auto-generated method stub
-//		renderingEngine.render(display, entities, currentLevel.getTilemap());
 		renderingEngine.render(display, entities);
 	}
 

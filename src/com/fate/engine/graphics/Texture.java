@@ -24,12 +24,12 @@ public class Texture {
 			this.resource = oldResource;
 			resource.addReference();
 		} else {
-			resource = Texture.loadTexture(filename);
+			resource = loadTexture(filename);
 			loadedTextures.put(filename, resource);
 		}
 	}
 	
-	public static TextureResource loadTexture(String filename) {
+	private TextureResource loadTexture(String filename) {
 		try {
 			BufferedImage image = ImageIO.read(Texture.class.getClassLoader().getResourceAsStream(filename));
 			int[] pixels = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
@@ -72,6 +72,10 @@ public class Texture {
 		}
 		
 		return null;
+	}
+	
+	public void destroy() {
+		resource.removeReference();
 	}
 	
 	public void bind() {

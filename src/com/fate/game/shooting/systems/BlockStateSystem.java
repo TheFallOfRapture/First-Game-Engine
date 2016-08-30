@@ -20,17 +20,30 @@ public class BlockStateSystem extends GameSystem {
 	protected void update(Entity e) {
 		Block block = e.getComponent(Block.class);
 		
-		switch(block.getCurrentStateName()) {
+		switch (block.getCurrentStateName()) {
 			case "BlockInactive":
+				inactiveUpdate(e);
 				break;
 			case "BlockHover":
+				hoverUpdate(e);
 				break;
 			case "BlockClick":
+				clickUpdate(e);
 				break;
 			case "BlockDestroy":
-				game.removeEntity(e);
+				destroyUpdate(e);
 				break;
 		}
+	}
+	
+	private void inactiveUpdate(Entity e) {}
+	
+	private void hoverUpdate(Entity e) {}
+	
+	private void clickUpdate(Entity e) {}
+	
+	private void destroyUpdate(Entity e) {
+		game.removeEntity(e);
 	}
 
 	@Override

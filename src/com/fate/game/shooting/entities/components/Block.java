@@ -2,15 +2,13 @@ package com.fate.game.shooting.entities.components;
 
 import com.fate.engine.entities.Component;
 import com.fate.engine.graphics.Color;
+import com.fate.engine.graphics.Texture;
 import com.fate.engine.graphics.components.RenderData;
 import com.fate.game.shooting.block.State;
 import com.fate.game.shooting.block.StateMachine;
 
 public class Block extends Component {
 	private StateMachine stateMachine;
-	private Color inactive;
-	private Color hover;
-	private Color click;
 	
 	public Block(Color inactive, Color hover, Color click) {
 		stateMachine = new StateMachine(new State("BlockInactive"));
@@ -18,26 +16,17 @@ public class Block extends Component {
 		
 		stateMachine.addTransition("*", "BlockClick", (e) -> {
 			RenderData data = e.getComponent(RenderData.class);
-			for (int i = 0; i < data.getVertices().size(); i++) {
-				data.getVertices().get(i).setColor(click);
-			}
-			data.init();
+			data.setTexture(new Texture("textures/tileClick.png"));
 		});
 		
 		stateMachine.addTransition("*", "BlockHover", (e) -> {
 			RenderData data = e.getComponent(RenderData.class);
-			for (int i = 0; i < data.getVertices().size(); i++) {
-				data.getVertices().get(i).setColor(hover);
-			}
-			data.init();
+			data.setTexture(new Texture("textures/tileHover.png"));
 		});
 		
 		stateMachine.addTransition("*", "BlockInactive", (e) -> {
 			RenderData data = e.getComponent(RenderData.class);
-			for (int i = 0; i < data.getVertices().size(); i++) {
-				data.getVertices().get(i).setColor(inactive);
-			}
-			data.init();
+			data.setTexture(new Texture("textures/tileUnlit.png"));
 		});
 	}
 	
