@@ -5,7 +5,7 @@ import com.fate.engine.math.Matrix4f;
 import com.fate.engine.math.Quaternion;
 import com.fate.engine.math.Vector2f;
 
-public abstract class Transform extends Component implements Cloneable {
+public abstract class Transform extends Component {
 	public Matrix4f getTransformationMatrix() {
 		return getScaleMatrix().mul(getRotationMatrix()).mul(getTranslationMatrix());
 	}

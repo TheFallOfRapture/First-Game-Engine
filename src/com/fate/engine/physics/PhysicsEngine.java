@@ -36,10 +36,4 @@ public class PhysicsEngine {
 		Vector2f translation = rb.update(dt);
 		t.translate(translation.asTranslationMatrix());
 	}
-	
-	public Entity updateRigidBodyPrior(Entity e, float dt) {
-		Entity tmp = e.clone();
-		updateRigidBody(tmp.getComponent(RigidBody.class), tmp.getComponent(Transform.class), dt);
-		return tmp;
-	}
 }

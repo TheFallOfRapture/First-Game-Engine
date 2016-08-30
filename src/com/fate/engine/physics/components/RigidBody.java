@@ -3,7 +3,7 @@ package com.fate.engine.physics.components;
 import com.fate.engine.entities.Component;
 import com.fate.engine.math.Vector2f;
 
-public class RigidBody extends Component implements Cloneable {
+public class RigidBody extends Component {
 	private Vector2f velocity;
 	private Vector2f acceleration;
 	
