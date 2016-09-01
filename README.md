@@ -4,6 +4,8 @@ One day in Summer 2016, I had the idea of taking my old AP Computer Science fina
 
 This repository is mainly for storage and version control purposes. No contributions are necessary.
 
+As this engine is very young, the code is currently very unstable and may change at any time.
+
 This repository is licensed under the MIT License.
 
 com/fate/engine contains the game engine files.
