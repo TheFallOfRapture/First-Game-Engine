@@ -7,5 +7,7 @@ This repository is mainly for storage and version control purposes. No contribut
 This repository is licensed under the MIT License.
 
 com/fate/engine contains the game engine files.
+
 com/fate/game contains game projects (demos).
+
 res contains game resources.
