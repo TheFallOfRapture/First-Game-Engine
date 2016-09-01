@@ -4,6 +4,8 @@ One day in Summer 2016, I had the idea of taking my old AP Computer Science fina
 
 This repository is mainly for storage and version control purposes. No contributions are necessary.
 
+This repository is licensed under the MIT license.
+
 ## Hierarchy
 
 ### src
