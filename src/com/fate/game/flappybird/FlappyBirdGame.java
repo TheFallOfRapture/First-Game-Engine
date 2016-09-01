@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import static org.lwjgl.glfw.GLFW.*;
 
+import com.fate.engine.collision.CollisionEngine;
 import com.fate.engine.collision.components.BoundingBox2D;
 import com.fate.engine.collision.components.CollisionComponent;
 import com.fate.engine.core.Game;
@@ -11,6 +12,7 @@ import com.fate.engine.entities.Entity;
 import com.fate.engine.entities.EntityRectangle;
 import com.fate.engine.events.EventDispatcher;
 import com.fate.engine.graphics.Color;
+import com.fate.engine.graphics.GLRenderingEngine;
 import com.fate.engine.input.Keyboard;
 import com.fate.engine.math.MatrixUtils;
 import com.fate.engine.math.Vector2f;
@@ -54,9 +56,9 @@ public class FlappyBirdGame extends Game {
 		EventDispatcher.INSTANCE.addEventHandler(this);
 		
 		renderingEngine.setClearColor(0.733f, 0.733f, 1f, 0f);
-		renderingEngine.setProjectionMatrix(MatrixUtils.getOrthographicProjectionMatrix(height, 0, 0, width, -1, 1));
+		GLRenderingEngine.setProjectionMatrix(MatrixUtils.getOrthographicProjectionMatrix(height, 0, 0, width, -1, 1));
 		
-		addSystem(collisionEngine);
+		addSystem(new CollisionEngine(this));
 		addSystem(new ObstacleCollisionSystem(this));
 		addSystem(new ScoreDetectorTriggerSystem(this));
 	}
@@ -100,24 +102,25 @@ public class FlappyBirdGame extends Game {
 			physicsEngine.update(this, entities, dt);
 		}
 		
-		Iterator<Entity> eIterator = entities.iterator();
-		while (eIterator.hasNext()) {
-			Entity e = eIterator.next();
-			if (e instanceof Obstacle || e instanceof ScoreDetector) {
-				EntityRectangle rect = (EntityRectangle) e;
-				Transform2D t2D = rect.getComponent(Transform2D.class);
-				t2D.translate(new Vector2f(-obstacleSpeed * dt, 0));
+		if (!hasLost) {
+			Iterator<Entity> eIterator = entities.iterator();
+			while (eIterator.hasNext()) {
+				Entity e = eIterator.next();
+				if (e instanceof Obstacle || e instanceof ScoreDetector) {
+					EntityRectangle rect = (EntityRectangle) e;
+					Transform2D t2D = rect.getComponent(Transform2D.class);
+					t2D.translate(new Vector2f(-obstacleSpeed * dt, 0));
+				}
+				// Remove invisible objects.
+				Transform2D t2D = e.getComponent(Transform2D.class);
+				if (t2D != null && (t2D.getPosition().getX() < -200 || t2D.getPosition().getX() >= width + 200)) {
+					e.destroy(); 
+					eIterator.remove();
+				}
 			}
-			// Remove invisible objects.
-			Transform2D t2D = e.getComponent(Transform2D.class);
-			if (t2D != null && (t2D.getPosition().getX() < -200 || t2D.getPosition().getX() >= width + 200)) {
-				e.destroy(); 
-				eIterator.remove();
-			}
-		}
-		
-		if (!hasLost)
+			
 			checkLoss();
+		}
 	}
 	
 	@Override
@@ -140,6 +143,7 @@ public class FlappyBirdGame extends Game {
 	public void restart() {
 		Transform2D playerTransform = player.getComponent(Transform2D.class);
 		playerTransform.setPosition(new Vector2f((width / 4) - 25, 500));
+		player.getComponent(BoundingBox2D.class).setCenter(new Vector2f((width / 4) - 25, 500));
 		player.getComponent(RigidBody.class).clear();
 		
 		obstacleTimeAccumulator = 0;
@@ -180,6 +184,7 @@ public class FlappyBirdGame extends Game {
 	
 	public void incrementScore() {
 		if (!hasLost) score++;
+		System.out.println(score);
 	}
 	
 	public void envokeLoss() {

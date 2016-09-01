@@ -16,7 +16,6 @@ public abstract class Game implements Runnable {
 	protected int width, height;
 	protected String title;
 	protected PhysicsEngine physicsEngine;
-	protected CollisionEngine collisionEngine;
 	protected boolean isRunning = false;
 	protected List<Entity> entities;
 	protected boolean fullscreen;
@@ -34,7 +33,6 @@ public abstract class Game implements Runnable {
 		this.title = title;
 		this.dt = 1.0f / fps;
 		physicsEngine = new PhysicsEngine();
-		collisionEngine = new CollisionEngine(this);
 		entities = new ArrayList<Entity>();
 		systems = new ArrayList<GameSystem>();
 		this.fullscreen = fullscreen;
