@@ -46,6 +46,16 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+# Class Files
 /bin
+
+# Eclipse Project Files
 .classpath
 .project
+
+# Gradle Project Files
+.gradle
+build/
+
+# Don't Ignore Gradle Wrapper Jar File
+!gradle-wrapper.jar
