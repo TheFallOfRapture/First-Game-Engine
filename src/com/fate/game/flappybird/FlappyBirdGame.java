@@ -38,10 +38,7 @@ public class FlappyBirdGame extends Game {
 		super(width, height, "Flappy Bird", fps, fullscreen);
 	}
 	
-	@Override
-	public void init() {
-		super.init();
-		
+	public void initGame() {
  		gameBoundingBox = new BoundingBox2D(new Vector2f(width / 2.0f, height / 2.0f), new Vector2f(width / 2.0f, height / 2.0f));
 		
 		obstacleTimeAccumulator = 0;

@@ -96,7 +96,7 @@ public abstract class Game implements Runnable {
 		display.destroy();
 	}
 
-	protected void init() {
+	private void init() {
 		display = new GLDisplay(width, height, title);
 		renderingEngine = new GLRenderingEngine(this);
 		addSystem(renderingEngine);
@@ -107,10 +107,12 @@ public abstract class Game implements Runnable {
 		if (fullscreen)
 			display.setFullscreen(width, height);
 		
+		initGame();
+		
 		systems.forEach(GameSystem::initSystem);
 	}
 
-	protected void update() {
+	private void update() {
 		for (GameSystem gs : systems) {
 			gs.update();
 		}
@@ -167,6 +169,7 @@ public abstract class Game implements Runnable {
 		}
 	}
 	
+	public abstract void initGame();
 	public abstract void preGameUpdate();
 	public abstract void fixedGameUpdate(float dt);
 	public abstract void postGameUpdate();

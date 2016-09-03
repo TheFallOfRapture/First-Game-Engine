@@ -12,8 +12,7 @@ public class TestingGame extends Game {
 	}
 	
 	@Override
-	public void init() {
-		super.init();
+	public void initGame() {
 		renderingEngine.setClearColor(new Color(1, 0, 0, 0));
 		
 		e = new TestEntity(this, 50, 50, 50, 50, new Color(0, 1, 0), new BasicShader());

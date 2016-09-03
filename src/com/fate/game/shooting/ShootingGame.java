@@ -45,8 +45,7 @@ public class ShootingGame extends Game {
 	}
 	
 	@Override
-	public void init() {
-		super.init();
+	public void initGame() {
 		renderingEngine.setClearColor(new Color(0.1f, 0.1f, 0.1f, 1));
 		float ratio = (float) width / (float) height;
 		GLRenderingEngine.setProjectionMatrix(MatrixUtils.getOrthographicProjectionMatrix(WORLD_SIZE, 0, 0, WORLD_SIZE * ratio, -1, 1));

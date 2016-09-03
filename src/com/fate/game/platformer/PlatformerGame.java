@@ -6,6 +6,11 @@ public class PlatformerGame extends Game {
 	public PlatformerGame(int width, int height, float fps, boolean fullscreen) {
 		super(width, height, "Platformer Game", fps, fullscreen);
 	}
+	
+	@Override
+	public void initGame() {
+		
+	}
 
 	@Override
 	public void fixedGameUpdate(float dt) {
