@@ -17,4 +17,16 @@ public final class RenderDataUtils {
 		
 		return result;
 	}
+	
+	public static RenderData createSquare(Shader<?> shader, Texture texture) {
+		RenderData result = new RenderData(shader, texture);
+		result.addVertex(new Vector2f(-0.5f, -0.5f), new Vector2f(0, 1));
+		result.addVertex(new Vector2f(-0.5f, 0.5f), new Vector2f(0, 0));
+		result.addVertex(new Vector2f(0.5f, 0.5f), new Vector2f(1, 0));
+		result.addVertex(new Vector2f(0.5f, -0.5f), new Vector2f(1, 1));
+		
+		result.addIndices(0, 1, 3, 1, 2, 3);
+		
+		return result;
+	}
 }

@@ -9,6 +9,7 @@ import com.fate.engine.math.Vector2f;
 import com.fate.engine.physics.components.RigidBody;
 import com.fate.engine.physics.components.Transform;
 
+// TODO: This class cannot be present in the Engine package with an immutable gravity factor!
 public class PhysicsEngine {
 	private static Vector2f gravity;
 	public PhysicsEngine() {

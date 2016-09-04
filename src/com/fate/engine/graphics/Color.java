@@ -25,14 +25,15 @@ public class Color {
 	}
 	
 	public Color(int argb) {
-		float alpha = ((argb & 0xff0000) >> 24) / 256f;
-		float red = ((argb & 0xff0000) >> 16) / 256f;
-		float green = ((argb & 0x00ff00) >> 8) / 256f;
-		float blue = (argb & 0x0000ff) / 256f;
+		float alpha = ((argb & 0xff000000) >> 24) / 256f;
+		float red = ((argb & 0x00ff0000) >> 16) / 256f;
+		float green = ((argb & 0x0000ff00) >> 8) / 256f;
+		float blue = (argb & 0x000000ff) / 256f;
 		this.r = red;
 		this.g = green;
 		this.b = blue;
 		this.a = alpha;
+		System.out.println(this);
 	}
 	
 	public String toString() {

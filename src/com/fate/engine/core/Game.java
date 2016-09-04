@@ -8,6 +8,7 @@ import com.fate.engine.entities.Entity;
 import com.fate.engine.events.EventDispatcher;
 import com.fate.engine.graphics.GLDisplay;
 import com.fate.engine.graphics.GLRenderingEngine;
+import com.fate.engine.gui.GUIContainer;
 import com.fate.engine.input.Keyboard;
 import com.fate.engine.input.Mouse;
 import com.fate.engine.physics.PhysicsEngine;
@@ -146,6 +147,11 @@ public abstract class Game implements Runnable {
 	
 	public void addEntity(Entity e) {
 		entities.add(e);
+	}
+	
+	public void addContainer(GUIContainer c) {
+		entities.add(c);
+		c.getElements().forEach(entities::add);
 	}
 	
 	public void addEntities(List<? extends Entity> e) {

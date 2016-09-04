@@ -18,14 +18,14 @@ public class Texture {
 	private String filename;
 	
 	public Texture(String filename) {
-		this.filename = filename;
-		TextureResource oldResource = loadedTextures.get(filename);
+		this.filename = filename != null ? filename : "textures/empty.png";
+		TextureResource oldResource = loadedTextures.get(this.filename);
 		if (oldResource != null) {
 			this.resource = oldResource;
 			resource.addReference();
 		} else {
-			resource = loadTexture(filename);
-			loadedTextures.put(filename, resource);
+			resource = loadTexture(this.filename);
+			loadedTextures.put(this.filename, resource);
 		}
 	}
 	

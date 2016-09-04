@@ -98,6 +98,8 @@ public class GLRenderingEngine extends GameSystem {
 	public void initSystem() {
 		glActiveTexture(GL_TEXTURE0);
 		glEnable(GL_TEXTURE_2D);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 	
 	public static void setProjectionMatrix(Matrix4f m) {

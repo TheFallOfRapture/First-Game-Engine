@@ -154,6 +154,15 @@ public class RenderData extends Component {
 		vertices.add(new Vertex(position, color));
 		indices.add(index);
 	}
+
+	public void addVertex(Vector2f position, Vector2f texCoord) {
+		vertices.add(new Vertex(position, texCoord));
+	}
+	
+	public void addVertex(Vector2f position, Vector2f texCoord, int index) {
+		vertices.add(new Vertex(position, texCoord));
+		indices.add(index);
+	}
 	
 	protected void addVertex(Vector3f position, Color color) {
 		vertices.add(new Vertex(position, color));
