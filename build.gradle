@@ -1,7 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'application'
 
-mainClassName = 'com.fate.game.shooting.ShootingGameLauncher'
+mainClassName = 'com.fate.engine.core.EngineLauncher'
 
 task execute(type : JavaExec) {
 	main = mainClassName;
