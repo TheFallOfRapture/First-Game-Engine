@@ -2,13 +2,13 @@ package com.fate.engine.gui;
 
 import com.fate.engine.graphics.Color;
 import com.fate.engine.graphics.Texture;
-import com.fate.engine.graphics.components.RenderDataUtils;
 import com.fate.engine.math.Vector2f;
 import com.fate.engine.physics.components.Transform2D;
+import com.fate.engine.util.RenderDataUtils;
 import com.fate.game.shooting.graphics.shaders.BasicTexturedShader;
 
 public class GUIPanel extends GUIContainer {
-	private Vector2f size;
+	protected Vector2f size;
 	
 	public GUIPanel(Vector2f position, Vector2f size, Color color, Texture texture) {
 		super(position);

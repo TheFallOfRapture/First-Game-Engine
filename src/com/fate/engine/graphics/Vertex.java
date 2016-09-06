@@ -45,7 +45,7 @@ public class Vertex {
 	}
 	
 	public String toString() {
-		return "Vertex(" + position.toString() + ", " + color.toString() + ")";
+		return "Vertex(" + position.toString() + ", " + color.toString() + ", " + texCoord.toString() + ")";
 	}
 	
 	public Vector3f getPosition() {

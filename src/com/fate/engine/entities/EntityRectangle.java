@@ -4,9 +4,9 @@ import com.fate.engine.collision.components.BoundingBox2D;
 import com.fate.engine.graphics.Color;
 import com.fate.engine.graphics.Shader;
 import com.fate.engine.graphics.Texture;
-import com.fate.engine.graphics.components.RenderDataUtils;
 import com.fate.engine.math.Vector2f;
 import com.fate.engine.physics.components.Transform2D;
+import com.fate.engine.util.RenderDataUtils;
 
 public class EntityRectangle extends Entity {
 	protected float width;

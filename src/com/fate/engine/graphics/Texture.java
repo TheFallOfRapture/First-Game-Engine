@@ -8,6 +8,10 @@ import java.util.HashMap;
 import javax.imageio.ImageIO;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.stb.STBTTBakedChar;
+import org.lwjgl.stb.STBTruetype;
+
+import com.fate.engine.util.IOUtils;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;
@@ -25,6 +29,18 @@ public class Texture {
 			resource.addReference();
 		} else {
 			resource = loadTexture(this.filename);
+			loadedTextures.put(this.filename, resource);
+		}
+	}
+	
+	public Texture(String font, int size, int bitmapWidth, int bitmapHeight) {
+		this.filename = font != null ? font : "C:/Windows/Fonts/arial.ttf";
+		TextureResource oldResource = loadedTextures.get(this.filename + ":" + size);
+		if (oldResource != null) {
+			this.resource = oldResource;
+			resource.addReference();
+		} else {
+			resource = loadFont(this.filename, size, bitmapWidth, bitmapHeight);
 			loadedTextures.put(this.filename, resource);
 		}
 	}
@@ -72,6 +88,48 @@ public class Texture {
 		}
 		
 		return null;
+	}
+	
+	private TextureResource loadFont(String font, int size, int bitmapWidth, int bitmapHeight) {
+		int texture = glGenTextures();
+		STBTTBakedChar.Buffer chars = STBTTBakedChar.malloc(96);
+		
+		try {
+			ByteBuffer fontBuffer = IOUtils.getFileAsByteBuffer(font, 160 * 1024);
+			ByteBuffer bitmap = BufferUtils.createByteBuffer(bitmapWidth * bitmapHeight);
+			
+			STBTruetype.stbtt_BakeFontBitmap(fontBuffer, size, bitmap, bitmapWidth, bitmapHeight, 32, chars);
+			
+			glBindTexture(GL_TEXTURE_2D, texture);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, bitmapWidth, bitmapHeight, 0, GL_ALPHA, GL_UNSIGNED_BYTE, bitmap);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		
+		return new TextureResource(texture);
+	}
+	
+	public static STBTTBakedChar.Buffer loadChars(String font, int size, int bitmapWidth, int bitmapHeight) {
+		int texture = glGenTextures();
+		STBTTBakedChar.Buffer chars = STBTTBakedChar.malloc(96);
+		
+		try {
+			ByteBuffer fontBuffer = IOUtils.getFileAsByteBuffer(font, 160 * 1024);
+			ByteBuffer bitmap = BufferUtils.createByteBuffer(bitmapWidth * bitmapHeight);
+			
+			STBTruetype.stbtt_BakeFontBitmap(fontBuffer, size, bitmap, bitmapWidth, bitmapHeight, 32, chars);
+			
+			glBindTexture(GL_TEXTURE_2D, texture);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, bitmapWidth, bitmapHeight, 0, GL_ALPHA, GL_UNSIGNED_BYTE, bitmap);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		
+		return chars;
 	}
 	
 	public void destroy() {
