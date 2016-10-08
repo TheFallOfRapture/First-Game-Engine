@@ -43,27 +43,28 @@ public class ShootingGame extends Game {
 	public ShootingGame(int width, int height, float fps, boolean fullscreen) {
 		super(width, height, "Platformer Project: Prototype 1", fps, fullscreen);
 	}
-	
+
 	@Override
 	public void initGame() {
 		renderingEngine.setClearColor(new Color(0.1f, 0.1f, 0.1f, 1));
 		float ratio = (float) width / (float) height;
 		GLRenderingEngine.setProjectionMatrix(MatrixUtils.getOrthographicProjectionMatrix(WORLD_SIZE, 0, 0, WORLD_SIZE * ratio, -1, 1));
-		
+
 		player = new Player(5, 20, 1, 1, new Color(1, 1, 1), new BasicTexturedShader());
+		System.out.println("xd");
 //		addEntity(player);
-		
+
 		addEntity(puzzlePlayer = new PuzzlePlayer(33.333f, 50, 3, 3, new BasicTexturedShader()));
-		
+
 //		currentLevel = new TestLevel(this);
-		
+
 //		addEntities(currentLevel.getEntities());
-		
+
 		Level testLevel = new FirstPrototypeLevel();
 		Level testPuzzleLevel = new TestPuzzleLevel();
-		
+
 		addEntities(testPuzzleLevel.getEntities());
-		
+
 		addSystem(new ControllerSystem(this));
 		addSystem(new PhysicsWorld(this));
 		addSystem(new CollisionEngine(this));
@@ -74,12 +75,12 @@ public class ShootingGame extends Game {
 		addSystem(new BlockInputSystem(this));
 		addSystem(new BlockStateSystem(this));
 	}
-	
+
 	@EventListener(ResizeEvent.class)
 	public void handleResize(ResizeEvent e) {
 		int width = e.getWidth();
 		int height = e.getHeight();
-		
+
 		glViewport(0, 0, width, height);
 		float ratio = (float) width / (float) height;
 		GLRenderingEngine.setProjectionMatrix(MatrixUtils.getOrthographicProjectionMatrix(WORLD_SIZE, 0, 0, WORLD_SIZE * ratio, -1, 1));
@@ -107,13 +108,13 @@ public class ShootingGame extends Game {
 	@Override
 	public void preGameUpdate() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void postGameUpdate() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }
