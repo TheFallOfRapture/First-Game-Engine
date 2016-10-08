@@ -69,3 +69,7 @@ buildAndRun.bat
 
 # Ctags File
 tags
+
+# IntelliJ Project Files
+.idea/
+.javac-classpath
