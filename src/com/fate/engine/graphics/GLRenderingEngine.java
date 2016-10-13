@@ -2,36 +2,34 @@ package com.fate.engine.graphics;
 
 import com.fate.engine.core.Game;
 import com.fate.engine.core.GameSystem;
-import com.fate.engine.entities.Component;
 import com.fate.engine.entities.Entity;
 import com.fate.engine.graphics.components.RenderData;
 import com.fate.engine.math.Matrix4f;
-import com.fate.engine.math.Vector2f;
-import com.fate.engine.math.Vector3f;
+import com.fate.engine.newgui.Element;
 import com.fate.engine.physics.components.Transform;
 import com.fate.engine.tiles.Tile;
 import com.fate.engine.tiles.TileEmpty;
 import com.fate.engine.tiles.Tilemap;
+import com.fate.engine.util.Pair;
 
 import static org.lwjgl.system.MemoryUtil.*;
 
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
+import java.util.ArrayList;
 import java.util.List;
-
-import org.lwjgl.BufferUtils;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;
-import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 
 public class GLRenderingEngine extends GameSystem {
 	public static Matrix4f projectionMatrix = new Matrix4f();
+	private List<Pair<RenderData, Transform>> gameRenderables;
+	private List<Pair<RenderData, Transform>> guiRenderables;
 	
 	public GLRenderingEngine(Game game) {
 		super(game);
+		this.gameRenderables = new ArrayList<>();
+		this.guiRenderables = new ArrayList<>();
 	}
 	
 	public void render(RenderData data, Transform transform) {
@@ -45,38 +43,54 @@ public class GLRenderingEngine extends GameSystem {
 		data.getShader().getUniforms().unbind(transform, data);
 		data.getShader().unbind();
 	}
+
+	public void render(Pair<RenderData, Transform> renderable) {
+		render(renderable.getFirst(), renderable.getSecond());
+	}
 	
 	public void render(GLDisplay display, List<Entity> entities) {
 		glClear(GL_COLOR_BUFFER_BIT);
-		
-		for (Entity e : entities) {
-			if (e.hasComponent(RenderData.class) && e.hasComponent(Transform.class)) {
-				RenderData data = e.getComponent(RenderData.class);
-				Transform transform = e.getComponent(Transform.class);
-				render(data, transform);
-			}
-		}
-		
+		entities.stream().filter(this::acceptEntity)
+				.forEach(e -> render(e.getComponent(RenderData.class), e.getComponent(Transform.class)));
 		display.update();
 	}
 	
 	public void render(GLDisplay display, List<Entity> entities, Tilemap tilemap) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-		for (Entity e : entities) {
-			if (e.hasComponent(RenderData.class) && e.hasComponent(Transform.class)) {
-				RenderData data = e.getComponent(RenderData.class);
-				Transform transform = e.getComponent(Transform.class);
-				render(data, transform);
-			}
-		}
+
+		entities.stream().filter(this::acceptEntity)
+				.forEach(e -> render(e.getComponent(RenderData.class), e.getComponent(Transform.class)));
 		
 		renderTilemap(tilemap);
 		
 		display.update();
 	}
+
+	public void register(RenderData data, Transform transform, boolean isGameObject) {
+		if (isGameObject)
+			gameRenderables.add(new Pair<>(data, transform));
+		else
+			guiRenderables.add(new Pair<>(data, transform));
+	}
+
+	public void register(Entity e) {
+		register(e.getComponent(RenderData.class), e.getComponent(Transform.class), true);
+	}
+
+	public void register(Element e) {
+		register(e.getRenderData(), e.getTransform(), false);
+	}
+
+	public void render(GLDisplay display) {
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		gameRenderables.forEach(this::render);
+		guiRenderables.forEach(this::render);
+
+		display.update();
+	}
 	
-	public void renderTilemap(Tilemap tilemap) {
+	private void renderTilemap(Tilemap tilemap) {
 		for (int y = 0; y < tilemap.getHeight(); y++) {
 			for (int x = 0; x < tilemap.getWidth(); x++) {
 				Tile tile = tilemap.getTile(x, y);

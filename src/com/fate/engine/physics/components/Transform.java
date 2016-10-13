@@ -3,7 +3,6 @@ package com.fate.engine.physics.components;
 import com.fate.engine.entities.Component;
 import com.fate.engine.math.Matrix4f;
 import com.fate.engine.math.Quaternion;
-import com.fate.engine.math.Vector2f;
 
 public abstract class Transform extends Component {
 	public Matrix4f getTransformationMatrix() {
@@ -19,4 +18,8 @@ public abstract class Transform extends Component {
 	public abstract Matrix4f getScaleMatrix();
 	
 	public abstract Transform clone();
+
+	public Matrix4f transform(Transform transform) {
+		return transform.getTransformationMatrix().mul(this.getTransformationMatrix());
+	}
 }

@@ -15,6 +15,8 @@ import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.lwjgl.BufferUtils;
@@ -130,13 +132,13 @@ public class RenderData extends Component {
 	}
 	
 	public void addVertices(Vertex... vertices) {
-		for (Vertex v : vertices)
-			this.vertices.add(v);
+		this.vertices.addAll(Arrays.asList(vertices));
 	}
 	
 	public void addIndices(int... indices) {
-		for (int i : indices)
+		for (int i : indices) {
 			this.indices.add(i);
+		}
 	}
 	
 	public void addVertex(Vertex v, int index) {
