@@ -119,12 +119,13 @@ public class FlappyBirdGame extends Game {
 			checkLoss();
 		}
 	}
-	
-	@Override
-	public void render() {
-		// Render the scene to the display.
-		renderingEngine.render(display, entities);
-	}
+
+	// TODO: Remove if working
+//	@Override
+//	public void render() {
+//		// Render the scene to the display.
+//		renderingEngine.render(display, entities);
+//	}
 	
 	public void pause() {
 		isPaused = true;

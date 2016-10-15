@@ -28,10 +28,11 @@ public class TestingGame extends Game {
 		
 	}
 
-	@Override
-	public void render() {
-		renderingEngine.render(display, entities);
-	}
+	// TODO: Remove if working
+//	@Override
+//	public void render() {
+//		renderingEngine.render(display, entities);
+//	}
 
 	@Override
 	public void handleInput() {

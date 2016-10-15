@@ -91,11 +91,12 @@ public class ShootingGame extends Game {
 		Transform2D t2d = puzzlePlayer.getComponent(Transform2D.class);
 	}
 
-	@Override
-	public void render() {
-		// TODO Auto-generated method stub
-		renderingEngine.render(display, entities);
-	}
+	// TODO: Remove if working
+//	@Override
+//	public void render() {
+//		// TODO Auto-generated method stub
+//		renderingEngine.render(display, entities);
+//	}
 
 	@Override
 	public void handleInput() {

@@ -76,9 +76,4 @@ public class Engine extends Game {
 			addEntity(new GUITextElement("LOLOLO", "C:/Windows/Fonts/Calibri.ttf", 43, new Vector2f(0, 0)));
 		}
 	}
-
-	@Override
-	public void render() {
-		renderingEngine.render(display, entities);
-	}
 }

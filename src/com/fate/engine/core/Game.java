@@ -180,7 +180,10 @@ public abstract class Game implements Runnable {
 	public abstract void fixedGameUpdate(float dt);
 	public abstract void postGameUpdate();
 	public abstract void handleInput();
-	public abstract void render();
+
+	public final void render() {
+		renderingEngine.render(display);
+	}
 	
 	public boolean isRunning() {
 		return isRunning;

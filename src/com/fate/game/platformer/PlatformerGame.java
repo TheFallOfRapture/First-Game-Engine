@@ -17,10 +17,11 @@ public class PlatformerGame extends Game {
 		// TODO Auto-generated method stub
 	}
 
-	@Override
-	public void render() {
-		renderingEngine.render(display, entities);
-	}
+	// TODO: Remove if working
+//	@Override
+//	public void render() {
+//		renderingEngine.render(display, entities);
+//	}
 	
 	@Override
 	public void handleInput() {

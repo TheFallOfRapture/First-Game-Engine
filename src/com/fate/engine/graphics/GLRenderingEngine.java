@@ -10,7 +10,6 @@ import com.fate.engine.physics.components.Transform;
 import com.fate.engine.tiles.Tile;
 import com.fate.engine.tiles.TileEmpty;
 import com.fate.engine.tiles.Tilemap;
-import com.fate.engine.util.Pair;
 
 import static org.lwjgl.system.MemoryUtil.*;
 
@@ -23,8 +22,8 @@ import static org.lwjgl.opengl.GL30.*;
 
 public class GLRenderingEngine extends GameSystem {
 	public static Matrix4f projectionMatrix = new Matrix4f();
-	private List<Pair<RenderData, Transform>> gameRenderables;
-	private List<Pair<RenderData, Transform>> guiRenderables;
+	private List<Entity> gameRenderables;
+	private List<Element> guiRenderables;
 	
 	public GLRenderingEngine(Game game) {
 		super(game);
@@ -44,8 +43,12 @@ public class GLRenderingEngine extends GameSystem {
 		data.getShader().unbind();
 	}
 
-	public void render(Pair<RenderData, Transform> renderable) {
-		render(renderable.getFirst(), renderable.getSecond());
+	private void render(Entity e) {
+		render(e.getComponent(RenderData.class), e.getComponent(Transform.class));
+	}
+
+	private void render(Element e) {
+		render(e.getRenderData(), e.getTransform());
 	}
 	
 	public void render(GLDisplay display, List<Entity> entities) {
@@ -66,26 +69,22 @@ public class GLRenderingEngine extends GameSystem {
 		display.update();
 	}
 
-	public void register(RenderData data, Transform transform, boolean isGameObject) {
-		if (isGameObject)
-			gameRenderables.add(new Pair<>(data, transform));
-		else
-			guiRenderables.add(new Pair<>(data, transform));
-	}
-
 	public void register(Entity e) {
-		register(e.getComponent(RenderData.class), e.getComponent(Transform.class), true);
+		gameRenderables.add(0, e);
 	}
 
 	public void register(Element e) {
-		register(e.getRenderData(), e.getTransform(), false);
+		guiRenderables.add(0, e);
 	}
 
+	// TODO: Replace old rendering pattern with new render pattern
 	public void render(GLDisplay display) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		gameRenderables.forEach(this::render);
 		guiRenderables.forEach(this::render);
+
+		System.out.println(gameRenderables.size());
 
 		display.update();
 	}
@@ -106,6 +105,10 @@ public class GLRenderingEngine extends GameSystem {
 	
 	public void setClearColor(Color clearColor) {
 		glClearColor(clearColor.getRed(), clearColor.getGreen(), clearColor.getBlue(), clearColor.getAlpha());
+	}
+
+	public void preUpdate(Entity e) {
+		if (!gameRenderables.contains(e)) register(e);
 	}
 
 	@Override
