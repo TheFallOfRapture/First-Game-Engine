@@ -15,6 +15,8 @@ import com.fate.engine.math.Vector2f;
 import com.fate.engine.math.Vector3f;
 import com.fate.engine.physics.components.Velocity2D;
 
+// Reference: noonat.io
+
 public class CollisionEngine extends GameSystem {
 	public CollisionEngine(Game game) {
 		super(game);
