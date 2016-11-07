@@ -55,6 +55,8 @@ public final class RenderDataUtils {
 		return result;
 	}
 	
+// Reference: LWJGL 3 STB Truetype Demos	
+	
 	public static RenderData createText(String text, String font, int size, Color color, Shader<?> shader) {
 		List<Vertex> vertices = new ArrayList<Vertex>();
 		List<Integer> indices = new ArrayList<Integer>();
