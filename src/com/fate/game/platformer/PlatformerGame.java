@@ -1,8 +1,9 @@
 package com.fate.game.platformer;
 
 import com.fate.engine.core.Game;
+import com.fate.engine.core.OpenGame;
 
-public class PlatformerGame extends Game {
+public class PlatformerGame extends OpenGame {
 	public PlatformerGame(int width, int height, float fps, boolean fullscreen) {
 		super(width, height, "Platformer Game", fps, fullscreen);
 	}

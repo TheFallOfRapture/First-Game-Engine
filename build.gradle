@@ -3,7 +3,7 @@ apply plugin: 'application'
 
 import org.gradle.internal.os.OperatingSystem
 
-mainClassName = 'com.fate.engine.core.EngineLauncher'
+mainClassName = 'com.fate.game.tetris.TetrisGameLauncher'
 project.ext.lwjglVersion = "3.0.1-SNAPSHOT"
 
 switch ( OperatingSystem.current() ) {

@@ -1,15 +1,42 @@
 package com.fate.engine.entities;
 
+import com.fate.engine.collision.components.BoundingBox2D;
+import com.fate.engine.events.Message;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Queue;
 import java.util.stream.Collectors;
 
 public class Entity implements Cloneable {
 	private List<Component> components;
+	private List<String> tags;
+
+	private String name;
+	private int id;
 	private boolean destroyed;
-	
+	private Queue<Message> messages;
+
 	public Entity() {
 		this.components = new ArrayList<Component>();
+	}
+
+	public Entity(String name, int id) {
+		this.tags = new ArrayList<>();
+		this.name = name;
+		this.id = id;
+		this.components = new ArrayList<>();
+	}
+
+	public Entity(Entity e) {
+		this.components = new ArrayList<>();
+		e.getAllComponents().forEach(c -> components.add(c.clone()));
+		components.forEach(c -> c.setParent(this));
+	}
+
+	public void sendMessage(Message m) {
+		components.stream().forEach(c -> c.processMessage(m));
 	}
 
 	public void addComponent(Component c) {
@@ -19,6 +46,9 @@ public class Entity implements Cloneable {
 	}
 	
 	public void removeComponent(Component c) {
+		if (c instanceof BoundingBox2D && !((BoundingBox2D) c).isTrigger())
+			System.out.println("!!!");
+
 		c.setParent(null);
 		components.remove(c);
 		c.destroy();

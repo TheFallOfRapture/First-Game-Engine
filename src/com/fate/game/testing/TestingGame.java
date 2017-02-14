@@ -1,10 +1,11 @@
 package com.fate.game.testing;
 
 import com.fate.engine.core.Game;
+import com.fate.engine.core.OpenGame;
 import com.fate.engine.graphics.Color;
 import com.fate.engine.math.MatrixUtils;
 
-public class TestingGame extends Game {
+public class TestingGame extends OpenGame {
 	private TestEntity e;
 
 	public TestingGame(int width, int height, float fps, boolean fullscreen) {

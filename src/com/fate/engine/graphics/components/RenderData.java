@@ -36,6 +36,7 @@ public class RenderData extends Component {
 	
 	protected Shader<?> shader;
 	protected Texture texture;
+	protected Color tint = new Color(1, 1, 1);
 	
 	protected int vao;
 	
@@ -56,7 +57,15 @@ public class RenderData extends Component {
 		
 		shader.init();
 	}
-	
+
+	public RenderData(List<Vertex> vertices, List<Integer> indices, Shader<?> shader, Texture texture, int vao) {
+		this.vertices = vertices;
+		this.indices = indices;
+		this.shader = shader;
+		this.texture = texture;
+		this.vao = vao;
+	}
+
 	public void init() {
 		int vbo = glGenBuffers();
 		int cbo = glGenBuffers();
@@ -201,6 +210,10 @@ public class RenderData extends Component {
 	public void setColor(int index, Color c) {
 		vertices.get(index).setColor(c);
 	}
+
+	public void setTint(Color tint) {
+		this.tint = tint;
+	}
 	
 	public void setPosition(int index, Vector3f v) {
 		vertices.get(index).setPosition(v);
@@ -238,9 +251,17 @@ public class RenderData extends Component {
 		this.texture = texture;
 	}
 
+	public Color getTint() {
+		return tint;
+	}
+
+	public void resetAllColors(Color c) {
+		vertices.stream().map(vert -> vert.getColor()).forEach(color -> color.setRGB(c));
+		init();
+	}
+
 	@Override
 	public Component clone() {
-		// TODO Auto-generated method stub
-		return null;
+		return new RenderData(vertices, indices, shader, texture, vao);
 	}
 }

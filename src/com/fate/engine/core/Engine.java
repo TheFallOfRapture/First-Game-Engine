@@ -12,7 +12,7 @@ import com.fate.engine.math.Vector2f;
 
 import org.lwjgl.glfw.GLFW;
 
-public class Engine extends Game {
+public class Engine extends OpenGame {
 	private GUIContainer parentContainer;
 	
 	public Engine(int width, int height, float fps, boolean fullscreen) {

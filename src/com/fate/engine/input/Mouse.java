@@ -41,11 +41,11 @@ public class Mouse {
 		
 		int width = widthBuffer.get();
 		int height = heightBuffer.get();
-		
+
 		if (screenToWorld == null) {
 			screenToWorld = GLRenderingEngine.getProjectionMatrix().getInverse();
 		}
-		
+
 		Vector2f normalizedMousePos = screenMousePosition.div(new Vector2f(width / 2f, height / 2f)).sub(new Vector2f(1, 1)).mul(new Vector2f(1, -1));
 		worldMousePosition = screenToWorld.mul(new Vector4f(normalizedMousePos, 0, 1)).getXY();
 	}

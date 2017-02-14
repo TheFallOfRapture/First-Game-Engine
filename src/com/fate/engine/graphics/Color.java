@@ -115,4 +115,10 @@ public class Color {
 
 		return new Color(red, green, blue, 1);
 	}
+
+	public void setRGB(Color c) {
+		this.r = c.r;
+		this.g = c.g;
+		this.b = c.b;
+	}
 }

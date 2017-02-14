@@ -79,6 +79,10 @@ public class Vector3f {
 		return new Vector3f(y * v.getZ() - z * v.getY(), z * v.getX() - x * v.getZ(), x * v.getY() - y * v.getX());
 	}
 
+	public float dot(Vector3f v) {
+		return (x * v.getX()) + (y * v.getY()) + (z * v.getZ());
+	}
+
 	public float getX() {
 		return x;
 	}
@@ -125,5 +129,9 @@ public class Vector3f {
 
 	public Vector3f negate() {
 		return new Vector3f(-x, -y, -z);
+	}
+
+	public static Vector3f reflect(Vector3f n, Vector3f v) {
+		return v.add(n.scale(2 * v.dot(n)));
 	}
 }

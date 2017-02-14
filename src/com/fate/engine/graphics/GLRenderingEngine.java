@@ -24,21 +24,21 @@ public class GLRenderingEngine extends GameSystem {
 	public static Matrix4f projectionMatrix = new Matrix4f();
 	private List<Entity> gameRenderables;
 	private List<Element> guiRenderables;
-	
+
 	public GLRenderingEngine(Game game) {
 		super(game);
 		this.gameRenderables = new ArrayList<>();
 		this.guiRenderables = new ArrayList<>();
 	}
-	
+
 	public void render(RenderData data, Transform transform) {
 		data.getShader().bind();
 		data.getShader().getUniforms().setUniforms(transform, data);
-		
+
 		glBindVertexArray(data.getVertexArrayObject());
 		glDrawElements(GL_TRIANGLES, data.getIndices().size(), GL_UNSIGNED_INT, NULL);
 		glBindVertexArray(0);
-		
+
 		data.getShader().getUniforms().unbind(transform, data);
 		data.getShader().unbind();
 	}
@@ -50,22 +50,22 @@ public class GLRenderingEngine extends GameSystem {
 	private void render(Element e) {
 		render(e.getRenderData(), e.getTransform());
 	}
-	
+
 	public void render(GLDisplay display, List<Entity> entities) {
 		glClear(GL_COLOR_BUFFER_BIT);
 		entities.stream().filter(this::acceptEntity)
 				.forEach(e -> render(e.getComponent(RenderData.class), e.getComponent(Transform.class)));
 		display.update();
 	}
-	
+
 	public void render(GLDisplay display, List<Entity> entities, Tilemap tilemap) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		entities.stream().filter(this::acceptEntity)
 				.forEach(e -> render(e.getComponent(RenderData.class), e.getComponent(Transform.class)));
-		
+
 		renderTilemap(tilemap);
-		
+
 		display.update();
 	}
 
@@ -73,8 +73,16 @@ public class GLRenderingEngine extends GameSystem {
 		gameRenderables.add(0, e);
 	}
 
+	public boolean unregister(Entity e) {
+		return gameRenderables.remove(e);
+	}
+
 	public void register(Element e) {
 		guiRenderables.add(0, e);
+	}
+
+	public void unregister(Element e) {
+		guiRenderables.remove(e);
 	}
 
 	// TODO: Replace old rendering pattern with new render pattern
@@ -84,31 +92,25 @@ public class GLRenderingEngine extends GameSystem {
 		gameRenderables.forEach(this::render);
 		guiRenderables.forEach(this::render);
 
-		System.out.println(gameRenderables.size());
-
 		display.update();
 	}
-	
+
 	private void renderTilemap(Tilemap tilemap) {
 		for (int y = 0; y < tilemap.getHeight(); y++) {
 			for (int x = 0; x < tilemap.getWidth(); x++) {
 				Tile tile = tilemap.getTile(x, y);
-				
+
 				Transform t = tilemap.genTileTransform(x, y);
 				RenderData rd = tile.getComponent(RenderData.class);
-				
+
 				if (!(tile instanceof TileEmpty))
 					render(rd, t);
 			}
 		}
 	}
-	
+
 	public void setClearColor(Color clearColor) {
 		glClearColor(clearColor.getRed(), clearColor.getGreen(), clearColor.getBlue(), clearColor.getAlpha());
-	}
-
-	public void preUpdate(Entity e) {
-		if (!gameRenderables.contains(e)) register(e);
 	}
 
 	@Override
@@ -118,11 +120,11 @@ public class GLRenderingEngine extends GameSystem {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
-	
+
 	public static void setProjectionMatrix(Matrix4f m) {
 		GLRenderingEngine.projectionMatrix = m;
 	}
-	
+
 	public static Matrix4f getProjectionMatrix() {
 		return GLRenderingEngine.projectionMatrix;
 	}

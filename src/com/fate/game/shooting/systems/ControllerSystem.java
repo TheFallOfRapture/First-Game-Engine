@@ -59,7 +59,7 @@ public class ControllerSystem extends GameSystem {
 		if (Keyboard.isKeyPressed(GLFW_KEY_ENTER)) {
 			Vector2f pos = t.getPosition();
 			TestBullet bullet = new TestBullet(pos.getX() + 2f, pos.getY(), new BasicTexturedShader());
-			game.addEntity(bullet);
+			((ShootingGame)game).getWorld().addEntity(bullet);
 		}
 		
 		if (Keyboard.isKeyDown(kc.getJumpKey())) {

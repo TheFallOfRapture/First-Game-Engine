@@ -24,7 +24,7 @@ public class ScoreDetectorTriggerSystem extends GameSystem {
 		
 		if (c.getParent() instanceof Player && c.getCollidedEntity() instanceof ScoreDetector) {
 			System.out.println("GOOD");
-			game.removeEntity(c.getCollidedEntity());
+			((FlappyBirdGame)game).getWorld().removeEntity(c.getCollidedEntity());
 			((FlappyBirdGame)game).incrementScore();
 			c.setHandled(true);
 		}

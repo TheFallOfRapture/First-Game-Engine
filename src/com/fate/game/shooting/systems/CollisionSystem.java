@@ -2,6 +2,7 @@ package com.fate.game.shooting.systems;
 
 import java.util.List;
 
+import com.fate.engine.collision.components.BoundingBox2D;
 import com.fate.engine.collision.components.CollisionComponent;
 import com.fate.engine.core.Game;
 import com.fate.engine.core.GameSystem;
@@ -26,7 +27,7 @@ public class CollisionSystem extends GameSystem {
 		List<CollisionComponent> collisions = e.getComponents(CollisionComponent.class);
 		
 		for (CollisionComponent c : collisions) {
-			if (e.hasComponent(Velocity2D.class)) {
+			if (e.hasComponent(Velocity2D.class) && !e.getComponent(BoundingBox2D.class).isTrigger()) {
 				Velocity2D v2D = e.getComponent(Velocity2D.class);
 				
 				Vector2f vel = v2D.getVelocity();
