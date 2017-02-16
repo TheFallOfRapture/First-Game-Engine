@@ -15,7 +15,7 @@ import com.fate.game.tetris.graphics.shaders.TetrisShader;
 public class TetrisEntityFactory {
     public static Entity getBlock(String name, Color c, float size) {
         Entity block = EntityFactory.getCustomTintRectangle(name, size, size, c, new TetrisShader());
-        block.getComponent(RenderData.class).setTexture(new Texture("textures/romeoface.png"));
+        block.getComponent(RenderData.class).setTexture(new Texture("textures/tetrisBlockSV.png"));
         return block;
     }
 

@@ -11,18 +11,24 @@ import com.fate.game.tetris.pieces.Piece;
 import com.fate.game.tetris.pieces.PieceFactory;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.List;
+
 /**
  * Created by Fernando on 2/10/2017.
  */
 public class TetrisGame extends Game {
-    private static final int WIDTH = 20, HEIGHT = 10;
-    private static final float TILE_SIZE = 2;
+    private static final int WIDTH = 10, HEIGHT = 20;
+    private static final float TILE_SIZE = 1;
     private static final int WORLD_SIZE = 20;
     private Piece nextPiece;
     private TetrisWorld w;
 
+    private boolean gameLost = false;
+
     private float dropInterval = 1.0f; // Time in seconds that a piece takes to drop one level
     private Timer dropTimer;
+
+    private int score = 0;
 
     public TetrisGame(int width, int height, float fps, boolean fullscreen) {
         super(width, height, "Tetris", fps, fullscreen);
@@ -39,6 +45,7 @@ public class TetrisGame extends Game {
         float ratio = (float) width / (float) height;
         GLRenderingEngine.setProjectionMatrix(MatrixUtils.getOrthographicProjectionMatrix(WORLD_SIZE, 0, 0, WORLD_SIZE * ratio, -1, 1));
         w = getWorld();
+        w.setXOffset(8.33f);
 
 //        EntityGrid[] pieces = new EntityGrid[7];
 //        for (int i = 0; i < 7; i++) {
@@ -48,18 +55,11 @@ public class TetrisGame extends Game {
 //        }
 
         nextPiece = PieceFactory.getPiece(PieceFactory.PieceType.RANDOM);
-        nextPiece.setPosition(5, 5);
+//        nextPiece.setPosition(5, 0);
         w.addPiece(nextPiece);
 
-        dropTimer = new Timer(dropInterval, () -> {
-            if (w.areEmpty(nextPiece.getExposedBlockLocationsWithOffset(0, 1))) {
-                w.translatePiece(nextPiece, 0, 1);
-            } else {
-                System.out.println("Bottom!");
-                nextPiece = PieceFactory.getPiece(PieceFactory.PieceType.RANDOM);
-                w.addPiece(nextPiece);
-            }
-        });
+        dropTimer = new Timer(dropInterval, this::timerTick);
+        dropTimer.start();
     }
 
     @Override
@@ -77,26 +77,72 @@ public class TetrisGame extends Game {
 
     }
 
+    private void timerTick() {
+        if (!w.moveIfValid(nextPiece, 0, 1)) {
+            nextPiece = PieceFactory.getPiece(PieceFactory.PieceType.RANDOM);
+            resolveFilledRows(1);
+
+            if (w.anyFilledColumns()) {
+                System.out.println("You lose! Score: " + score);
+                gameLost = true;
+                dropTimer.stop();
+            } else
+                w.addPiece(nextPiece);
+        }
+    }
+
+    private void resolveFilledRows(int combo) {
+        List<Integer> filledRows = w.checkForFilledRows();
+
+        if (filledRows.size() > 0) {
+            for (int row : filledRows) {
+                w.clearRow(row);
+                score += 50 * combo;
+                System.out.println("Scored " + ((50 + ((filledRows.size() - 1) * 10)) * combo) + " points! New Score: " + score);
+            }
+
+            w.fillEmptyRows(filledRows);
+
+            if (w.checkForFilledRows().size() != 0) {
+                resolveFilledRows(combo + 1);
+            }
+        }
+    }
+
     @Override
     public void handleInput() {
-        if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_A)) {
-            w.translatePiece(nextPiece, -1, 0);
+        if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_A) && !gameLost) {
+            w.moveIfValid(nextPiece, -1, 0);
         }
 
-        if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_D)) {
-            w.translatePiece(nextPiece, 1, 0);
+        if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_D) && !gameLost) {
+            w.moveIfValid(nextPiece, 1, 0);
         }
 
-        if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_LEFT)) {
-            w.removePiece(nextPiece);
-            nextPiece = nextPiece.rotateLeft();
-            w.addPiece(nextPiece);
+        if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_LEFT) && !gameLost) {
+            Piece newPiece = nextPiece.rotateLeft();
+            if (w.moveIfValid(nextPiece, newPiece))
+                nextPiece = newPiece;
         }
 
-        if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_RIGHT)) {
-            w.removePiece(nextPiece);
-            nextPiece = nextPiece.rotateRight();
-            w.addPiece(nextPiece);
+        if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_RIGHT) && !gameLost) {
+            Piece newPiece = nextPiece.rotateRight();
+            if (w.moveIfValid(nextPiece, newPiece))
+                nextPiece = newPiece;
+        }
+
+        if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_SPACE) && !gameLost) {
+            w.moveToBottom(nextPiece);
+        }
+
+        if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_S) && !gameLost) {
+            dropInterval = 0.05f;
+            dropTimer.setInterval(dropInterval);
+        }
+
+        if (Keyboard.isKeyReleased(GLFW.GLFW_KEY_S) && !gameLost) {
+            dropInterval = 1.0f;
+            dropTimer.setInterval(dropInterval);
         }
     }
 }

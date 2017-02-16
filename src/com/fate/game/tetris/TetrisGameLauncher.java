@@ -12,12 +12,4 @@ public class TetrisGameLauncher {
 
         gameLauncher.launch();
     }
-
-    /**
-     * TODO: Prototype 1
-     *
-     * Player
-     * Level (bag of Obstacles)
-     * KeyboardController
-     */
 }

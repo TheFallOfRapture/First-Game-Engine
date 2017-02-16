@@ -14,6 +14,8 @@ import java.util.List;
 public class TileWorld extends World {
     private int width;
     private int height;
+    private float xOffset;
+    private float yOffset;
     private float tileSize;
     private Entity[] entities;
 
@@ -21,6 +23,8 @@ public class TileWorld extends World {
         super(game);
         this.width = width;
         this.height = height;
+        this.xOffset = 0;
+        this.yOffset = 0;
         this.tileSize = tileSize;
         this.entities = new Entity[width*height];
     }
@@ -42,6 +46,14 @@ public class TileWorld extends World {
         return tileSize;
     }
 
+    public void setXOffset(float xOffset) {
+        this.xOffset = xOffset;
+    }
+
+    public void setYOffset(float yOffset) {
+        this.yOffset = yOffset;
+    }
+
     public boolean addEntity(Entity e, int tileX, int tileY) {
         if (tileX < 0 || tileX >= width || tileY < 0 || tileY >= height)
             return false;
@@ -53,7 +65,7 @@ public class TileWorld extends World {
             game.renderingEngine.unregister(tmp);
 
         entities[tileX + tileY * width] = e;
-        e.getComponent(Transform2D.class).setPosition(new Vector2f((tileX + 0.5f) * tileSize, (height * tileSize) - (tileY + 0.5f) * tileSize));
+        e.getComponent(Transform2D.class).setPosition(new Vector2f(xOffset + (tileX + 0.5f) * tileSize, yOffset + (height * tileSize) - (tileY + 0.5f) * tileSize));
         e.getComponent(Transform2D.class).setScale(new Vector2f(tileSize, tileSize));
 
         return true;
@@ -97,7 +109,7 @@ public class TileWorld extends World {
         entities[endX + endY * width] = entities[startX + startY * width];
         entities[startX + startY * width] = null;
 
-        entities[endX + endY * width].getComponent(Transform2D.class).setPosition(new Vector2f((endX + 0.5f) * tileSize, (height * tileSize) - (endY + 0.5f) * tileSize));
+        entities[endX + endY * width].getComponent(Transform2D.class).setPosition(new Vector2f(xOffset + (endX + 0.5f) * tileSize, yOffset + (height * tileSize) - (endY + 0.5f) * tileSize));
 
         return true;
     }
@@ -129,6 +141,16 @@ public class TileWorld extends World {
             return false;
 
         return moveEntity(location[0], location[1], x, y);
+    }
+
+    public boolean translateEntity(int tileX, int tileY, int dx, int dy) {
+        int x = tileX + dx;
+        int y = tileY + dy;
+
+        if (x < 0 || x >= width || y < 0 || y >= height)
+            return false;
+
+        return moveEntity(tileX, tileY, x, y);
     }
 
     private int[] findMatch(Entity e) {
