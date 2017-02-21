@@ -1,5 +1,4 @@
-[![Build Status](https://travis-ci.org/TheFallOfRapture/First-Game-Engine.svg?branch=engine-ui)](https://travis-ci.org/TheFallOfRapture/First-Game-Engine)
-
+[![Build Status](https://travis-ci.org/TheFallOfRapture/First-Game-Engine.svg)](https://travis-ci.org/TheFallOfRapture/First-Game-Engine)
 # First Game Engine
 
 One day in Summer 2016, I had the idea of taking my old AP Computer Science final project and making a game engine out of it. A number of weeks later, on August 26, 2016, I pushed the new game engine I had to this repository.
