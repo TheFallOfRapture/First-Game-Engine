@@ -3,11 +3,12 @@ package com.fate.game.shooting.systems;
 import com.fate.engine.core.Game;
 import com.fate.engine.core.GameSystem;
 import com.fate.engine.entities.Entity;
+import com.fate.game.shooting.ShootingGame;
 import com.fate.game.shooting.entities.components.Health;
 
-public class PlayerHealthSystem extends GameSystem {
+public class HealthSystem extends GameSystem {
 
-	public PlayerHealthSystem(Game game) {
+	public HealthSystem(Game game) {
 		super(game);
 		// TODO Auto-generated constructor stub
 	}
@@ -24,6 +25,10 @@ public class PlayerHealthSystem extends GameSystem {
 	}
 	
 	protected void fixedUpdate(Entity e, float dt) {
-//		Health h = e.getComponent(Health.class);
+		Health h = e.getComponent(Health.class);
+
+		if (h.getCurrentHealth() <= 0) {
+			((ShootingGame)game).getWorld().removeEntity(e);
+		}
 	}
 }

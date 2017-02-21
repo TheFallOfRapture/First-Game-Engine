@@ -15,6 +15,8 @@ import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.lwjgl.BufferUtils;
@@ -34,6 +36,7 @@ public class RenderData extends Component {
 	
 	protected Shader<?> shader;
 	protected Texture texture;
+	protected Color tint = new Color(1, 1, 1);
 	
 	protected int vao;
 	
@@ -51,8 +54,18 @@ public class RenderData extends Component {
 		this.indices = indices;
 		this.shader = shader;
 		this.texture = texture;
+		
+		shader.init();
 	}
-	
+
+	public RenderData(List<Vertex> vertices, List<Integer> indices, Shader<?> shader, Texture texture, int vao) {
+		this.vertices = vertices;
+		this.indices = indices;
+		this.shader = shader;
+		this.texture = texture;
+		this.vao = vao;
+	}
+
 	public void init() {
 		int vbo = glGenBuffers();
 		int cbo = glGenBuffers();
@@ -127,73 +140,86 @@ public class RenderData extends Component {
 		shader.removeReference();
 	}
 	
-	protected void addVertices(Vertex... vertices) {
-		for (Vertex v : vertices)
-			this.vertices.add(v);
+	public void addVertices(Vertex... vertices) {
+		this.vertices.addAll(Arrays.asList(vertices));
 	}
 	
-	protected void addIndices(int... indices) {
-		for (int i : indices)
+	public void addIndices(int... indices) {
+		for (int i : indices) {
 			this.indices.add(i);
+		}
 	}
 	
-	protected void addVertex(Vertex v, int index) {
+	public void addVertex(Vertex v, int index) {
 		vertices.add(v);
 		indices.add(index);
 	}
 	
-	protected void addVertex(Vertex v) {
+	public void addVertex(Vertex v) {
 		vertices.add(v);
 	}
 	
-	protected void addVertex(Vector2f position, Color color, Vector2f texCoord) {
+	public void addVertex(Vector2f position, Color color, Vector2f texCoord) {
 		vertices.add(new Vertex(position, color, texCoord));
 	}
 	
-	protected void addVertex(Vector2f position, Color color, int index) {
+	public void addVertex(Vector2f position, Color color, int index) {
 		vertices.add(new Vertex(position, color));
 		indices.add(index);
 	}
+
+	public void addVertex(Vector2f position, Vector2f texCoord) {
+		vertices.add(new Vertex(position, texCoord));
+	}
 	
-	protected void addVertex(Vector3f position, Color color) {
+	public void addVertex(Vector2f position, Vector2f texCoord, int index) {
+		vertices.add(new Vertex(position, texCoord));
+		indices.add(index);
+	}
+	
+	public void addVertex(Vector3f position, Color color) {
 		vertices.add(new Vertex(position, color));
 	}
 	
-	protected void addVertex(Vector2f position, Color color) {
+	public void addVertex(Vector2f position, Color color) {
 		vertices.add(new Vertex(position, color));
 	}
 	
-	protected void addVertex(Vector3f position, int index) {
+	public void addVertex(Vector3f position, int index) {
 		vertices.add(new Vertex(position, new Color(1, 1, 1)));
 		indices.add(index);
 	}
 	
-	protected void addVertex(Vector2f position, int index) {
+	public void addVertex(Vector2f position, int index) {
 		vertices.add(new Vertex(position, new Color(1, 1, 1)));
 		indices.add(index);
 	}
 	
-	protected void addVertex(Vector3f position) {
+	public void addVertex(Vector3f position) {
 		vertices.add(new Vertex(position, new Color(1, 1, 1)));
 	}
 	
-	protected void addVertex(Vector2f position) {
+	public void addVertex(Vector2f position) {
 		vertices.add(new Vertex(position, new Color(1, 1, 1)));
 	}
 	
-	protected void setVertex(int index, Vertex v) {
+	public void setVertex(int index, Vertex v) {
 		vertices.set(index, v);
 	}
 
-	protected void setColor(int index, Color c) {
+	public void setColor(int index, Color c) {
 		vertices.get(index).setColor(c);
 	}
+
+	public void setTint(Color tint) {
+		this.tint = tint;
+	}
 	
-	protected void setPosition(int index, Vector3f v) {
+	public void setPosition(int index, Vector3f v) {
 		vertices.get(index).setPosition(v);
 	}
 	
-	protected void addIndex(int index) {
+	public void addIndex(int index) {
 		indices.add(index);
 	}
 	
@@ -225,9 +251,17 @@ public class RenderData extends Component {
 		this.texture = texture;
 	}
 
+	public Color getTint() {
+		return tint;
+	}
+
+	public void resetAllColors(Color c) {
+		vertices.stream().map(vert -> vert.getColor()).forEach(color -> color.setRGB(c));
+		init();
+	}
+
 	@Override
 	public Component clone() {
-		// TODO Auto-generated method stub
-		return null;
+		return new RenderData(vertices, indices, shader, texture, vao);
 	}
 }

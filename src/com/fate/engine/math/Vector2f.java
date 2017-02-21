@@ -138,4 +138,8 @@ public class Vector2f {
 	public float dot(Vector2f v) {
 		return (x * v.getX()) + (y * v.getY());
 	}
+
+	public static Vector2f reflect(Vector2f n, Vector2f v) {
+		return v.add(n.scale(-2 * v.dot(n)));
+	}
 }

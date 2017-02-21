@@ -1,7 +1,22 @@
 apply plugin: 'java'
 apply plugin: 'application'
 
-mainClassName = 'com.fate.game.shooting.ShootingGameLauncher'
+import org.gradle.internal.os.OperatingSystem
+
+mainClassName = 'com.fate.game.tetris.TetrisGameLauncher'
+project.ext.lwjglVersion = "3.0.1-SNAPSHOT"
+
+switch ( OperatingSystem.current() ) {
+	case OperatingSystem.WINDOWS:
+		project.ext.lwjglNatives = "natives-windows"
+		break
+	case OperatingSystem.LINUX:
+		project.ext.lwjglNatives = "natives-linux"
+		break
+	case OperatingSystem.MAC_OS:
+		project.ext.lwjglNatives = "natives-macos"
+		break
+}
 
 task execute(type : JavaExec) {
 	main = mainClassName;
@@ -9,18 +24,44 @@ task execute(type : JavaExec) {
 }
 
 task wrapper(type : Wrapper) {
-	gradleVersion = "3.0"
+	gradleVersion = "3.1"
 }
 
 repositories {
 	mavenCentral()
+	maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 }
 
 dependencies {
-	compile 'org.lwjgl:lwjgl:3.0.0'
-	compile 'org.lwjgl:lwjgl-platform:3.0.0:natives-windows'
-	compile 'org.lwjgl:lwjgl-platform:3.0.0:natives-linux'
-	compile 'org.lwjgl:lwjgl-platform:3.0.0:natives-osx'
+	// LWJGL dependencies START
+	compile "org.lwjgl:lwjgl:${lwjglVersion}"
+	compile "org.lwjgl:lwjgl-egl:${lwjglVersion}"
+	compile "org.lwjgl:lwjgl-glfw:${lwjglVersion}"
+	compile "org.lwjgl:lwjgl-jawt:${lwjglVersion}"
+	compile "org.lwjgl:lwjgl-jemalloc:${lwjglVersion}"
+	compile "org.lwjgl:lwjgl-lmdb:${lwjglVersion}"
+	compile "org.lwjgl:lwjgl-nanovg:${lwjglVersion}"
+	compile "org.lwjgl:lwjgl-nfd:${lwjglVersion}"
+	compile "org.lwjgl:lwjgl-nuklear:${lwjglVersion}"
+	compile "org.lwjgl:lwjgl-openal:${lwjglVersion}"
+	compile "org.lwjgl:lwjgl-opencl:${lwjglVersion}"
+	compile "org.lwjgl:lwjgl-opengl:${lwjglVersion}"
+	compile "org.lwjgl:lwjgl-opengles:${lwjglVersion}"
+	compile "org.lwjgl:lwjgl-stb:${lwjglVersion}"
+	compile "org.lwjgl:lwjgl-vulkan:${lwjglVersion}"
+	compile "org.lwjgl:lwjgl-xxhash:${lwjglVersion}"
+	// LWJGL natives
+	runtime "org.lwjgl:lwjgl:${lwjglVersion}:${lwjglNatives}"
+	runtime "org.lwjgl:lwjgl-glfw:${lwjglVersion}:${lwjglNatives}"
+	runtime "org.lwjgl:lwjgl-jemalloc:${lwjglVersion}:${lwjglNatives}"
+	runtime "org.lwjgl:lwjgl-lmdb:${lwjglVersion}:${lwjglNatives}"
+	runtime "org.lwjgl:lwjgl-nanovg:${lwjglVersion}:${lwjglNatives}"
+	runtime "org.lwjgl:lwjgl-nfd:${lwjglVersion}:${lwjglNatives}"
+	runtime "org.lwjgl:lwjgl-nuklear:${lwjglVersion}:${lwjglNatives}"
+	runtime "org.lwjgl:lwjgl-openal:${lwjglVersion}:${lwjglNatives}"
+	runtime "org.lwjgl:lwjgl-stb:${lwjglVersion}:${lwjglNatives}"
+	runtime "org.lwjgl:lwjgl-xxhash:${lwjglVersion}:${lwjglNatives}"
+	// LWJGL dependencies END
 }
 
 sourceSets {

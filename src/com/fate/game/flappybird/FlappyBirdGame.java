@@ -8,6 +8,7 @@ import com.fate.engine.collision.CollisionEngine;
 import com.fate.engine.collision.components.BoundingBox2D;
 import com.fate.engine.collision.components.CollisionComponent;
 import com.fate.engine.core.Game;
+import com.fate.engine.core.OpenGame;
 import com.fate.engine.entities.Entity;
 import com.fate.engine.entities.EntityRectangle;
 import com.fate.engine.events.EventDispatcher;
@@ -19,7 +20,7 @@ import com.fate.engine.math.Vector2f;
 import com.fate.engine.physics.components.RigidBody;
 import com.fate.engine.physics.components.Transform2D;
 
-public class FlappyBirdGame extends Game {
+public class FlappyBirdGame extends OpenGame {
 	private final float timeBetweenObstacles = 1.5f; // Time in seconds between obstacles.
 	private int obstacleSpace = 110;
 	private int score;
@@ -96,11 +97,11 @@ public class FlappyBirdGame extends Game {
 			generateObstacles();
 		
 		if (!isPaused) {
-			physicsEngine.update(this, entities, dt);
+			physicsEngine.update(this, getEntities(), dt);
 		}
 		
 		if (!hasLost) {
-			Iterator<Entity> eIterator = entities.iterator();
+			Iterator<Entity> eIterator = getEntities().iterator();
 			while (eIterator.hasNext()) {
 				Entity e = eIterator.next();
 				if (e instanceof Obstacle || e instanceof ScoreDetector) {
@@ -119,12 +120,13 @@ public class FlappyBirdGame extends Game {
 			checkLoss();
 		}
 	}
-	
-	@Override
-	public void render() {
-		// Render the scene to the display.
-		renderingEngine.render(display, entities);
-	}
+
+	// TODO: Remove if working
+//	@Override
+//	public void render() {
+//		// Render the scene to the display.
+//		renderingEngine.render(display, entities);
+//	}
 	
 	public void pause() {
 		isPaused = true;
@@ -148,7 +150,7 @@ public class FlappyBirdGame extends Game {
 		
 		obstacleSpeed = 250f;
 		
-		Iterator<Entity> eIterator = entities.iterator();
+		Iterator<Entity> eIterator = getEntities().iterator();
 		while (eIterator.hasNext()) {
 			Entity e = eIterator.next();
 			if (e instanceof Obstacle || e instanceof ScoreDetector) {

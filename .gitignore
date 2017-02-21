@@ -58,5 +58,18 @@ bin/
 .gradle
 build/
 
+# Gradle build/execute batch files
+build.bat
+run.bat
+buildAndRun.bat
+.atom-build.yml
+
 # Don't Ignore Gradle Wrapper Jar File
 !gradle-wrapper.jar
+
+# Ctags File
+tags
+
+# IntelliJ Project Files
+.idea/
+.javac-classpath

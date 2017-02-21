@@ -4,6 +4,7 @@ import com.fate.engine.core.Game;
 import com.fate.engine.core.GameSystem;
 import com.fate.engine.entities.Entity;
 import com.fate.engine.math.Vector2f;
+import com.fate.engine.physics.components.Gravity;
 import com.fate.engine.physics.components.Velocity2D;
 
 public class PhysicsWorld extends GameSystem {
@@ -21,7 +22,9 @@ public class PhysicsWorld extends GameSystem {
 	
 	protected void fixedUpdate(Entity e, float dt) {
 		Velocity2D vel2D = e.getComponent(Velocity2D.class);
-		vel2D.addVelocity(GRAVITY.scale(dt));
+
+		if (e.hasComponent(Gravity.class))
+			vel2D.addVelocity(GRAVITY.scale(dt));
 	}
 
 	@Override

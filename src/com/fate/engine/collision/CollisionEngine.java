@@ -106,12 +106,12 @@ public class CollisionEngine extends GameSystem {
 						solveCollision(coll);
 					
 					if (boxA.isTrigger())
-						b.addComponent(new TriggerComponent(a));
+						b.addComponent(new TriggerComponent(a, normal));
 					else
 						b.addComponent(new CollisionComponent(a, normal, distance, coll.getTime()));
 					
 					if (boxB.isTrigger())
-						a.addComponent(new TriggerComponent(b));
+						a.addComponent(new TriggerComponent(b, normal));
 					else
 						a.addComponent(new CollisionComponent(b, normal, distance, coll.getTime()));
 				}
@@ -415,12 +415,12 @@ public class CollisionEngine extends GameSystem {
 //						System.out.println("X: " + dX + ", Y: " + dY);
 						
 						if (boundingBoxes.get(i).isTrigger())
-							e2.addComponent(new TriggerComponent(e1));
+							e2.addComponent(new TriggerComponent(e1, normal.negate()));
 						else
 							e2.addComponent(new CollisionComponent(e1, normal.negate(), distance, collisionTime));
 						
 						if (boundingBoxes.get(j).isTrigger())
-							e1.addComponent(new TriggerComponent(e2));
+							e1.addComponent(new TriggerComponent(e2, normal));
 						else
 							e1.addComponent(new CollisionComponent(e2, normal, distance, collisionTime));
 						
@@ -472,12 +472,12 @@ public class CollisionEngine extends GameSystem {
 				}
 				
 				if (boundingBoxes.get(i).isTrigger())
-					e2.addComponent(new TriggerComponent(e1));
+					e2.addComponent(new TriggerComponent(e1, normal.negate()));
 				else
 					e2.addComponent(new CollisionComponent(e1, normal.negate(), distance, 0));
 				
 				if (boundingBoxes.get(j).isTrigger())
-					e1.addComponent(new TriggerComponent(e2));
+					e1.addComponent(new TriggerComponent(e2, normal));
 				else
 					e1.addComponent(new CollisionComponent(e2, normal, distance, 0));
 			}
@@ -558,12 +558,12 @@ public class CollisionEngine extends GameSystem {
 					}
 					
 					if (boundingBoxes.get(i).isTrigger())
-						e2.addComponent(new TriggerComponent(e1));
+						e2.addComponent(new TriggerComponent(e1, normal.negate()));
 					else
 						e2.addComponent(new CollisionComponent(e1, normal.negate(), distance, 0));
 					
 					if (boundingBoxes.get(j).isTrigger())
-						e1.addComponent(new TriggerComponent(e2));
+						e1.addComponent(new TriggerComponent(e2, normal));
 					else
 						e1.addComponent(new CollisionComponent(e2, normal, distance, 0));
 				}

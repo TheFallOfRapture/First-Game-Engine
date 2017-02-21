@@ -4,6 +4,7 @@ import com.fate.engine.core.Game;
 import com.fate.engine.core.GameSystem;
 import com.fate.engine.entities.Entity;
 import com.fate.engine.graphics.components.RenderData;
+import com.fate.game.shooting.ShootingGame;
 import com.fate.game.shooting.entities.components.Block;
 
 public class BlockStateSystem extends GameSystem {
@@ -43,7 +44,7 @@ public class BlockStateSystem extends GameSystem {
 	private void clickUpdate(Entity e) {}
 	
 	private void destroyUpdate(Entity e) {
-		game.removeEntity(e);
+		((ShootingGame)game).getWorld().removeEntity(e);
 	}
 
 	@Override

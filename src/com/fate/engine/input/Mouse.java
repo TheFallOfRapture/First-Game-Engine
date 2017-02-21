@@ -8,12 +8,15 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWVidMode;
 
 import com.fate.engine.graphics.GLRenderingEngine;
+import com.fate.engine.math.Matrix4f;
 import com.fate.engine.math.Vector2f;
 import com.fate.engine.math.Vector4f;
 
 public class Mouse {
 	private static Vector2f screenMousePosition;
 	private static Vector2f worldMousePosition;
+	
+	private static Matrix4f screenToWorld;
 	
 	private static boolean[] buttonsPressed = new boolean[GLFW_MOUSE_BUTTON_LAST];
 	private static boolean[] buttonsDown = new boolean[GLFW_MOUSE_BUTTON_LAST];
@@ -38,9 +41,13 @@ public class Mouse {
 		
 		int width = widthBuffer.get();
 		int height = heightBuffer.get();
-		
+
+		if (screenToWorld == null) {
+			screenToWorld = GLRenderingEngine.getProjectionMatrix().getInverse();
+		}
+
 		Vector2f normalizedMousePos = screenMousePosition.div(new Vector2f(width / 2f, height / 2f)).sub(new Vector2f(1, 1)).mul(new Vector2f(1, -1));
-		worldMousePosition = GLRenderingEngine.getProjectionMatrix().getInverse().mul(new Vector4f(normalizedMousePos, 0, 1)).getXY();
+		worldMousePosition = screenToWorld.mul(new Vector4f(normalizedMousePos, 0, 1)).getXY();
 	}
 	
 	public static Vector2f getScreenMousePosition() {
