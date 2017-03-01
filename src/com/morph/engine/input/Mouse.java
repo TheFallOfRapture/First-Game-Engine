@@ -1,4 +1,4 @@
-package com.fate.engine.input;
+package com.morph.engine.input;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -7,10 +7,10 @@ import java.nio.IntBuffer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWVidMode;
 
-import com.fate.engine.graphics.GLRenderingEngine;
-import com.fate.engine.math.Matrix4f;
-import com.fate.engine.math.Vector2f;
-import com.fate.engine.math.Vector4f;
+import com.morph.engine.graphics.GLRenderingEngine;
+import com.morph.engine.math.Matrix4f;
+import com.morph.engine.math.Vector2f;
+import com.morph.engine.math.Vector4f;
 
 public class Mouse {
 	private static Vector2f screenMousePosition;

@@ -1,6 +1,6 @@
-package com.fate.engine.events;
+package com.morph.engine.events;
 
-import com.fate.engine.entities.Component;
+import com.morph.engine.entities.Component;
 
 /**
  * Created by Fernando on 1/12/2017.

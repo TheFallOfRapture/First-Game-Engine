@@ -1,8 +1,8 @@
-package com.fate.engine.collision.components;
+package com.morph.engine.collision.components;
 
-import com.fate.engine.entities.Component;
-import com.fate.engine.entities.Entity;
-import com.fate.engine.math.Vector3f;
+import com.morph.engine.entities.Component;
+import com.morph.engine.entities.Entity;
+import com.morph.engine.math.Vector3f;
 
 public class TriggerComponent extends Component {
 	private Entity other;

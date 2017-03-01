@@ -1,7 +1,7 @@
-package com.fate.engine.graphics;
+package com.morph.engine.graphics;
 
-import com.fate.engine.entities.Component;
-import com.fate.engine.graphics.components.RenderData;
+import com.morph.engine.entities.Component;
+import com.morph.engine.graphics.components.RenderData;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;

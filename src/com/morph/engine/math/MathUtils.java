@@ -1,4 +1,4 @@
-package com.fate.engine.math;
+package com.morph.engine.math;
 
 public class MathUtils {
 	public static final float clamp(float value, float min, float max) {

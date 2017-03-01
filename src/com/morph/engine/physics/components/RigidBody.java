@@ -1,7 +1,7 @@
-package com.fate.engine.physics.components;
+package com.morph.engine.physics.components;
 
-import com.fate.engine.entities.Component;
-import com.fate.engine.math.Vector2f;
+import com.morph.engine.entities.Component;
+import com.morph.engine.math.Vector2f;
 
 public class RigidBody extends Component {
 	private Vector2f velocity;

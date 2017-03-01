@@ -1,7 +1,7 @@
-package com.fate.engine.entities;
+package com.morph.engine.entities;
 
-import com.fate.engine.collision.components.BoundingBox2D;
-import com.fate.engine.events.Message;
+import com.morph.engine.collision.components.BoundingBox2D;
+import com.morph.engine.events.Message;
 
 import java.util.ArrayList;
 import java.util.Arrays;

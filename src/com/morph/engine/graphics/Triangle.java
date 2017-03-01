@@ -1,4 +1,4 @@
-package com.fate.engine.graphics;
+package com.morph.engine.graphics;
 
 public class Triangle {
 	private Vertex a, b, c;

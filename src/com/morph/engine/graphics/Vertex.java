@@ -1,7 +1,7 @@
-package com.fate.engine.graphics;
+package com.morph.engine.graphics;
 
-import com.fate.engine.math.Vector2f;
-import com.fate.engine.math.Vector3f;
+import com.morph.engine.math.Vector2f;
+import com.morph.engine.math.Vector3f;
 
 public class Vertex {
 	private Vector3f position;

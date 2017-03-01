@@ -1,6 +1,6 @@
-package com.fate.engine.physics.components;
+package com.morph.engine.physics.components;
 
-import com.fate.engine.entities.Component;
+import com.morph.engine.entities.Component;
 
 /**
  * Created by Fernando on 1/9/2017.

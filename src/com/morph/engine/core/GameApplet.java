@@ -1,9 +1,9 @@
-package com.fate.engine.core;
+package com.morph.engine.core;
 
 import javax.swing.*;
 
-import com.fate.engine.graphics.CustomDisplay;
-import com.fate.game.flappybird.FlappyBirdGame;
+import com.morph.engine.graphics.CustomDisplay;
+import com.morph.game.flappybird.FlappyBirdGame;
 
 public class GameApplet extends JApplet {
 	/**

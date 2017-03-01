@@ -1,6 +1,6 @@
-package com.fate.engine.collision;
+package com.morph.engine.collision;
 
-import com.fate.engine.math.Vector2f;
+import com.morph.engine.math.Vector2f;
 
 public class SweepCollision {
 	private Collision collision;

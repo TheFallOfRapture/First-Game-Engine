@@ -1,10 +1,10 @@
-package com.fate.engine.gui;
+package com.morph.engine.gui;
 
-import com.fate.engine.math.Vector2f;
-import com.fate.engine.util.RenderDataUtils;
-import com.fate.engine.graphics.shaders.BasicTexturedShader;
-import com.fate.engine.graphics.Color;
-import com.fate.engine.physics.components.Transform2D;
+import com.morph.engine.math.Vector2f;
+import com.morph.engine.util.RenderDataUtils;
+import com.morph.engine.graphics.shaders.BasicTexturedShader;
+import com.morph.engine.graphics.Color;
+import com.morph.engine.physics.components.Transform2D;
 
 public class GUIButton extends GUIElement {
     protected String text;

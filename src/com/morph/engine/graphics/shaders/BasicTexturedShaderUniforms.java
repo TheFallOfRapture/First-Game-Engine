@@ -1,11 +1,11 @@
-package com.fate.engine.graphics.shaders;
+package com.morph.engine.graphics.shaders;
 
-import com.fate.engine.graphics.GLRenderingEngine;
-import com.fate.engine.graphics.Texture;
-import com.fate.engine.graphics.Uniforms;
-import com.fate.engine.graphics.components.RenderData;
-import com.fate.engine.math.Matrix4f;
-import com.fate.engine.physics.components.Transform;
+import com.morph.engine.graphics.GLRenderingEngine;
+import com.morph.engine.graphics.Texture;
+import com.morph.engine.graphics.Uniforms;
+import com.morph.engine.graphics.components.RenderData;
+import com.morph.engine.math.Matrix4f;
+import com.morph.engine.physics.components.Transform;
 
 public class BasicTexturedShaderUniforms extends Uniforms {
 	private Matrix4f mvp;

@@ -1,7 +1,7 @@
-package com.fate.engine.gui;
+package com.morph.engine.gui;
 
-import com.fate.engine.entities.Entity;
-import com.fate.engine.math.Vector2f;
+import com.morph.engine.entities.Entity;
+import com.morph.engine.math.Vector2f;
 
 public class GUIElement extends Entity {
 	protected Vector2f position;

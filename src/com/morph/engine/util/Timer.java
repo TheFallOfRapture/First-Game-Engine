@@ -1,4 +1,4 @@
-package com.fate.engine.util;
+package com.morph.engine.util;
 
 /**
  * Created by Fernando on 2/13/2017.

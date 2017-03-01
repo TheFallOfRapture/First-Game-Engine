@@ -1,15 +1,15 @@
-package com.fate.engine.graphics;
+package com.morph.engine.graphics;
 
 import static org.lwjgl.opengl.GL20.*;
 
 import java.util.HashMap;
 
-import com.fate.engine.entities.Entity;
-import com.fate.engine.graphics.components.RenderData;
-import com.fate.engine.math.Matrix4f;
-import com.fate.engine.math.Vector3f;
-import com.fate.engine.math.Vector4f;
-import com.fate.engine.physics.components.Transform;
+import com.morph.engine.entities.Entity;
+import com.morph.engine.graphics.components.RenderData;
+import com.morph.engine.math.Matrix4f;
+import com.morph.engine.math.Vector3f;
+import com.morph.engine.math.Vector4f;
+import com.morph.engine.physics.components.Transform;
 
 public abstract class Uniforms {
 	private HashMap<String, Integer> uniforms;

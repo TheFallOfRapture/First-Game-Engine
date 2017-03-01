@@ -1,6 +1,6 @@
-package com.fate.engine.events;
+package com.morph.engine.events;
 
-import com.fate.engine.core.Game;
+import com.morph.engine.core.Game;
 
 public class GameEvent extends Event {
 	public GameEvent(Game game) {

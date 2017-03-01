@@ -1,4 +1,4 @@
-package com.fate.engine.graphics.components;
+package com.morph.engine.graphics.components;
 
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
@@ -21,14 +21,14 @@ import java.util.List;
 
 import org.lwjgl.BufferUtils;
 
-import com.fate.engine.entities.Component;
-import com.fate.engine.graphics.Color;
-import com.fate.engine.graphics.Shader;
-import com.fate.engine.graphics.Texture;
-import com.fate.engine.graphics.Uniforms;
-import com.fate.engine.graphics.Vertex;
-import com.fate.engine.math.Vector2f;
-import com.fate.engine.math.Vector3f;
+import com.morph.engine.entities.Component;
+import com.morph.engine.graphics.Color;
+import com.morph.engine.graphics.Shader;
+import com.morph.engine.graphics.Texture;
+import com.morph.engine.graphics.Uniforms;
+import com.morph.engine.graphics.Vertex;
+import com.morph.engine.math.Vector2f;
+import com.morph.engine.math.Vector3f;
 
 public class RenderData extends Component {
 	protected List<Vertex> vertices;
