@@ -3,7 +3,6 @@ package com.morph.engine.core;
 import javax.swing.*;
 
 import com.morph.engine.graphics.CustomDisplay;
-import com.morph.game.flappybird.FlappyBirdGame;
 
 public class GameApplet extends JApplet {
 	/**
@@ -14,10 +13,14 @@ public class GameApplet extends JApplet {
 	private Thread gameThread;
 	private Game game;
 	private CustomDisplay displayReference;
+
+	public GameApplet(Game game) {
+		super();
+		this.game = game;
+	}
 	
 	public void init() {
 //		System.out.println("Game initialized.");
-		game = new FlappyBirdGame(WIDTH, HEIGHT, 60, false);
 		gameThread = new Thread(game);
 		setSize(WIDTH, HEIGHT);
 	}

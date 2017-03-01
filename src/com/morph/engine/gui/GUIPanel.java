@@ -5,7 +5,7 @@ import com.morph.engine.graphics.Texture;
 import com.morph.engine.math.Vector2f;
 import com.morph.engine.physics.components.Transform2D;
 import com.morph.engine.util.RenderDataUtils;
-import com.morph.game.shooting.graphics.shaders.BasicTexturedShader;
+import com.morph.engine.graphics.shaders.BasicTexturedShader;
 
 public class GUIPanel extends GUIContainer {
 	protected Vector2f size;
