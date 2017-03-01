@@ -80,7 +80,7 @@ public class TetrisGame extends Game {
     private void timerTick() {
         if (!w.moveIfValid(nextPiece, 0, 1)) {
             nextPiece = PieceFactory.getPiece(PieceFactory.PieceType.RANDOM);
-            resolveFilledRows(1);
+            resolveFilledRows();
 
             if (w.anyFilledColumns()) {
                 System.out.println("You lose! Score: " + score);
@@ -91,21 +91,18 @@ public class TetrisGame extends Game {
         }
     }
 
-    private void resolveFilledRows(int combo) {
+    private void resolveFilledRows() {
         List<Integer> filledRows = w.checkForFilledRows();
 
         if (filledRows.size() > 0) {
             for (int row : filledRows) {
                 w.clearRow(row);
-                score += 50 * combo;
-                System.out.println("Scored " + ((50 + ((filledRows.size() - 1) * 10)) * combo) + " points! New Score: " + score);
             }
 
+            int points = ((50 + ((filledRows.size() - 1) * 10)));
+            score += points;
+            System.out.println("Scored " + points + " points! New Score: " + score);
             w.fillEmptyRows(filledRows);
-
-            if (w.checkForFilledRows().size() != 0) {
-                resolveFilledRows(combo + 1);
-            }
         }
     }
 
