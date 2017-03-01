@@ -1,6 +1,6 @@
-package com.fate.engine.graphics.shaders;
+package com.morph.engine.graphics.shaders;
 
-import com.fate.engine.graphics.Shader;
+import com.morph.engine.graphics.Shader;
 
 public class BasicTexturedShader extends Shader<BasicTexturedShaderUniforms> {
 	public BasicTexturedShader() {

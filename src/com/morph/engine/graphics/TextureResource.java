@@ -1,4 +1,4 @@
-package com.fate.engine.graphics;
+package com.morph.engine.graphics;
 
 import static org.lwjgl.opengl.GL20.glDeleteProgram;
 

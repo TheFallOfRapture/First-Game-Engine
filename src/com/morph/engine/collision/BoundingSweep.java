@@ -1,7 +1,7 @@
-package com.fate.engine.collision;
+package com.morph.engine.collision;
 
-import com.fate.engine.collision.components.BoundingBox2D;
-import com.fate.engine.math.Vector2f;
+import com.morph.engine.collision.components.BoundingBox2D;
+import com.morph.engine.math.Vector2f;
 
 public class BoundingSweep {
 	private BoundingBox2D box;

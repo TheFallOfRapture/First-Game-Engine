@@ -1,4 +1,4 @@
-package com.fate.engine.math;
+package com.morph.engine.math;
 
 public class Matrix3f {
 	private float[] m;

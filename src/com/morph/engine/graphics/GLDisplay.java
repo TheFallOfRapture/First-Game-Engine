@@ -1,13 +1,13 @@
-package com.fate.engine.graphics;
+package com.morph.engine.graphics;
 
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
 
-import com.fate.engine.events.EventDispatcher;
-import com.fate.engine.events.ResizeEvent;
-import com.fate.engine.input.Keyboard;
-import com.fate.engine.input.Mouse;
-import com.fate.engine.math.Vector2f;
+import com.morph.engine.events.EventDispatcher;
+import com.morph.engine.events.ResizeEvent;
+import com.morph.engine.input.Keyboard;
+import com.morph.engine.input.Mouse;
+import com.morph.engine.math.Vector2f;
 
 import static org.lwjgl.opengl.GL11.*;
 

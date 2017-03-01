@@ -1,8 +1,8 @@
-package com.fate.engine.physics.components;
+package com.morph.engine.physics.components;
 
-import com.fate.engine.math.Matrix4f;
-import com.fate.engine.math.Quaternion;
-import com.fate.engine.math.Vector3f;
+import com.morph.engine.math.Matrix4f;
+import com.morph.engine.math.Quaternion;
+import com.morph.engine.math.Vector3f;
 
 public class Transform3D extends Transform {
 	private Vector3f position;

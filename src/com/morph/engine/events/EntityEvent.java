@@ -1,6 +1,6 @@
-package com.fate.engine.events;
+package com.morph.engine.events;
 
-import com.fate.engine.entities.Entity;
+import com.morph.engine.entities.Entity;
 
 public class EntityEvent extends Event {
 	public EntityEvent(Entity e) {

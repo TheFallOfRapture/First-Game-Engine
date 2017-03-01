@@ -1,4 +1,4 @@
-package com.fate.engine.math;
+package com.morph.engine.math;
 
 public class VectorUtils {
 	public static float triangleArea(Vector2f v1, Vector2f v2, Vector2f v3) {

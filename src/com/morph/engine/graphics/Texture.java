@@ -1,4 +1,4 @@
-package com.fate.engine.graphics;
+package com.morph.engine.graphics;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -11,7 +11,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.stb.STBTTBakedChar;
 import org.lwjgl.stb.STBTruetype;
 
-import com.fate.engine.util.IOUtils;
+import com.morph.engine.util.IOUtils;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;

@@ -1,4 +1,4 @@
-package com.fate.engine.graphics;
+package com.morph.engine.graphics;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
@@ -8,9 +8,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 
-import com.fate.engine.math.Matrix4f;
-import com.fate.engine.math.Vector3f;
-import com.fate.engine.math.Vector4f;
+import com.morph.engine.math.Matrix4f;
+import com.morph.engine.math.Vector3f;
+import com.morph.engine.math.Vector4f;
 
 public abstract class Shader<T extends Uniforms> {
 	protected T uniforms;

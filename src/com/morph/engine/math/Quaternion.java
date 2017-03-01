@@ -1,4 +1,4 @@
-package com.fate.engine.math;
+package com.morph.engine.math;
 
 public class Quaternion {
 	private float x, y, z, w;

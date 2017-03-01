@@ -1,9 +1,9 @@
-package com.fate.engine.gui;
+package com.morph.engine.gui;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fate.engine.math.Vector2f;
+import com.morph.engine.math.Vector2f;
 
 public class GUIContainer extends GUIElement {
 	protected List<GUIElement> elements;

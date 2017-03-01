@@ -1,8 +1,8 @@
-package com.fate.engine.entities;
+package com.morph.engine.entities;
 
-import com.fate.engine.core.Game;
-import com.fate.engine.math.Vector2f;
-import com.fate.engine.physics.components.Transform2D;
+import com.morph.engine.core.Game;
+import com.morph.engine.math.Vector2f;
+import com.morph.engine.physics.components.Transform2D;
 
 import java.util.Arrays;
 import java.util.List;

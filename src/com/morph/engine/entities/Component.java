@@ -1,6 +1,6 @@
-package com.fate.engine.entities;
+package com.morph.engine.entities;
 
-import com.fate.engine.events.Message;
+import com.morph.engine.events.Message;
 
 public abstract class Component implements Cloneable {
 	protected Entity parent;

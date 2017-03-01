@@ -1,11 +1,11 @@
-package com.fate.engine.gui;
+package com.morph.engine.gui;
 
-import com.fate.engine.graphics.Color;
-import com.fate.engine.graphics.Texture;
-import com.fate.engine.math.Vector2f;
-import com.fate.engine.physics.components.Transform2D;
-import com.fate.engine.util.RenderDataUtils;
-import com.fate.game.shooting.graphics.shaders.BasicTexturedShader;
+import com.morph.engine.graphics.Color;
+import com.morph.engine.graphics.Texture;
+import com.morph.engine.math.Vector2f;
+import com.morph.engine.physics.components.Transform2D;
+import com.morph.engine.util.RenderDataUtils;
+import com.morph.game.shooting.graphics.shaders.BasicTexturedShader;
 
 public class GUIPanel extends GUIContainer {
 	protected Vector2f size;

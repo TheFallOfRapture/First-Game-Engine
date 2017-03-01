@@ -1,4 +1,4 @@
-package com.fate.engine.math;
+package com.morph.engine.math;
 
 public class MatrixUtils {
 	public static Matrix4f getOrthographicProjectionMatrix(float top, float bottom, float left, float right, float near, float far) {

@@ -1,10 +1,10 @@
-package com.fate.engine.graphics.gui;
+package com.morph.engine.graphics.gui;
 
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fate.engine.core.Game;
+import com.morph.engine.core.Game;
 
 public abstract class GUI extends GUIElement {
 	protected List<GUIElement> elements;

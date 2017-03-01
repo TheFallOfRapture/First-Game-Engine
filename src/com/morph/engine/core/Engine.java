@@ -1,14 +1,14 @@
-package com.fate.engine.core;
+package com.morph.engine.core;
 
-import com.fate.engine.graphics.Color;
-import com.fate.engine.graphics.GLRenderingEngine;
-import com.fate.engine.graphics.Texture;
-import com.fate.engine.gui.GUIContainer;
-import com.fate.engine.gui.GUIPanel;
-import com.fate.engine.gui.GUITextElement;
-import com.fate.engine.input.Keyboard;
-import com.fate.engine.math.MatrixUtils;
-import com.fate.engine.math.Vector2f;
+import com.morph.engine.graphics.Color;
+import com.morph.engine.graphics.GLRenderingEngine;
+import com.morph.engine.graphics.Texture;
+import com.morph.engine.gui.GUIContainer;
+import com.morph.engine.gui.GUIPanel;
+import com.morph.engine.gui.GUITextElement;
+import com.morph.engine.input.Keyboard;
+import com.morph.engine.math.MatrixUtils;
+import com.morph.engine.math.Vector2f;
 
 import org.lwjgl.glfw.GLFW;
 

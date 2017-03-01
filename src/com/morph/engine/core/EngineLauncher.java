@@ -1,4 +1,4 @@
-package com.fate.engine.core;
+package com.morph.engine.core;
 
 public class EngineLauncher {
 	private static GameApplication launcher;

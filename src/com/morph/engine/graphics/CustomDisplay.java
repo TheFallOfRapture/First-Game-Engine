@@ -1,4 +1,4 @@
-package com.fate.engine.graphics;
+package com.morph.engine.graphics;
 
 import java.awt.Canvas;
 import java.awt.DisplayMode;
@@ -13,7 +13,7 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
-import com.fate.engine.graphics.gui.GUI;
+import com.morph.engine.graphics.gui.GUI;
 
 public class CustomDisplay extends Canvas {
 	private static final long serialVersionUID = 1L;

@@ -1,6 +1,6 @@
-package com.fate.engine.events;
+package com.morph.engine.events;
 
-import com.fate.engine.graphics.GLDisplay;
+import com.morph.engine.graphics.GLDisplay;
 
 public class ResizeEvent extends Event {
 	private int width, height;

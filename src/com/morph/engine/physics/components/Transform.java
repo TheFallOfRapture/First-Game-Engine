@@ -1,8 +1,8 @@
-package com.fate.engine.physics.components;
+package com.morph.engine.physics.components;
 
-import com.fate.engine.entities.Component;
-import com.fate.engine.math.Matrix4f;
-import com.fate.engine.math.Quaternion;
+import com.morph.engine.entities.Component;
+import com.morph.engine.math.Matrix4f;
+import com.morph.engine.math.Quaternion;
 
 public abstract class Transform extends Component {
 	public Matrix4f getTransformationMatrix() {

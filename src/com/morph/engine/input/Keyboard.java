@@ -1,8 +1,8 @@
-package com.fate.engine.input;
+package com.morph.engine.input;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-import com.fate.engine.events.KeyEvent;
+import com.morph.engine.events.KeyEvent;
 
 public class Keyboard {
 	private final static int keys = GLFW_KEY_LAST;

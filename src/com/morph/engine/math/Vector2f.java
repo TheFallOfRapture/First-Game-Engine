@@ -1,4 +1,4 @@
-package com.fate.engine.math;
+package com.morph.engine.math;
 
 public class Vector2f {
 	private float x, y;
