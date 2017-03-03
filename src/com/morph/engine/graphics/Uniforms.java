@@ -33,6 +33,11 @@ public abstract class Uniforms {
 		int location = uniforms.get(name);
 		glUniform1i(location, value);
 	}
+
+	public void setUniform1f(String name, float value) {
+		int location = uniforms.get(name);
+		glUniform1f(location, value);
+	}
 	
 	public void setUniform3f(String name, Vector3f value) {
 		int location = uniforms.get(name);

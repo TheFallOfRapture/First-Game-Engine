@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.morph.engine.core.Game;
 
+@Deprecated
 public abstract class GUI extends GUIElement {
 	protected List<GUIElement> elements;
 	protected Game game;

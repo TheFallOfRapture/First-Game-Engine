@@ -36,7 +36,10 @@ public class RenderData extends Component {
 	
 	protected Shader<?> shader;
 	protected Texture texture;
+	protected Texture altTexture;
 	protected Color tint = new Color(1, 1, 1);
+
+	protected float lerpFactor;
 	
 	protected int vao;
 	
@@ -249,6 +252,22 @@ public class RenderData extends Component {
 	
 	public void setTexture(Texture texture) {
 		this.texture = texture;
+	}
+
+	public Texture getAltTexture() {
+		return altTexture;
+	}
+
+	public void setAltTexture(Texture altTexture) {
+		this.altTexture = altTexture;
+	}
+
+	public float getLerpFactor() {
+		return lerpFactor;
+	}
+
+	public void setLerpFactor(float lerpFactor) {
+		this.lerpFactor = lerpFactor;
 	}
 
 	public Color getTint() {

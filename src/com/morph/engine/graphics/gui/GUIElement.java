@@ -2,6 +2,7 @@ package com.morph.engine.graphics.gui;
 
 import java.awt.Graphics;
 
+@Deprecated
 public abstract class GUIElement implements Comparable<GUIElement> {
 	protected boolean enabled;
 	protected int layer;

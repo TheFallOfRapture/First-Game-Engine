@@ -3,15 +3,13 @@ package com.morph.engine.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.morph.engine.collision.CollisionEngine;
 import com.morph.engine.entities.Entity;
 import com.morph.engine.events.EventDispatcher;
 import com.morph.engine.graphics.GLDisplay;
 import com.morph.engine.graphics.GLRenderingEngine;
-import com.morph.engine.gui.GUIElement;
-import com.morph.engine.gui.GUIContainer;
 import com.morph.engine.input.Keyboard;
 import com.morph.engine.input.Mouse;
+import com.morph.engine.newgui.Container;
 import com.morph.engine.newgui.Element;
 import com.morph.engine.physics.PhysicsEngine;
 
@@ -30,7 +28,7 @@ public abstract class Game implements Runnable {
 
 	protected float dt;
 
-	protected List<GUIElement> guiElements;
+	protected List<Element> guiElements;
 
 	public Game(int width, int height, String title, float fps, boolean fullscreen) {
 		this.width = width;
@@ -149,36 +147,13 @@ public abstract class Game implements Runnable {
 		start();
 	}
 
-//	public void addEntity(Entity e) {
-//		entities.add(e);
-//		renderingEngine.register(e);
-//	}
-
-	public void addContainer(GUIContainer c) {
-		guiElements.add(c);
-		c.getElements().forEach(guiElements::add);
-		renderingEngine.register(c);
-		c.getElements().forEach(renderingEngine::register);
+	public void addElement(Element e) {
+		guiElements.add(e);
+		renderingEngine.register(e);
+		if (e instanceof Container) {
+			((Container)e).getChildren(true).forEach(this::addElement);
+		}
 	}
-
-//	public void addEntities(List<? extends Entity> e) {
-//		entities.addAll(e);
-//		e.forEach(renderingEngine::register);
-//	}
-
-//	public void removeEntity(Entity e) {
-//		entities.remove(e);
-//		renderingEngine.unregister(e);
-//		e.destroy();
-//	}
-
-//	public void removeEntities(List<Entity> e) {
-//		entities.removeAll(e);
-//		e.forEach(en -> {
-//			renderingEngine.unregister(en);
-//			en.destroy();
-//		});
-//	}
 
 	public void fixedUpdate(float dt) {
 		fixedGameUpdate(dt);
