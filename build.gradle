@@ -3,7 +3,7 @@ apply plugin: 'application'
 
 import org.gradle.internal.os.OperatingSystem
 
-mainClassName = 'com.morph.game.tetris.TetrisGameLauncher'
+mainClassName = 'com.morph.engine.core.EngineLauncher'
 project.ext.lwjglVersion = "3.0.1-SNAPSHOT"
 
 switch ( OperatingSystem.current() ) {
@@ -77,6 +77,6 @@ sourceSets {
 
 jar {
 	manifest {
-		attributes 'Main-Class': 'com.morph.game.shooting.ShootingGameLauncher'
+		attributes 'Main-Class': 'com.morph.engine.core.ShootingGameLauncher'
 	}
 }

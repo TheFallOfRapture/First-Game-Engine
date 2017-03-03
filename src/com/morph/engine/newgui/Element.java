@@ -11,14 +11,42 @@ public abstract class Element {
     private String ID;
     private String guiClass;
     private Transform2D transform;
-    private RenderData renderData;
+    private RenderData data;
+    private int depth;
+
+    public Element(Transform2D transform, RenderData data, int depth) {
+        this.transform = transform;
+        this.data = data;
+        this.depth = depth;
+
+        transform.init();
+        data.init();
+    }
+
+    public Element(Transform2D transform, RenderData data) {
+        this.transform = transform;
+        this.data = data;
+
+        transform.init();
+        data.init();
+    }
+
+    public Element(Transform2D transform) {
+        this.transform = transform;
+
+        transform.init();
+    }
 
     public RenderData getRenderData() {
-        return renderData;
+        return data;
     }
 
     public Transform2D getTransform() {
         return transform;
+    }
+
+    public int getDepth() {
+        return depth;
     }
     // Render, Behavior
 }

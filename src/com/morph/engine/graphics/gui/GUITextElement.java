@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 
+@Deprecated
 public class GUITextElement extends GUIElement {
 	private String text, font;
 	private int size, x, y;

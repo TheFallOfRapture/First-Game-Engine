@@ -31,6 +31,20 @@ import com.morph.engine.graphics.components.RenderData;
 import com.morph.engine.math.Vector2f;
 
 public final class RenderDataUtils {
+	public static RenderData createSquare(Color c, Shader<?> shader, Texture texture, Texture altTexture, float lerpFactor) {
+		RenderData result = new RenderData(shader, texture);
+		result.setAltTexture(altTexture);
+		result.setLerpFactor(lerpFactor);
+		result.addVertex(new Vector2f(-0.5f, -0.5f), c, new Vector2f(0, 1));
+		result.addVertex(new Vector2f(-0.5f, 0.5f), c, new Vector2f(0, 0));
+		result.addVertex(new Vector2f(0.5f, 0.5f), c, new Vector2f(1, 0));
+		result.addVertex(new Vector2f(0.5f, -0.5f), c, new Vector2f(1, 1));
+
+		result.addIndices(0, 1, 3, 1, 2, 3);
+
+		return result;
+	}
+
 	public static RenderData createSquare(Color c, Shader<?> shader, Texture texture) {
 		RenderData result = new RenderData(shader, texture);
 		result.addVertex(new Vector2f(-0.5f, -0.5f), c, new Vector2f(0, 1));
@@ -40,6 +54,20 @@ public final class RenderDataUtils {
 		
 		result.addIndices(0, 1, 3, 1, 2, 3);
 		
+		return result;
+	}
+
+	public static RenderData createSquare(Shader<?> shader, Texture texture, Texture altTexture, float lerpFactor) {
+		RenderData result = new RenderData(shader, texture);
+		result.setAltTexture(altTexture);
+		result.setLerpFactor(lerpFactor);
+		result.addVertex(new Vector2f(-0.5f, -0.5f), new Vector2f(0, 1));
+		result.addVertex(new Vector2f(-0.5f, 0.5f), new Vector2f(0, 0));
+		result.addVertex(new Vector2f(0.5f, 0.5f), new Vector2f(1, 0));
+		result.addVertex(new Vector2f(0.5f, -0.5f), new Vector2f(1, 1));
+
+		result.addIndices(0, 1, 3, 1, 2, 3);
+
 		return result;
 	}
 	
@@ -97,7 +125,7 @@ public final class RenderDataUtils {
 				vertices.add(new Vertex(new Vector2f(q.x1(), -q.y0()), color, new Vector2f(q.s1(), q.t0())));
 				vertices.add(new Vertex(new Vector2f(q.x1(), -q.y1()), color, new Vector2f(q.s1(), q.t1())));
 				vertices.add(new Vertex(new Vector2f(q.x0(), -q.y1()), color, new Vector2f(q.s0(), q.t1())));
-				
+
 				indices.add(0 + (i * 4));
 				indices.add(1 + (i * 4));
 				indices.add(3 + (i * 4));

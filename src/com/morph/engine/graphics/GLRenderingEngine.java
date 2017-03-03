@@ -32,6 +32,9 @@ public class GLRenderingEngine extends GameSystem {
 	}
 
 	public void render(RenderData data, Transform transform) {
+		if (data == null || transform == null)
+			return;
+
 		data.getShader().bind();
 		data.getShader().getUniforms().setUniforms(transform, data);
 
@@ -90,6 +93,7 @@ public class GLRenderingEngine extends GameSystem {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		gameRenderables.forEach(this::render);
+		guiRenderables.sort((e1, e2) -> e2.getDepth() - e1.getDepth());
 		guiRenderables.forEach(this::render);
 
 		display.update();

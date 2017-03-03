@@ -140,6 +140,11 @@ public class Texture {
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, resource.getID());
 	}
+
+	public void bind(int i) {
+		glActiveTexture(GL_TEXTURE0 + i);
+		glBindTexture(GL_TEXTURE_2D, resource.getID());
+	}
 	
 	public void unbind() {
 		glBindTexture(GL_TEXTURE_2D, 0);
