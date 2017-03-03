@@ -9,6 +9,8 @@ import com.morph.engine.graphics.GLDisplay;
 import com.morph.engine.graphics.GLRenderingEngine;
 import com.morph.engine.input.Keyboard;
 import com.morph.engine.input.Mouse;
+import com.morph.engine.math.Matrix4f;
+import com.morph.engine.math.MatrixUtils;
 import com.morph.engine.newgui.Container;
 import com.morph.engine.newgui.Element;
 import com.morph.engine.physics.PhysicsEngine;
@@ -36,7 +38,7 @@ public abstract class Game implements Runnable {
 		this.title = title;
 		this.dt = 1.0f / fps;
 		physicsEngine = new PhysicsEngine();
-		systems = new ArrayList<GameSystem>();
+		systems = new ArrayList<>();
 		guiElements = new ArrayList<>();
 		this.fullscreen = fullscreen;
 		EventDispatcher.INSTANCE.addEventHandler(this);
@@ -181,5 +183,9 @@ public abstract class Game implements Runnable {
 
 	public List<Entity> getEntities() {
 		return world.getEntities();
+	}
+
+	public Matrix4f getScreenOrtho() {
+		return MatrixUtils.getOrthographicProjectionMatrix(height, 0, 0, width, -1, 1);
 	}
 }
