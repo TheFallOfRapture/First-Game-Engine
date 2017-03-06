@@ -137,6 +137,7 @@ public final class RenderDataUtils {
 		
 		Texture textureAtlas = new Texture(font, size, bitmapWidth, bitmapHeight);
 		RenderData result = new RenderData(shader, textureAtlas, vertices, indices);
+		result.setTint(color);
 		return result;
 	}
 	
