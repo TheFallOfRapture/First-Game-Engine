@@ -1,6 +1,7 @@
 package com.morph.engine.newgui;
 
 import com.morph.engine.graphics.Color;
+import com.morph.engine.graphics.shaders.GUIShader;
 import com.morph.engine.math.Vector2f;
 import com.morph.engine.physics.components.Transform2D;
 import com.morph.engine.util.RenderDataUtils;
@@ -16,7 +17,7 @@ public class TextElement extends Element {
 
 	public TextElement(String text, String font, int size, Color color, Vector2f position, int depth) {
 		super(new Transform2D(position.add(new Vector2f(0, 0)), 0, new Vector2f(1, 1)),
-				RenderDataUtils.createText(text, font, size, color, new BasicTexturedShader()),
+				RenderDataUtils.createText(text, font, size, color, new GUIShader()),
 				depth);
 		this.text = text;
 		this.font = font;
