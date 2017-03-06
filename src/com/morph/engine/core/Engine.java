@@ -16,7 +16,7 @@ public class Engine extends OpenGame {
 	private Button testBtn1;
 	private Button testBtn2;
 
-	private GUI testGUI;
+	private EngineGUI testGUI;
 
 	private float time;
 
@@ -68,5 +68,9 @@ public class Engine extends OpenGame {
 //			testBtn1.getRenderData().setLerpFactor(alpha);
 //			testBtn2.getRenderData().setLerpFactor(alpha);
 //		}
+
+		if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_X)) {
+			testGUI.changeTestText("Hello!");
+		}
 	}
 }

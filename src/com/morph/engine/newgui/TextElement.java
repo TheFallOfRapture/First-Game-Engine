@@ -11,6 +11,7 @@ import com.morph.engine.graphics.shaders.BasicTexturedShader;
 public class TextElement extends Element {
 	private String text;
 	private String font;
+	private Color color;
 	protected int size;
 
 	private Vector2f bottomLeft;
@@ -22,6 +23,7 @@ public class TextElement extends Element {
 				depth);
 		this.text = text;
 		this.font = font;
+		this.color = color;
 		this.size = size;
 
 		this.bottomLeft = getRenderData().getVertices().get(0).getPosition().getXY();
