@@ -37,6 +37,8 @@ public abstract class Game implements Runnable {
 	protected List<Element> guiElements;
 	private List<GUI> guis;
 
+	public static Matrix4f screenOrtho;
+
 	public Game(int width, int height, String title, float fps, boolean fullscreen) {
 		this.width = width;
 		this.height = height;
@@ -48,6 +50,8 @@ public abstract class Game implements Runnable {
 		guis = new ArrayList<>();
 		this.fullscreen = fullscreen;
 		EventDispatcher.INSTANCE.addEventHandler(this);
+
+		Game.screenOrtho = getScreenOrtho();
 	}
 
 	public void start() {

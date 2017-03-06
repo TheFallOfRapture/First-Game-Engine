@@ -1,6 +1,7 @@
 package com.morph.engine.newgui;
 
 import com.morph.engine.graphics.Texture;
+import com.morph.engine.graphics.shaders.GUITransitionShader;
 import com.morph.engine.graphics.shaders.TransitionShader;
 import com.morph.engine.math.Vector2f;
 import com.morph.engine.util.RenderDataUtils;
@@ -15,7 +16,7 @@ public class Button extends Container {
 
     public Button(String text, String font, int size, Color color, Color buttonColor, Texture texture, Texture altTexture, Transform2D transform, int depth) {
         super(transform,
-				RenderDataUtils.createSquare(buttonColor, new TransitionShader(), texture, altTexture, 0),
+				RenderDataUtils.createSquare(buttonColor, new GUITransitionShader(), texture, altTexture, 0),
 				depth);
 		this.text = text;
 		this.font = font;
