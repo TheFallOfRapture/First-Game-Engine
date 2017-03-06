@@ -13,10 +13,6 @@ public class Button extends Container {
 	private String font;
 	protected int size;
 
-	private Texture hoverTexture;
-	private Texture clickTexture;
-	private Runnable onClick;
-
     public Button(String text, String font, int size, Color color, Color buttonColor, Texture texture, Texture altTexture, Transform2D transform, int depth) {
         super(transform,
 				RenderDataUtils.createSquare(buttonColor, new TransitionShader(), texture, altTexture, 0),
@@ -24,9 +20,6 @@ public class Button extends Container {
 		this.text = text;
 		this.font = font;
 		this.size = size;
-
-		this.hoverTexture = texture;
-		this.clickTexture = texture;
 
 		TextElement textObj = new TextElement(text, font, size, color,
 				transform.getPosition().sub(transform.getScale().mul(new Vector2f(0.5f, 0.5f))), depth - 1);
@@ -38,10 +31,6 @@ public class Button extends Container {
 
 		this.addElement(textObj);
     }
-
-	public void setOnClick(Runnable onClick) {
-		this.onClick = onClick;
-	}
 
 	public String getText() {
 		return text;

@@ -33,7 +33,7 @@ import com.morph.engine.math.Vector2f;
 public final class RenderDataUtils {
 	public static RenderData createSquare(Color c, Shader<?> shader, Texture texture, Texture altTexture, float lerpFactor) {
 		RenderData result = new RenderData(shader, texture);
-		result.setAltTexture(altTexture);
+		result.setTexture(altTexture, 1);
 		result.setLerpFactor(lerpFactor);
 		result.addVertex(new Vector2f(-0.5f, -0.5f), c, new Vector2f(0, 1));
 		result.addVertex(new Vector2f(-0.5f, 0.5f), c, new Vector2f(0, 0));
@@ -59,7 +59,7 @@ public final class RenderDataUtils {
 
 	public static RenderData createSquare(Shader<?> shader, Texture texture, Texture altTexture, float lerpFactor) {
 		RenderData result = new RenderData(shader, texture);
-		result.setAltTexture(altTexture);
+		result.setTexture(altTexture, 1);
 		result.setLerpFactor(lerpFactor);
 		result.addVertex(new Vector2f(-0.5f, -0.5f), new Vector2f(0, 1));
 		result.addVertex(new Vector2f(-0.5f, 0.5f), new Vector2f(0, 0));

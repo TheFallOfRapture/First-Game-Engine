@@ -33,10 +33,9 @@ import com.morph.engine.math.Vector3f;
 public class RenderData extends Component {
 	protected List<Vertex> vertices;
 	protected List<Integer> indices;
+	protected List<Texture> textures;
 	
 	protected Shader<?> shader;
-	protected Texture texture;
-	protected Texture altTexture;
 	protected Color tint = new Color(1, 1, 1);
 
 	protected float lerpFactor;
@@ -44,10 +43,13 @@ public class RenderData extends Component {
 	protected int vao;
 	
 	public RenderData(Shader<?> shader, Texture texture) {
-		this.vertices = new ArrayList<Vertex>();
-		this.indices = new ArrayList<Integer>();
+		this.vertices = new ArrayList<>();
+		this.indices = new ArrayList<>();
+		this.textures = new ArrayList<>();
+
 		this.shader = shader;
-		this.texture = texture;
+
+		this.textures.add(texture);
 		
 		shader.init();
 	}
@@ -55,17 +57,21 @@ public class RenderData extends Component {
 	public RenderData(Shader<?> shader, Texture texture, List<Vertex> vertices, List<Integer> indices) {
 		this.vertices = vertices;
 		this.indices = indices;
+		this.textures = new ArrayList<>();
+
 		this.shader = shader;
-		this.texture = texture;
-		
+		this.textures.add(texture);
+
 		shader.init();
 	}
 
-	public RenderData(List<Vertex> vertices, List<Integer> indices, Shader<?> shader, Texture texture, int vao) {
+	public RenderData(List<Vertex> vertices, List<Integer> indices, Shader<?> shader, List<Texture> textures, int vao) {
 		this.vertices = vertices;
 		this.indices = indices;
+		this.textures = textures;
+
 		this.shader = shader;
-		this.texture = texture;
+
 		this.vao = vao;
 	}
 
@@ -246,20 +252,18 @@ public class RenderData extends Component {
 		return shader;
 	}
 	
-	public Texture getTexture() {
-		return texture;
+	public Texture getTexture(int index) {
+		return textures.get(index);
 	}
 	
-	public void setTexture(Texture texture) {
-		this.texture = texture;
-	}
+	public void setTexture(Texture texture, int index) {
+		if (textures.size() < index + 1) {
+			for (int i = 0; i < index; i++) {
+				textures.add(null);
+			}
+		}
 
-	public Texture getAltTexture() {
-		return altTexture;
-	}
-
-	public void setAltTexture(Texture altTexture) {
-		this.altTexture = altTexture;
+		textures.set(index, texture);
 	}
 
 	public float getLerpFactor() {
@@ -275,12 +279,12 @@ public class RenderData extends Component {
 	}
 
 	public void resetAllColors(Color c) {
-		vertices.stream().map(vert -> vert.getColor()).forEach(color -> color.setRGB(c));
+		vertices.stream().map(Vertex::getColor).forEach(color -> color.setRGB(c));
 		init();
 	}
 
 	@Override
 	public Component clone() {
-		return new RenderData(vertices, indices, shader, texture, vao);
+		return new RenderData(vertices, indices, shader, textures, vao);
 	}
 }

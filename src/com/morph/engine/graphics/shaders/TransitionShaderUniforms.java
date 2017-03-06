@@ -27,8 +27,8 @@ public class TransitionShaderUniforms extends Uniforms {
     @Override
     public void setUniforms(Transform t, RenderData data) {
         this.mvp = t.getTransformationMatrix();
-        this.diff1 = data.getTexture();
-        this.diff2 = data.getAltTexture();
+        this.diff1 = data.getTexture(0);
+        this.diff2 = data.getTexture(1);
         this.lerpFactor = data.getLerpFactor();
 
         setUniformMatrix4fv("mvp", mvp.mul(GLRenderingEngine.projectionMatrix).getTranspose());
