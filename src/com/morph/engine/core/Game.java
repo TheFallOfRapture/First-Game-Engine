@@ -9,9 +9,15 @@ import com.morph.engine.graphics.GLDisplay;
 import com.morph.engine.graphics.GLRenderingEngine;
 import com.morph.engine.input.Keyboard;
 import com.morph.engine.input.Mouse;
+import com.morph.engine.math.Matrix4f;
+import com.morph.engine.math.MatrixUtils;
+import com.morph.engine.math.Vector2f;
 import com.morph.engine.newgui.Container;
 import com.morph.engine.newgui.Element;
+import com.morph.engine.newgui.GUI;
 import com.morph.engine.physics.PhysicsEngine;
+import com.morph.engine.util.StateMachine;
+import org.lwjgl.glfw.GLFW;
 
 public abstract class Game implements Runnable {
 	protected int width, height;
@@ -29,6 +35,7 @@ public abstract class Game implements Runnable {
 	protected float dt;
 
 	protected List<Element> guiElements;
+	private List<GUI> guis;
 
 	public Game(int width, int height, String title, float fps, boolean fullscreen) {
 		this.width = width;
@@ -36,8 +43,9 @@ public abstract class Game implements Runnable {
 		this.title = title;
 		this.dt = 1.0f / fps;
 		physicsEngine = new PhysicsEngine();
-		systems = new ArrayList<GameSystem>();
+		systems = new ArrayList<>();
 		guiElements = new ArrayList<>();
+		guis = new ArrayList<>();
 		this.fullscreen = fullscreen;
 		EventDispatcher.INSTANCE.addEventHandler(this);
 	}
@@ -119,6 +127,41 @@ public abstract class Game implements Runnable {
 		for (GameSystem gs : systems) {
 			gs.update();
 		}
+
+		Vector2f mousePos = Mouse.getScreenMousePosition();
+
+		if (Mouse.isMouseButtonPressed(0))
+			System.out.println("pressed");
+
+		for (GUI gui : guis) {
+			for (Element e : gui.getElements()) {
+				switch (e.getState()) {
+					case "IDLE":
+						if (mousePos != null && e.contains(mousePos)) {
+							if (Mouse.isMouseButtonPressed(0)) {
+								e.setState("CLICK");
+							} else {
+								e.setState("HOVER");
+							}
+						}
+						break;
+					case "HOVER":
+						if (mousePos != null && e.contains(mousePos)) {
+							if (Mouse.isMouseButtonPressed(0)) {
+								e.setState("CLICK");
+							}
+						} else {
+							e.setState("IDLE");
+						}
+						break;
+					case "CLICK":
+						if (!Mouse.isMouseButtonDown(0)) {
+							e.setState("IDLE");
+						}
+						break;
+				}
+			}
+		}
 	}
 
 	public void addSystem(GameSystem gs) {
@@ -155,6 +198,28 @@ public abstract class Game implements Runnable {
 		}
 	}
 
+	public void removeElement(Element e) {
+		guiElements.remove(e);
+		renderingEngine.unregister(e);
+		if (e instanceof Container) {
+			((Container)e).getChildren(true).forEach(this::removeElement);
+		}
+	}
+
+	public void addElements(List<Element> e) {
+		e.forEach(this::addElement);
+	}
+
+	public void addGUI(GUI gui) {
+		guis.add(gui);
+		gui.load();
+	}
+
+	public void removeGUI(GUI gui) {
+		guis.remove(gui);
+		gui.unload();
+	}
+
 	public void fixedUpdate(float dt) {
 		fixedGameUpdate(dt);
 
@@ -181,5 +246,9 @@ public abstract class Game implements Runnable {
 
 	public List<Entity> getEntities() {
 		return world.getEntities();
+	}
+
+	public Matrix4f getScreenOrtho() {
+		return MatrixUtils.getOrthographicProjectionMatrix(height, 0, 0, width, -1, 1);
 	}
 }

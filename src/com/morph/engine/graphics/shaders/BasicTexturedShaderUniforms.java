@@ -19,7 +19,7 @@ public class BasicTexturedShaderUniforms extends Uniforms {
 
 	public void setUniforms(Transform t, RenderData data) {
 		mvp = t.getTransformationMatrix();
-		diffuse = data.getTexture();
+		diffuse = data.getTexture(0);
 
 		setUniformMatrix4fv("mvp", mvp.mul(GLRenderingEngine.projectionMatrix).getTranspose());
 		setUniform1i("diffuse", 0);

@@ -39,7 +39,7 @@ public class TextureAnimation extends Component {
         }
 
         if (accumulator >= delay) {
-            renderDataRef.setTexture(frames[counter]);
+            renderDataRef.setTexture(frames[counter], 0);
 
             accumulator = 0;
             counter++;

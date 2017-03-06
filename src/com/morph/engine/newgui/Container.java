@@ -40,8 +40,6 @@ public class Container extends Element {
                 }
             });
 
-            result.forEach(System.out::println);
-
             return result;
         }
 

@@ -33,14 +33,14 @@ public class Mouse {
 	}
 	
 	public static void setMousePosition(long window, Vector2f v) {
-		screenMousePosition = v;
-		
 		IntBuffer widthBuffer = BufferUtils.createIntBuffer(1);
 		IntBuffer heightBuffer = BufferUtils.createIntBuffer(1);
 		glfwGetWindowSize(window, widthBuffer, heightBuffer);
-		
+
 		int width = widthBuffer.get();
 		int height = heightBuffer.get();
+
+		screenMousePosition = new Vector2f(v.getX(), height - v.getY());
 
 		if (screenToWorld == null) {
 			screenToWorld = GLRenderingEngine.getProjectionMatrix().getInverse();
