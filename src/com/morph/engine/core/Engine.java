@@ -16,7 +16,7 @@ public class Engine extends OpenGame {
 	private Button testBtn1;
 	private Button testBtn2;
 
-	private GUI testGUI;
+	private EngineGUI testGUI;
 
 	private float time;
 
