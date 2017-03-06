@@ -222,6 +222,7 @@ public abstract class Game implements Runnable {
 	public void removeGUI(GUI gui) {
 		guis.remove(gui);
 		gui.unload();
+		gui.getElements().forEach(this::removeElement);
 	}
 
 	public void fixedUpdate(float dt) {
