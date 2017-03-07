@@ -88,6 +88,10 @@ public abstract class Element {
         return depth;
     }
 
+    public void setDepth(int depth) {
+        this.depth = depth;
+    }
+
     public boolean contains(Vector2f point) {
         Vector2f p0 = transform.getPosition().sub(transform.getScale().scale(0.5f));
         Vector2f p1 = p0.add(transform.getScale());
