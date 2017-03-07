@@ -87,4 +87,36 @@ public class TextElement extends Element {
 
 		return textObj;
 	}
+
+	public static TextElement centerXWithin(String text, String font, int size, Color color, Element e) {
+		TextElement textObj = new TextElement(text,
+				font,
+				size,
+				color,
+				e.getTransform().getPosition().sub(e.getTransform().getScale().mul(new Vector2f(0.5f, 0.5f))),
+				e.getDepth() - 1);
+
+		Vector2f textSize = textObj.getTopRight().sub(textObj.getBottomLeft()).abs();
+
+		Vector2f shift = e.getTransform().getScale().sub(textSize).mul(new Vector2f(0.5f, 0));
+		textObj.getTransform().translate(shift);
+
+		return textObj;
+	}
+
+	public static TextElement centerYWithin(String text, String font, int size, Color color, Element e) {
+		TextElement textObj = new TextElement(text,
+				font,
+				size,
+				color,
+				e.getTransform().getPosition().sub(e.getTransform().getScale().mul(new Vector2f(0.5f, 0.5f))),
+				e.getDepth() - 1);
+
+		Vector2f textSize = textObj.getTopRight().sub(textObj.getBottomLeft()).abs();
+
+		Vector2f shift = e.getTransform().getScale().sub(textSize).mul(new Vector2f(0, 0.5f));
+		textObj.getTransform().translate(shift);
+
+		return textObj;
+	}
 }
