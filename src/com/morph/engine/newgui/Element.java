@@ -104,10 +104,12 @@ public abstract class Element {
 
     public void setOnHover(Runnable onHover) {
         this.onHover = onHover;
+        state.addTransition("*", "HOVER", onHover);
     }
 
     public void setOnClick(Runnable onClick) {
         this.onClick = onClick;
+        state.addTransition("*", "CLICK", onClick);
     }
 
     public void setState(String stateName) {
