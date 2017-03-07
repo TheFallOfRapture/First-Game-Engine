@@ -36,6 +36,10 @@ public abstract class GUI {
         game.removeElement(e);
     }
 
+    public Game getGame() {
+        return game;
+    }
+
     public List<Element> getElements() {
         return elements;
     }
