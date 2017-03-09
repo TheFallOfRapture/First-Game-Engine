@@ -1,5 +1,6 @@
 package com.morph.engine.graphics.shaders;
 
+import com.morph.engine.core.Game;
 import com.morph.engine.graphics.GLRenderingEngine;
 import com.morph.engine.graphics.Texture;
 import com.morph.engine.graphics.Uniforms;
@@ -26,7 +27,7 @@ public class GUITintShaderUniforms extends Uniforms {
         mvp = t.getTransformationMatrix();
         diffuse = data.getTexture(0);
 
-        setUniformMatrix4fv("mvp", mvp.mul(GLRenderingEngine.projectionMatrix).getTranspose());
+        setUniformMatrix4fv("mvp", mvp.mul(Game.screenOrtho).getTranspose());
         setUniform1i("diffuse", 0);
         setUniform4f("diffuseColor", data.getTint());
 
