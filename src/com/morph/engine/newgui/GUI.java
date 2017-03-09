@@ -36,6 +36,8 @@ public abstract class GUI {
         game.removeElement(e);
     }
 
+    public void fixedUpdate(float dt) {}
+
     public Game getGame() {
         return game;
     }
