@@ -31,6 +31,27 @@ import com.morph.engine.graphics.components.RenderData;
 import com.morph.engine.math.Vector2f;
 
 public final class RenderDataUtils {
+	public static RenderData createTintedSquare(Shader<?> shader, Texture texture) {
+		RenderData data = RenderDataUtils.createSquare(shader, texture);
+		data.setTint(new Color(1, 1, 1));
+
+		return data;
+	}
+
+	public static RenderData createTintedSquare(Color c, Shader<?> shader, Texture texture) {
+		RenderData data = RenderDataUtils.createSquare(new Color(1, 1, 1), shader, texture);
+		data.setTint(c);
+
+		return data;
+	}
+
+	public static RenderData createTintedSquare(Color c, Shader<?> shader, Texture texture, Texture altTexture, float lerpFactor) {
+		RenderData data = RenderDataUtils.createSquare(new Color(1, 1, 1), shader, texture, altTexture, lerpFactor);
+		data.setTint(c);
+
+		return data;
+	}
+
 	public static RenderData createSquare(Color c, Shader<?> shader, Texture texture, Texture altTexture, float lerpFactor) {
 		RenderData result = new RenderData(shader, texture);
 		result.setTexture(altTexture, 1);
