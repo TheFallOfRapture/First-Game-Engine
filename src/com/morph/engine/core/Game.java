@@ -231,6 +231,8 @@ public abstract class Game implements Runnable {
 		for (GameSystem gs : systems) {
 			gs.fixedUpdate(dt);
 		}
+
+		guis.forEach(gui -> gui.fixedUpdate(dt));
 	}
 
 	public abstract void initGame();
