@@ -40,4 +40,9 @@ public class Timer {
     public void stop() {
         running = false;
     }
+
+    public void restart() {
+        running = true;
+        accumulator = 0;
+    }
 }
