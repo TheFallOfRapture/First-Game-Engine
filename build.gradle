@@ -30,6 +30,11 @@ task wrapper(type : Wrapper) {
 	gradleVersion = "3.1"
 }
 
+task sourcesJar(type : Jar, dependsOn : classes) {
+	classifier = "sources"
+	from sourceSets.main.java.srcDirs, sourceSets.main.kotlin.srcDirs
+}
+
 repositories {
 	mavenCentral()
 	maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
