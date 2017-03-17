@@ -19,7 +19,7 @@ switch ( OperatingSystem.current() ) {
 }
 
 task execute(type : JavaExec) {
-	main = mainClassName;
+	main = mainClassName
 	classpath = sourceSets.main.runtimeClasspath
 }
 
@@ -62,17 +62,6 @@ dependencies {
 	runtime "org.lwjgl:lwjgl-stb:${lwjglVersion}:${lwjglNatives}"
 	runtime "org.lwjgl:lwjgl-xxhash:${lwjglVersion}:${lwjglNatives}"
 	// LWJGL dependencies END
-}
-
-sourceSets {
-	main {
-		java {
-			srcDirs = ['src']
-		}
-		resources {
-			srcDirs = ['res']
-		}
-	}
 }
 
 jar {
