@@ -16,4 +16,4 @@ include 'api'
 include 'services:webservice'
 */
 
-rootProject.name = 'Game Engine Project - Based on APCS 2014-2015 Final Project'
+rootProject.name = 'Morph'
