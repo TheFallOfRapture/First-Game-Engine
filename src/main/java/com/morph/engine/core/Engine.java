@@ -10,6 +10,7 @@ import com.morph.engine.math.MatrixUtils;
 import com.morph.engine.math.Vector2f;
 
 import com.morph.engine.physics.components.Transform2D;
+import com.morph.engine.util.KotlinTestKt;
 import org.lwjgl.glfw.GLFW;
 
 public class Engine extends OpenGame {
@@ -32,6 +33,8 @@ public class Engine extends OpenGame {
 		testGUI = new EngineGUI(this, width, height);
 
 		addGUI(testGUI);
+
+		KotlinTestKt.printMsg("Hello, world! Kotlin 1.1.1 is working in Morph 0.5.0!");
 	}
 
 	@Override

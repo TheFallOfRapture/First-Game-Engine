@@ -73,3 +73,6 @@ tags
 # IntelliJ Project Files
 .idea/
 .javac-classpath
+.iml
+.ipr
+.iws
