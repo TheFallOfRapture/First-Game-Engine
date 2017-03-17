@@ -1,5 +1,8 @@
-apply plugin: 'java'
-apply plugin: 'application'
+plugins {
+	id 'java'
+	id 'application'
+	id "org.jetbrains.kotlin.jvm" version "1.1.1"
+}
 
 import org.gradle.internal.os.OperatingSystem
 
@@ -62,6 +65,7 @@ dependencies {
 	runtime "org.lwjgl:lwjgl-stb:${lwjglVersion}:${lwjglNatives}"
 	runtime "org.lwjgl:lwjgl-xxhash:${lwjglVersion}:${lwjglNatives}"
 	// LWJGL dependencies END
+	compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:1.1.1"
 }
 
 jar {
