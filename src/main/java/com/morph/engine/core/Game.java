@@ -1,5 +1,6 @@
 package com.morph.engine.core;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,8 +17,12 @@ import com.morph.engine.newgui.Container;
 import com.morph.engine.newgui.Element;
 import com.morph.engine.newgui.GUI;
 import com.morph.engine.physics.PhysicsEngine;
-import com.morph.engine.util.StateMachine;
-import org.lwjgl.glfw.GLFW;
+import com.morph.engine.script.GameBehavior;
+import com.morph.engine.util.IOUtils;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 public abstract class Game implements Runnable {
 	protected int width, height;
@@ -29,6 +34,8 @@ public abstract class Game implements Runnable {
 	protected World world;
 	protected List<GameSystem> systems;
 
+	protected List<GameBehavior> behaviors;
+
 	protected GLDisplay display;
 	protected GLRenderingEngine renderingEngine;
 
@@ -36,6 +43,8 @@ public abstract class Game implements Runnable {
 
 	protected List<Element> guiElements;
 	private List<GUI> guis;
+
+	private ScriptEngine kotlinEngine;
 
 	public static Matrix4f screenOrtho;
 
@@ -48,10 +57,13 @@ public abstract class Game implements Runnable {
 		systems = new ArrayList<>();
 		guiElements = new ArrayList<>();
 		guis = new ArrayList<>();
+		behaviors = new ArrayList<>();
 		this.fullscreen = fullscreen;
 		EventDispatcher.INSTANCE.addEventHandler(this);
 
 		Game.screenOrtho = getScreenOrtho();
+
+		kotlinEngine = new ScriptEngineManager().getEngineByExtension("kts");
 	}
 
 	public void start() {
@@ -97,6 +109,8 @@ public abstract class Game implements Runnable {
 		for (GameSystem gs : systems) {
 			gs.preUpdate();
 		}
+
+		behaviors.forEach(GameBehavior::preUpdate);
 	}
 
 	private void postUpdate() {
@@ -105,6 +119,8 @@ public abstract class Game implements Runnable {
 		for (GameSystem gs : systems) {
 			gs.postUpdate();
 		}
+
+		behaviors.forEach(GameBehavior::postUpdate);
 	}
 
 	protected void destroy() {
@@ -136,6 +152,8 @@ public abstract class Game implements Runnable {
 
 		if (Mouse.isMouseButtonPressed(0))
 			System.out.println("pressed");
+
+		behaviors.forEach(GameBehavior::update);
 
 		for (GUI gui : guis) {
 			for (Element e : gui.getElements()) {
@@ -233,6 +251,30 @@ public abstract class Game implements Runnable {
 		}
 
 		guis.forEach(gui -> gui.fixedUpdate(dt));
+
+		behaviors.forEach(b -> b.fixedUpdate(dt));
+	}
+
+	public void attachBehavior(String behaviorName) {
+		String scriptSource = "";
+
+		try {
+			scriptSource = IOUtils.getFileAsString("scripts/" + behaviorName + ".kts");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		GameBehavior behavior = null;
+
+		try {
+			behavior = (GameBehavior) kotlinEngine.eval(scriptSource);
+			System.out.println(behavior.getClass().getSimpleName());
+		} catch (ScriptException e) {
+			e.printStackTrace();
+		}
+
+		behaviors.add(behavior);
+		behavior.init();
 	}
 
 	public abstract void initGame();

@@ -1,17 +1,11 @@
 package com.morph.engine.core;
 
 import com.morph.engine.core.gui.EngineGUI;
-import com.morph.engine.graphics.Color;
 import com.morph.engine.graphics.GLRenderingEngine;
-import com.morph.engine.graphics.Texture;
 import com.morph.engine.newgui.*;
-import com.morph.engine.input.Keyboard;
 import com.morph.engine.math.MatrixUtils;
-import com.morph.engine.math.Vector2f;
 
-import com.morph.engine.physics.components.Transform2D;
 import com.morph.engine.util.KotlinTestKt;
-import org.lwjgl.glfw.GLFW;
 
 public class Engine extends OpenGame {
 	private Button testBtn1;
@@ -35,6 +29,8 @@ public class Engine extends OpenGame {
 		addGUI(testGUI);
 
 		KotlinTestKt.printMsg("Hello, world! Kotlin 1.1.1 is working in Morph 0.5.0!");
+
+		attachBehavior("TestBehavior");
 	}
 
 	@Override

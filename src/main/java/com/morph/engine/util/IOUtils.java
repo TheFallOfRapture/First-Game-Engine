@@ -1,11 +1,14 @@
 package com.morph.engine.util;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -45,6 +48,20 @@ public class IOUtils {
 		
 		buffer.flip();
 		return buffer;
+	}
+
+	public static String getFileAsString(String filename) throws IOException {
+		StringBuilder fileSource = new StringBuilder();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(IOUtils.class.getClassLoader().getResourceAsStream(filename)));
+		String line;
+
+		while ((line = reader.readLine()) != null) {
+			fileSource.append(line).append("\n");
+		}
+
+		reader.close();
+
+		return fileSource.toString();
 	}
 	
 	/**

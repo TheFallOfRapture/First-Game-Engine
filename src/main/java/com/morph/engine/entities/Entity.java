@@ -3,6 +3,7 @@ package com.morph.engine.entities;
 import com.morph.engine.collision.components.BoundingBox2D;
 import com.morph.engine.events.Message;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,7 +30,9 @@ public class Entity implements Cloneable {
 		this.components = new ArrayList<>();
 	}
 
-	public Entity(Entity e) {
+	public Entity(Entity e, String name, int id) {
+		this.name = name;
+		this.id = id;
 		this.components = new ArrayList<>();
 		e.getAllComponents().forEach(c -> components.add(c.clone()));
 		components.forEach(c -> c.setParent(this));
@@ -120,5 +123,13 @@ public class Entity implements Cloneable {
 		}
 		
 		return result;
+	}
+
+	public int getID() {
+		return id;
+	}
+
+	public String getName() {
+		return name;
 	}
 }
