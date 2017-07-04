@@ -273,6 +273,8 @@ public abstract class Game implements Runnable {
 			e.printStackTrace();
 		}
 
+		behavior.setGame(this);
+
 		behaviors.add(behavior);
 		behavior.init();
 	}
