@@ -30,7 +30,7 @@ public class Engine extends OpenGame {
 
 		KotlinTestKt.printMsg("Hello, world! Kotlin 1.1.1 is working in Morph 0.5.0!");
 
-		attachBehavior("TestBehavior");
+		attachBehavior("scripts/TestBehavior.kts");
 	}
 
 	@Override

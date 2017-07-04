@@ -255,11 +255,11 @@ public abstract class Game implements Runnable {
 		behaviors.forEach(b -> b.fixedUpdate(dt));
 	}
 
-	public void attachBehavior(String behaviorName) {
+	public void attachBehavior(String filename) {
 		String scriptSource = "";
 
 		try {
-			scriptSource = IOUtils.getFileAsString("scripts/" + behaviorName + ".kts");
+			scriptSource = IOUtils.getFileAsString(filename);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
