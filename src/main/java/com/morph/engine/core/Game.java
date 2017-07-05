@@ -21,11 +21,7 @@ import com.morph.engine.newgui.GUI;
 import com.morph.engine.physics.PhysicsEngine;
 import com.morph.engine.script.GameBehavior;
 import com.morph.engine.script.ScriptSystem;
-import com.morph.engine.util.IOUtils;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import com.morph.engine.util.ScriptUtils;
 
 public abstract class Game implements Runnable {
 	protected int width, height;
@@ -48,7 +44,6 @@ public abstract class Game implements Runnable {
 	private List<GUI> guis;
 
 	private ScriptSystem scriptSystem;
-	private ScriptEngine kotlinEngine;
 
 	private WatchService watchService;
 
@@ -69,7 +64,7 @@ public abstract class Game implements Runnable {
 
 		Game.screenOrtho = getScreenOrtho();
 
-		kotlinEngine = new ScriptEngineManager().getEngineByExtension("kts");
+		ScriptUtils.init();
 	}
 
 	public void start() {
@@ -265,22 +260,7 @@ public abstract class Game implements Runnable {
 	}
 
 	public void attachBehavior(String filename) {
-		String scriptSource = "";
-
-		try {
-			scriptSource = IOUtils.getFileAsString(filename);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		GameBehavior behavior = null;
-
-		try {
-			behavior = (GameBehavior) kotlinEngine.eval(scriptSource);
-			System.out.println(behavior.getClass().getSimpleName());
-		} catch (ScriptException e) {
-			e.printStackTrace();
-		}
+		GameBehavior behavior = ScriptUtils.getScriptBehavior(filename);
 
 		behavior.setGame(this);
 
