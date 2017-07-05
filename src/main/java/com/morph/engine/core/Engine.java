@@ -38,6 +38,7 @@ public class Engine extends OpenGame {
 		addEntity(player);
 
 		attachBehavior("scripts/TestBehavior.kts");
+		attachBehavior("scripts/TestBehavior2.kts");
 	}
 
 	@Override
