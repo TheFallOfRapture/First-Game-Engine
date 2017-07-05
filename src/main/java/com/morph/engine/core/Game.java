@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.nio.file.WatchService;
+
 import com.morph.engine.entities.Entity;
 import com.morph.engine.events.EventDispatcher;
 import com.morph.engine.graphics.GLDisplay;
@@ -18,6 +20,7 @@ import com.morph.engine.newgui.Element;
 import com.morph.engine.newgui.GUI;
 import com.morph.engine.physics.PhysicsEngine;
 import com.morph.engine.script.GameBehavior;
+import com.morph.engine.script.ScriptSystem;
 import com.morph.engine.util.IOUtils;
 
 import javax.script.ScriptEngine;
@@ -44,7 +47,10 @@ public abstract class Game implements Runnable {
 	protected List<Element> guiElements;
 	private List<GUI> guis;
 
+	private ScriptSystem scriptSystem;
 	private ScriptEngine kotlinEngine;
+
+	private WatchService watchService;
 
 	public static Matrix4f screenOrtho;
 
@@ -130,7 +136,10 @@ public abstract class Game implements Runnable {
 	private void init() {
 		display = new GLDisplay(width, height, title);
 		renderingEngine = new GLRenderingEngine(this);
+		scriptSystem = new ScriptSystem(this);
+
 		addSystem(renderingEngine);
+		addSystem(scriptSystem);
 
 		display.init();
 		display.show();
@@ -277,6 +286,10 @@ public abstract class Game implements Runnable {
 
 		behaviors.add(behavior);
 		behavior.init();
+	}
+
+	public void reloadBehavior() {
+
 	}
 
 	public abstract void initGame();

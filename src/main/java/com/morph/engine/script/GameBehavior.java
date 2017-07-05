@@ -25,4 +25,5 @@ public abstract class GameBehavior {
     public void update() {}
     public void fixedUpdate(float dt) {}
     public void postUpdate() {}
+    public void destroy() {}
 }

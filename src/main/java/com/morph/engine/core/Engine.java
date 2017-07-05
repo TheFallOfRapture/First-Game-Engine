@@ -1,7 +1,11 @@
 package com.morph.engine.core;
 
 import com.morph.engine.core.gui.EngineGUI;
+import com.morph.engine.entities.Entity;
+import com.morph.engine.entities.EntityFactory;
+import com.morph.engine.graphics.Color;
 import com.morph.engine.graphics.GLRenderingEngine;
+import com.morph.engine.graphics.shaders.TintShader;
 import com.morph.engine.newgui.*;
 import com.morph.engine.math.MatrixUtils;
 
@@ -29,6 +33,9 @@ public class Engine extends OpenGame {
 		addGUI(testGUI);
 
 		KotlinTestKt.printMsg("Hello, world! Kotlin 1.1.1 is working in Morph 0.5.0!");
+
+		Entity player = EntityFactory.getCustomTintRectangle("player", 20, 20, new Color(0, 1, 0), new TintShader());
+		addEntity(player);
 
 		attachBehavior("scripts/TestBehavior.kts");
 	}
