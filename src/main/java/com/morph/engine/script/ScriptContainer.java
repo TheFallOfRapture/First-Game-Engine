@@ -14,6 +14,10 @@ import java.util.stream.Collectors;
 public class ScriptContainer extends Component {
     private HashMap<String, EntityBehavior> behaviors;
 
+    public ScriptContainer() {
+        behaviors = new HashMap<>();
+    }
+
     public void addBehavior(String filename) {
         EntityBehavior behavior = ScriptUtils.getScriptBehavior(filename);
         behaviors.put(filename, behavior);
