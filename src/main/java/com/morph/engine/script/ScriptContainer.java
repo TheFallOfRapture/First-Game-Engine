@@ -20,6 +20,7 @@ public class ScriptContainer extends Component {
 
     public void addBehavior(String filename) {
         EntityBehavior behavior = ScriptUtils.getScriptBehavior(filename);
+        behavior.setSelf(parent);
         behaviors.put(filename, behavior);
         behavior.init();
     }
