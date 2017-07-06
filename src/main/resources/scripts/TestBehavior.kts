@@ -15,6 +15,7 @@ class TestBehavior : GameBehavior() {
     }
 
     override fun update() {
+        println("Okay")
     }
 }
 

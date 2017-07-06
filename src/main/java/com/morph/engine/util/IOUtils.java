@@ -63,6 +63,10 @@ public class IOUtils {
 
 		return fileSource.toString();
 	}
+
+	public static String getFileAsStringAbsolute(String filename) throws IOException {
+		return Files.readAllLines(Paths.get(filename)).stream().reduce("", (a, b) -> a + "\n" + b);
+	}
 	
 	/**
 	 * From org.lwjgl.demo.util.IOUtil.resizeBuffer

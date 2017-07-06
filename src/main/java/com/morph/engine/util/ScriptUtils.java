@@ -26,13 +26,11 @@ public class ScriptUtils {
         bindings = new SimpleBindings();
         supportedScriptEngines.put("kts", new ScriptEngineManager().getEngineByExtension("kts"));
 
-        System.out.println(Paths.get(ScriptUtils.class.getClassLoader()
-                .getResource("scripts/Test.kts")
-                .getPath().replaceFirst("^/(.:/)", "$1")));
+        System.out.println(Paths.get(System.getProperty("user.dir") + "/src/main/resources/scripts/Test.kts").getFileName());
 
         try {
             watchService = FileSystems.getDefault().newWatchService();
-            WatchKey key = Paths.get(ScriptUtils.class.getClassLoader().getResource("scripts/").getPath().replaceFirst("^/(.:/)", "$1")).register(watchService, ENTRY_MODIFY);
+            WatchKey key = Paths.get(System.getProperty("user.dir") + "/src/main/resources/scripts/").register(watchService, ENTRY_MODIFY);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -50,7 +48,7 @@ public class ScriptUtils {
                 Path filename = event.context();
 
                 Path file = Paths.get("scripts/").resolve(filename);
-                String simpleName = file.toString().substring(8);
+                String simpleName = file.getFileName().toString();
 
                 System.out.println(simpleName);
                 GameBehavior newBehavior = getScriptBehavior(simpleName);
@@ -64,13 +62,13 @@ public class ScriptUtils {
 
     public static <T extends GameBehavior> T getScriptBehavior(String filename) {
         String scriptSource = "";
-        String fullFilename = "scripts/" + filename;
+        String fullFilename = System.getProperty("user.dir") + "/src/main/resources/scripts/" + filename;
 
         String extension = fullFilename.substring(fullFilename.indexOf(".") + 1);
         ScriptEngine engine = supportedScriptEngines.get(extension);
 
         try {
-            scriptSource = IOUtils.getFileAsString(fullFilename);
+            scriptSource = IOUtils.getFileAsStringAbsolute(fullFilename);
         } catch (IOException e) {
             e.printStackTrace();
         }
