@@ -1,7 +1,10 @@
 package com.morph.engine.util;
 
 import com.morph.engine.core.Game;
+import com.morph.engine.entities.Entity;
+import com.morph.engine.script.EntityBehavior;
 import com.morph.engine.script.GameBehavior;
+import com.morph.engine.script.ScriptContainer;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -9,7 +12,9 @@ import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static java.nio.file.StandardWatchEventKinds.*;
 
@@ -18,11 +23,13 @@ import static java.nio.file.StandardWatchEventKinds.*;
  */
 public class ScriptUtils {
     private static HashMap<String, ScriptEngine> supportedScriptEngines;
+    private static HashMap<String, List<Entity>> scriptedEntities;
     private static SimpleBindings bindings;
     private static WatchService watchService;
 
     public static void init(Game game) {
         supportedScriptEngines = new HashMap<>();
+        scriptedEntities = new HashMap<>();
         bindings = new SimpleBindings();
         supportedScriptEngines.put("kts", new ScriptEngineManager().getEngineByExtension("kts"));
 
@@ -53,10 +60,21 @@ public class ScriptUtils {
                 System.out.println(simpleName);
                 GameBehavior newBehavior = getScriptBehavior(simpleName);
 
-                game.replaceBehavior(simpleName, newBehavior);
+                if (newBehavior instanceof EntityBehavior) scriptedEntities.get(simpleName).forEach(entity -> entity.getComponent(ScriptContainer.class).replaceBehavior(simpleName, (EntityBehavior)newBehavior));
+                else game.replaceBehavior(simpleName, newBehavior);
             }
 
             key.reset();
+        }
+    }
+
+    public static void register(String scriptName, Entity e) {
+        if (scriptedEntities.get(scriptName) == null) {
+            List<Entity> eList = new ArrayList<>();
+            eList.add(e);
+            scriptedEntities.put(scriptName, eList);
+        } else {
+            scriptedEntities.get(scriptName).add(e);
         }
     }
 

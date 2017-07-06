@@ -1,8 +1,10 @@
 package com.morph.engine.script;
 
+import com.morph.engine.core.Game;
 import com.morph.engine.entities.Component;
 import com.morph.engine.util.ScriptUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,16 +15,29 @@ import java.util.stream.Collectors;
  */
 public class ScriptContainer extends Component {
     private HashMap<String, EntityBehavior> behaviors;
+    private Game game;
 
-    public ScriptContainer() {
+    public ScriptContainer(Game game) {
         behaviors = new HashMap<>();
+        this.game = game;
     }
 
     public void addBehavior(String filename) {
         EntityBehavior behavior = ScriptUtils.getScriptBehavior(filename);
+        behavior.setGame(game);
         behavior.setSelf(parent);
         behaviors.put(filename, behavior);
         behavior.init();
+        behavior.start();
+
+        ScriptUtils.register(filename, parent);
+    }
+
+    public void replaceBehavior(String filename, EntityBehavior newBehavior) {
+        newBehavior.setGame(game);
+        newBehavior.setSelf(parent);
+        behaviors.replace(filename, newBehavior);
+        newBehavior.start();
     }
 
     public void removeBehavior(String filename) {
@@ -32,7 +47,7 @@ public class ScriptContainer extends Component {
     }
 
     public List<EntityBehavior> getBehaviors() {
-        return behaviors.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList());
+        return new ArrayList<>(behaviors.values());
     }
 
     @Override

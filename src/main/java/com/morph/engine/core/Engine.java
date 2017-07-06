@@ -9,6 +9,7 @@ import com.morph.engine.graphics.shaders.TintShader;
 import com.morph.engine.newgui.*;
 import com.morph.engine.math.MatrixUtils;
 
+import com.morph.engine.script.ScriptContainer;
 import com.morph.engine.util.KotlinTestKt;
 
 public class Engine extends OpenGame {
@@ -35,6 +36,10 @@ public class Engine extends OpenGame {
 		KotlinTestKt.printMsg("Hello, world! Kotlin 1.1.1 is working in Morph 0.5.0!");
 
 		Entity player = EntityFactory.getCustomTintRectangle("player", 20, 20, new Color(0, 1, 0), new TintShader());
+		ScriptContainer sc = new ScriptContainer(this);
+		player.addComponent(sc);
+		sc.addBehavior("EScript.kts");
+
 		addEntity(player);
 
 		attachBehavior("TestBehavior.kts");
