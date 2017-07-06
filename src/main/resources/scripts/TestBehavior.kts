@@ -11,11 +11,11 @@ class TestBehavior : GameBehavior() {
         val player: Entity? = getEntityByName("player")
         println(player)
 
-        println("TestBehavior has been modified!")
+        println("TestBehavior has been modified! (Null modification)")
     }
 
-    override fun update() {
-        println("Okay")
+    override fun start() {
+        println("Hello again! This is really working!")
     }
 }
 

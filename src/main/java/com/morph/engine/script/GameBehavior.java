@@ -20,7 +20,8 @@ public abstract class GameBehavior {
         return game.getWorld().getEntityByName(name);
     }
 
-    public void init() {}
+    public void init() {} // Runs only once - on script initialization.
+    public void start() {} // Runs on script initialization, and every time the script is modified.
     public void preUpdate() {}
     public void update() {}
     public void fixedUpdate(float dt) {}

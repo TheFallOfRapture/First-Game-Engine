@@ -269,12 +269,14 @@ public abstract class Game implements Runnable {
 
 		behaviors.put(filename, behavior);
 		behavior.init();
+		behavior.start();
 	}
 
 	public void replaceBehavior(String filename, GameBehavior newBehavior) {
 		System.out.println("Behavior " + filename + " has been modified.");
 		newBehavior.setGame(this);
 		behaviors.replace(filename, newBehavior);
+		newBehavior.start();
 	}
 
 	public abstract void initGame();
