@@ -5,6 +5,8 @@ import com.morph.engine.entities.Entity;
 import com.morph.engine.script.EntityBehavior;
 import com.morph.engine.script.GameBehavior;
 import com.morph.engine.script.ScriptContainer;
+import org.jetbrains.kotlin.script.jsr223.KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory;
+import org.python.jsr223.PyScriptEngineFactory;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -31,9 +33,19 @@ public class ScriptUtils {
         supportedScriptEngines = new HashMap<>();
         scriptedEntities = new HashMap<>();
         bindings = new SimpleBindings();
-        supportedScriptEngines.put("kts", new ScriptEngineManager().getEngineByExtension("kts"));
+
+        KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory kotlinEngine = new KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory();
+        PyScriptEngineFactory pythonEngine = new PyScriptEngineFactory();
+
+        ScriptEngineManager manager = new ScriptEngineManager();
+        manager.registerEngineExtension("kts", kotlinEngine);
+        manager.registerEngineExtension("py", pythonEngine);
+
+        supportedScriptEngines.put("kts", kotlinEngine.getScriptEngine());
+        supportedScriptEngines.put("py", pythonEngine.getScriptEngine());
 
         System.out.println(Paths.get(System.getProperty("user.dir") + "/src/main/resources/scripts/Test.kts").getFileName());
+        System.out.println("Python support test: " + supportedScriptEngines.get("py").getFactory().getLanguageName());
 
         try {
             watchService = FileSystems.getDefault().newWatchService();
@@ -95,6 +107,10 @@ public class ScriptUtils {
 
         try {
             behavior = (T) engine.eval(scriptSource, bindings);
+            if (behavior == null) {
+                System.out.println("No result from eval, getting script variable");
+                behavior = (T) bindings.get("script");
+            }
             System.out.println(behavior.getClass().getSimpleName());
         } catch (ScriptException e) {
             e.printStackTrace();

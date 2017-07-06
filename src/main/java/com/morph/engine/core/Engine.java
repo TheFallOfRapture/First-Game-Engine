@@ -39,6 +39,7 @@ public class Engine extends OpenGame {
 		ScriptContainer sc = new ScriptContainer(this);
 		player.addComponent(sc);
 		sc.addBehavior("EScript.kts");
+		sc.addBehavior("TestPythonScript.py");
 
 		addEntity(player);
 
