@@ -37,8 +37,8 @@ public class Engine extends OpenGame {
 		Entity player = EntityFactory.getCustomTintRectangle("player", 20, 20, new Color(0, 1, 0), new TintShader());
 		addEntity(player);
 
-		attachBehavior("scripts/TestBehavior.kts");
-		attachBehavior("scripts/TestBehavior2.kts");
+		attachBehavior("TestBehavior.kts");
+		attachBehavior("TestBehavior2.kts");
 	}
 
 	@Override

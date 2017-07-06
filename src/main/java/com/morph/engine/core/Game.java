@@ -2,6 +2,7 @@ package com.morph.engine.core;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import java.nio.file.WatchService;
@@ -33,7 +34,7 @@ public abstract class Game implements Runnable {
 	protected World world;
 	protected List<GameSystem> systems;
 
-	protected List<GameBehavior> behaviors;
+	protected HashMap<String, GameBehavior> behaviors;
 
 	protected GLDisplay display;
 	protected GLRenderingEngine renderingEngine;
@@ -58,13 +59,13 @@ public abstract class Game implements Runnable {
 		systems = new ArrayList<>();
 		guiElements = new ArrayList<>();
 		guis = new ArrayList<>();
-		behaviors = new ArrayList<>();
+		behaviors = new HashMap<>();
 		this.fullscreen = fullscreen;
 		EventDispatcher.INSTANCE.addEventHandler(this);
 
 		Game.screenOrtho = getScreenOrtho();
 
-		ScriptUtils.init();
+		ScriptUtils.init(this);
 	}
 
 	public void start() {
@@ -111,7 +112,7 @@ public abstract class Game implements Runnable {
 			gs.preUpdate();
 		}
 
-		behaviors.forEach(GameBehavior::preUpdate);
+		behaviors.values().forEach(GameBehavior::preUpdate);
 	}
 
 	private void postUpdate() {
@@ -121,7 +122,7 @@ public abstract class Game implements Runnable {
 			gs.postUpdate();
 		}
 
-		behaviors.forEach(GameBehavior::postUpdate);
+		behaviors.values().forEach(GameBehavior::postUpdate);
 	}
 
 	protected void destroy() {
@@ -157,7 +158,7 @@ public abstract class Game implements Runnable {
 		if (Mouse.isMouseButtonPressed(0))
 			System.out.println("pressed");
 
-		behaviors.forEach(GameBehavior::update);
+		behaviors.values().forEach(GameBehavior::update);
 
 		for (GUI gui : guis) {
 			for (Element e : gui.getElements()) {
@@ -188,6 +189,8 @@ public abstract class Game implements Runnable {
 				}
 			}
 		}
+
+		ScriptUtils.pollEvents(this);
 	}
 
 	public void addSystem(GameSystem gs) {
@@ -256,7 +259,7 @@ public abstract class Game implements Runnable {
 
 		guis.forEach(gui -> gui.fixedUpdate(dt));
 
-		behaviors.forEach(b -> b.fixedUpdate(dt));
+		behaviors.values().forEach(b -> b.fixedUpdate(dt));
 	}
 
 	public void attachBehavior(String filename) {
@@ -264,12 +267,14 @@ public abstract class Game implements Runnable {
 
 		behavior.setGame(this);
 
-		behaviors.add(behavior);
+		behaviors.put(filename, behavior);
 		behavior.init();
 	}
 
-	public void reloadBehavior() {
-
+	public void replaceBehavior(String filename, GameBehavior newBehavior) {
+		System.out.println("Behavior " + filename + " has been modified.");
+		newBehavior.setGame(this);
+		behaviors.replace(filename, newBehavior);
 	}
 
 	public abstract void initGame();
