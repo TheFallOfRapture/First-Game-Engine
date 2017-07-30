@@ -1,12 +1,8 @@
 package com.morph.engine.graphics.components;
 
+import static org.lwjgl.opengl.GL11.GL_DOUBLE;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
-import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
-import static org.lwjgl.opengl.GL15.glBindBuffer;
-import static org.lwjgl.opengl.GL15.glBufferData;
-import static org.lwjgl.opengl.GL15.glGenBuffers;
+import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
@@ -18,6 +14,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
+import java.util.stream.Stream;
 
 import org.lwjgl.BufferUtils;
 
@@ -39,8 +38,11 @@ public class RenderData extends Component {
 	protected Color tint = new Color(1, 1, 1);
 
 	protected float lerpFactor;
-	
+
+	protected int vbo, cbo, tbo, ibo;
 	protected int vao;
+
+	private boolean initialized = false;
 	
 	public RenderData(Shader<?> shader, Texture texture) {
 		this.vertices = new ArrayList<>();
@@ -76,68 +78,71 @@ public class RenderData extends Component {
 	}
 
 	public void init() {
-		int vbo = glGenBuffers();
-		int cbo = glGenBuffers();
-		int tbo = glGenBuffers();
-		int ibo = glGenBuffers();
+		vbo = glGenBuffers();
+		cbo = glGenBuffers();
+		tbo = glGenBuffers();
+		ibo = glGenBuffers();
 		
 		vao = glGenVertexArrays();
-		
-		IntBuffer indexBuffer = BufferUtils.createIntBuffer(indices.size());
-		indices.forEach(indexBuffer::put);
-		indexBuffer.flip();
-		
-		FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(vertices.size() * 3);
-		FloatBuffer colorBuffer = BufferUtils.createFloatBuffer(vertices.size() * 4);
-		FloatBuffer texCoordBuffer = BufferUtils.createFloatBuffer(vertices.size() * 2);
-		for (Vertex v : vertices) {
-			Vector3f pos = v.getPosition();
-			Color c = v.getColor();
-			Vector2f tex = v.getTexCoord();
-			
-			vertexBuffer.put(pos.getX());
-			vertexBuffer.put(pos.getY());
-			vertexBuffer.put(pos.getZ());
-			
-			colorBuffer.put(c.getRed());
-			colorBuffer.put(c.getGreen());
-			colorBuffer.put(c.getBlue());
-			colorBuffer.put(c.getAlpha());
-			
-			texCoordBuffer.put(tex.getX());
-			texCoordBuffer.put(tex.getY());
-		}
-		
-		vertexBuffer.flip();
-		colorBuffer.flip();
-		texCoordBuffer.flip();
-		
+
+		double[] pointData = vertices
+				.stream()
+				.map(Vertex::getPosition)
+				.flatMapToDouble(
+						p -> DoubleStream.of(
+								(double)p.getX(),
+								(double)p.getY(),
+								(double)p.getZ()))
+				.toArray();
+
+		double[] colorData = vertices
+				.stream()
+				.map(Vertex::getColor)
+				.flatMapToDouble(
+						c -> DoubleStream.of(
+								(double)c.getRed(),
+								(double)c.getGreen(),
+								(double)c.getBlue(),
+								(double)c.getAlpha()))
+				.toArray();
+
+		double[] texCoordData = vertices
+				.stream()
+				.map(Vertex::getTexCoord)
+				.flatMapToDouble(
+						t -> DoubleStream.of(
+								(double)t.getX(),
+								(double)t.getY()))
+				.toArray();
+
+		int[] indexData = indices.stream().mapToInt(Integer::intValue).toArray();
+
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, vertexBuffer, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, pointData, GL_STATIC_DRAW);
 		
 		glBindBuffer(GL_ARRAY_BUFFER, cbo);
-		glBufferData(GL_ARRAY_BUFFER, colorBuffer, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, colorData, GL_STATIC_DRAW);
 		
 		glBindBuffer(GL_ARRAY_BUFFER, tbo);
-		glBufferData(GL_ARRAY_BUFFER, texCoordBuffer, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, texCoordData, GL_STATIC_DRAW);
 		
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexData, GL_STATIC_DRAW);
 		
 		glBindVertexArray(vao);
 			glBindBuffer(GL_ARRAY_BUFFER, vbo);
 			glEnableVertexAttribArray(0);
-			glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+			glVertexAttribPointer(0, 3, GL_DOUBLE, false, 0, 0);
 			
 			glBindBuffer(GL_ARRAY_BUFFER, cbo);
 			glEnableVertexAttribArray(1);
-			glVertexAttribPointer(1, 4, GL_FLOAT, false, 0, 0);
+			glVertexAttribPointer(1, 4, GL_DOUBLE, false, 0, 0);
 			
 			glBindBuffer(GL_ARRAY_BUFFER, tbo);
 			glEnableVertexAttribArray(2);
-			glVertexAttribPointer(2, 2, GL_FLOAT, false, 0, 0);
+			glVertexAttribPointer(2, 2, GL_DOUBLE, false, 0, 0);
 			
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 		glBindVertexArray(0);

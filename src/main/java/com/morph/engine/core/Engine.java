@@ -67,19 +67,5 @@ public class Engine extends OpenGame {
 
 	@Override
 	public void handleInput() {
-//		if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_T)) {
-//			addElement(new TextElement("LOLOLO", "C:/Windows/Fonts/Calibri.ttf", 43, new Vector2f(0, 0)));
-//		}
-
-//		if (Keyboard.isKeyDown(GLFW.GLFW_KEY_S)) {
-//			float inc = 0.1f;
-//
-//			time += inc;
-//
-//			float alpha = (float) (Math.sin(time) * 0.5f) + 0.5f;
-//
-//			testBtn1.getRenderData().setLerpFactor(alpha);
-//			testBtn2.getRenderData().setLerpFactor(alpha);
-//		}
 	}
 }
