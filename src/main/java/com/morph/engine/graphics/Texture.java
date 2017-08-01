@@ -44,6 +44,35 @@ public class Texture {
 			loadedTextures.put(this.filename, resource);
 		}
 	}
+
+	public Texture(String id, int width, int height, ByteBuffer pixels) {
+		this.filename = id;
+		TextureResource oldResource = loadedTextures.get(this.filename);
+		if (oldResource != null) {
+			this.resource = oldResource;
+			resource.addReference();
+		} else {
+			resource = loadTextureFromByteBuffer(width, height, pixels);
+			loadedTextures.put(this.filename, resource);
+		}
+	}
+
+	private TextureResource loadTextureFromByteBuffer(int width, int height, ByteBuffer buffer) {
+		int ID = glGenTextures();
+		buffer.flip();
+
+		glBindTexture(GL_TEXTURE_2D, ID);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, width, height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, buffer);
+
+		return new TextureResource(ID);
+	}
 	
 	private TextureResource loadTexture(String filename) {
 		try {

@@ -1,10 +1,10 @@
 package com.morph.engine.math;
 
 public class MathUtils {
-	public static final float clamp(float value, float min, float max) {
-		if (value < min)
+	public static final <T extends Comparable<T>> T clamp(T value, T min, T max) {
+		if (value.compareTo(min) < 0)
 			return min;
-		else if (value > max)
+		else if (value.compareTo(max) > 0)
 			return max;
 		else
 			return value;

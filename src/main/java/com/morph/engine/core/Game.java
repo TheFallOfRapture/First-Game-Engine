@@ -46,8 +46,6 @@ public abstract class Game implements Runnable {
 
 	private ScriptSystem scriptSystem;
 
-	private WatchService watchService;
-
 	public static Matrix4f screenOrtho;
 
 	public Game(int width, int height, String title, float fps, boolean fullscreen) {

@@ -169,7 +169,7 @@ public class CollisionEngine extends GameSystem {
 			Vector2f delta = vB.scale(dt);
 			Collision c = checkStaticDynamic(boxA, boxB, delta, boxB.getHalfSize());
 			if (c != null) {
-				float time = MathUtils.clamp(c.getTime(), 0, 1);
+				float time = MathUtils.clamp(c.getTime(), 0f, 1f);
 				Vector2f pos = boxB.getCenter().add(delta).scale(time);
 				Vector2f dir = delta.normalize();
 				Vector2f hitPos = c.getPosition().add(boxB.getHalfSize().mul(dir));
@@ -186,7 +186,7 @@ public class CollisionEngine extends GameSystem {
 			Vector2f delta = vA.scale(dt);
 			Collision c = checkStaticDynamic(boxB, boxA, delta, boxA.getHalfSize());
 			if (c != null) {
-				float time = MathUtils.clamp(c.getTime(), 0, 1);
+				float time = MathUtils.clamp(c.getTime(), 0f, 1f);
 				Vector2f pos = boxA.getCenter().add(delta).scale(time);
 				Vector2f dir = delta.normalize();
 				Vector2f hitPos = c.getPosition().add(boxA.getHalfSize().mul(dir));
@@ -203,7 +203,7 @@ public class CollisionEngine extends GameSystem {
 		Vector2f delta = vB.sub(vA).scale(dt);
 		Collision c = checkDoubleDynamic(boxA, boxB, vA, vB, boxB.getHalfSize(), dt);
 		if (c != null) {
-			float time = MathUtils.clamp(c.getTime(), 0, 1);
+			float time = MathUtils.clamp(c.getTime(), 0f, 1f);
 			Vector2f pos = boxB.getCenter().add(delta).scale(time);
 			Vector2f dir = delta.normalize();
 			Vector2f hitPos = c.getPosition().add(boxB.getHalfSize().mul(dir));
@@ -273,7 +273,7 @@ public class CollisionEngine extends GameSystem {
 		if (nearTime >= 1 || farTime <= 0)
 			return null;
 		
-		float time = MathUtils.clamp(nearTime, 0, 1);
+		float time = MathUtils.clamp(nearTime, 0f, 1f);
 		Vector2f n;
 		if (nearTimeX > nearTimeY) {
 			n = new Vector2f(-signX, 0);
@@ -316,7 +316,7 @@ public class CollisionEngine extends GameSystem {
 		if (nearTime >= 1 || farTime <= 0)
 			return null;
 		
-		float time = MathUtils.clamp(nearTime, 0, 1);
+		float time = MathUtils.clamp(nearTime, 0f, 1f);
 		Vector2f n;
 		if (nearTimeX > nearTimeY) {
 			n = new Vector2f(-signX, 0);
@@ -510,7 +510,7 @@ public class CollisionEngine extends GameSystem {
 		if (nearTime >= 1 || farTime <= 0)
 			return -1;
 		
-		return MathUtils.clamp(nearTime, 0, 1);
+		return MathUtils.clamp(nearTime, 0f, 1f);
 	}
 	
 	public static boolean checkAgainstWorld(Vector2f point, List<Entity> entities) {

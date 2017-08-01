@@ -3,25 +3,25 @@ package com.morph.engine.core;
 import com.morph.engine.core.gui.EngineGUI;
 import com.morph.engine.entities.Entity;
 import com.morph.engine.entities.EntityFactory;
+import com.morph.engine.events.EventDispatcher;
+import com.morph.engine.events.EventListener;
+import com.morph.engine.events.KeyEvent;
 import com.morph.engine.graphics.Color;
 import com.morph.engine.graphics.GLRenderingEngine;
 import com.morph.engine.graphics.shaders.TintShader;
-import com.morph.engine.newgui.*;
 import com.morph.engine.math.MatrixUtils;
 
 import com.morph.engine.script.ScriptContainer;
 import com.morph.engine.util.KotlinTestKt;
+import org.lwjgl.glfw.GLFW;
 
 public class Engine extends OpenGame {
-	private Button testBtn1;
-	private Button testBtn2;
-
 	private EngineGUI testGUI;
-
-	private float time;
 
 	public Engine(int width, int height, float fps, boolean fullscreen) {
 		super(width, height, "Game Engine", fps, fullscreen);
+
+		EventDispatcher.INSTANCE.addEventHandler(this);
 	}
 
 	@Override
@@ -67,5 +67,17 @@ public class Engine extends OpenGame {
 
 	@Override
 	public void handleInput() {
+
+	}
+
+	@EventListener(KeyEvent.class)
+	public void onKeyEvent(KeyEvent e) {
+		System.out.println("LOL");
+
+		if (e.getAction() == GLFW.GLFW_PRESS) {
+			char c = (char) e.getKeyCode();
+			if (c == GLFW.GLFW_KEY_BACKSPACE) testGUI.removeChar();
+			else testGUI.addChar(c);
+		}
 	}
 }

@@ -105,15 +105,6 @@ public final class RenderDataUtils {
 		
 		return result;
 	}
-
-//	public static RenderData createTextNew(String text, String font, int size, Color color, Shader<?> shader) {
-//		Font awtFont;
-//		try {
-//			awtFont = FontUtils.createFont(font);
-//		} catch (FontFormatException | IOException e) {
-//			e.printStackTrace();
-//		}
-//	}
 	
 // Reference: LWJGL 3 STB Truetype Demos
 	

@@ -8,17 +8,12 @@ import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
-import java.util.stream.Stream;
-
-import org.lwjgl.BufferUtils;
 
 import com.morph.engine.entities.Component;
 import com.morph.engine.graphics.Color;
@@ -28,6 +23,8 @@ import com.morph.engine.graphics.Uniforms;
 import com.morph.engine.graphics.Vertex;
 import com.morph.engine.math.Vector2f;
 import com.morph.engine.math.Vector3f;
+import com.morph.engine.util.RenderDataUtilsKt;
+import kotlin.Unit;
 
 public class RenderData extends Component {
 	protected List<Vertex> vertices;
@@ -75,6 +72,8 @@ public class RenderData extends Component {
 		this.shader = shader;
 
 		this.vao = vao;
+
+		initialized = true;
 	}
 
 	public void init() {
@@ -85,37 +84,10 @@ public class RenderData extends Component {
 		
 		vao = glGenVertexArrays();
 
-		double[] pointData = vertices
-				.stream()
-				.map(Vertex::getPosition)
-				.flatMapToDouble(
-						p -> DoubleStream.of(
-								(double)p.getX(),
-								(double)p.getY(),
-								(double)p.getZ()))
-				.toArray();
-
-		double[] colorData = vertices
-				.stream()
-				.map(Vertex::getColor)
-				.flatMapToDouble(
-						c -> DoubleStream.of(
-								(double)c.getRed(),
-								(double)c.getGreen(),
-								(double)c.getBlue(),
-								(double)c.getAlpha()))
-				.toArray();
-
-		double[] texCoordData = vertices
-				.stream()
-				.map(Vertex::getTexCoord)
-				.flatMapToDouble(
-						t -> DoubleStream.of(
-								(double)t.getX(),
-								(double)t.getY()))
-				.toArray();
-
-		int[] indexData = indices.stream().mapToInt(Integer::intValue).toArray();
+		double[] pointData = getPointDataArray();
+		double[] colorData = getColorDataArray();
+		double[] texCoordData = getTexCoordDataArray();
+		int[] indexData = getIndexDataArray();
 
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferData(GL_ARRAY_BUFFER, pointData, GL_STATIC_DRAW);
@@ -148,20 +120,95 @@ public class RenderData extends Component {
 		glBindVertexArray(0);
 		
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		initialized = true;
+	}
+
+	public void refreshVertices() {
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBufferData(GL_ARRAY_BUFFER, getPointDataArray(), GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
+
+	public void refreshColors() {
+		glBindBuffer(GL_ARRAY_BUFFER, cbo);
+		glBufferData(GL_ARRAY_BUFFER, getColorDataArray(), GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
+
+	public void refreshTexCoords() {
+		glBindBuffer(GL_ARRAY_BUFFER, tbo);
+		glBufferData(GL_ARRAY_BUFFER, getTexCoordDataArray(), GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
+
+	public void refreshIndices() {
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, getIndexDataArray(), GL_STATIC_DRAW);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	}
+
+	public void refreshData() {
+		refreshVertices();
+		refreshColors();
+		refreshTexCoords();
+		refreshIndices();
 	}
 	
 	public void destroy() {
 		shader.removeReference();
 	}
-	
+
+	private double[] getPointDataArray() {
+		return vertices
+				.stream()
+				.map(Vertex::getPosition)
+				.flatMapToDouble(
+						p -> DoubleStream.of(
+								(double)p.getX(),
+								(double)p.getY(),
+								(double)p.getZ()))
+				.toArray();
+	}
+
+	private double[] getColorDataArray() {
+		return vertices
+				.stream()
+				.map(Vertex::getColor)
+				.flatMapToDouble(
+						c -> DoubleStream.of(
+								(double)c.getRed(),
+								(double)c.getGreen(),
+								(double)c.getBlue(),
+								(double)c.getAlpha()))
+				.toArray();
+	}
+
+	private double[] getTexCoordDataArray() {
+		return vertices
+				.stream()
+				.map(Vertex::getTexCoord)
+				.flatMapToDouble(
+						t -> DoubleStream.of(
+								(double)t.getX(),
+								(double)t.getY()))
+				.toArray();
+	}
+
+	private int[] getIndexDataArray() {
+		return indices.stream().mapToInt(Integer::intValue).toArray();
+	}
+
 	public void addVertices(Vertex... vertices) {
-		this.vertices.addAll(Arrays.asList(vertices));
+		updateAll(data -> data.vertices.addAll(Arrays.asList(vertices)));
 	}
 	
 	public void addIndices(int... indices) {
-		for (int i : indices) {
-			this.indices.add(i);
-		}
+		updateIndices(data -> data.loadIndices(indices));
+	}
+
+	public void loadIndices(int... indices) {
+		this.indices.addAll(Arrays.stream(indices).boxed().collect(Collectors.toList()));
 	}
 	
 	public void addVertex(Vertex v, int index) {
@@ -216,6 +263,10 @@ public class RenderData extends Component {
 	public void addVertex(Vector2f position) {
 		vertices.add(new Vertex(position, new Color(1, 1, 1)));
 	}
+
+	public void removeVertexAtPosition(int i) {
+		vertices.remove(i);
+	}
 	
 	public void setVertex(int index, Vertex v) {
 		vertices.set(index, v);
@@ -235,6 +286,10 @@ public class RenderData extends Component {
 	
 	public void addIndex(int index) {
 		indices.add(index);
+	}
+
+	public void removeIndexAtPosition(int i) {
+		indices.remove(i);
 	}
 	
 	public List<Vertex> getVertices() {
@@ -286,6 +341,41 @@ public class RenderData extends Component {
 	public void resetAllColors(Color c) {
 		vertices.stream().map(Vertex::getColor).forEach(color -> color.setRGB(c));
 		init();
+	}
+
+	public void updateAll(Consumer<? super RenderData> body) {
+		RenderDataUtilsKt.updateAll(this, data -> {
+			body.accept(data);
+			return Unit.INSTANCE;
+		});
+	}
+
+	public void updateVertices(Consumer<? super RenderData> body) {
+		RenderDataUtilsKt.updateVertices(this, data -> {
+			body.accept(data);
+			return Unit.INSTANCE;
+		});
+	}
+
+	public void updateColors(Consumer<? super RenderData> body) {
+		RenderDataUtilsKt.updateColors(this, data -> {
+			body.accept(data);
+			return Unit.INSTANCE;
+		});
+	}
+
+	public void updateTexCoords(Consumer<? super RenderData> body) {
+		RenderDataUtilsKt.updateTexCoords(this, data -> {
+			body.accept(data);
+			return Unit.INSTANCE;
+		});
+	}
+
+	public void updateIndices(Consumer<? super RenderData> body) {
+		RenderDataUtilsKt.updateIndices(this, data -> {
+			body.accept(data);
+			return Unit.INSTANCE;
+		});
 	}
 
 	@Override

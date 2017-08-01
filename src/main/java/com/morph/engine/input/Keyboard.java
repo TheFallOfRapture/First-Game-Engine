@@ -2,6 +2,7 @@ package com.morph.engine.input;
 
 import static org.lwjgl.glfw.GLFW.*;
 
+import com.morph.engine.events.EventDispatcher;
 import com.morph.engine.events.KeyEvent;
 
 public class Keyboard {

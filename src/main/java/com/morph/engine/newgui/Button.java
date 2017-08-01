@@ -1,5 +1,6 @@
 package com.morph.engine.newgui;
 
+import com.morph.engine.graphics.LoadedFont;
 import com.morph.engine.graphics.Texture;
 import com.morph.engine.graphics.shaders.GUITintTransitionShader;
 import com.morph.engine.graphics.shaders.GUITransitionShader;
@@ -23,13 +24,17 @@ public class Button extends Container {
 		this.font = font;
 		this.size = size;
 
-		TextElement textObj = new TextElement(text, font, size, color,
+		TestDynamicText textObj = new TestDynamicText(text, font, size, color,
 				transform.getPosition().sub(transform.getScale().mul(new Vector2f(0.5f, 0.5f))), depth - 1);
 
-		Vector2f textSize = textObj.getTopRight().sub(textObj.getBottomLeft()).abs();
+		float scaleRatio = (float) size / (float) LoadedFont.SIZE;
 
-		Vector2f shift = transform.getScale().sub(textSize).scale(0.5f);
-		textObj.getTransform().translate(shift);
+		float xShift = (transform.getScale().getX() - textObj.getRenderData().getWidth() * scaleRatio) * 0.5f;
+		float yShift = transform.getScale().getY() * 0.5f - (textObj.getFont().getAscent() * textObj.getFont().getScale() * 2.0f);
+
+		System.out.println(textObj.getFont().getAscent() * textObj.getFont().getScale() * scaleRatio);
+
+		textObj.getTransform().translate(new Vector2f(xShift, yShift));
 
 		this.addElement(textObj);
     }
