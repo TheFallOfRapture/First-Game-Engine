@@ -7,6 +7,7 @@ import com.morph.engine.events.KeyEvent;
 
 public class Keyboard {
 	private final static int keys = GLFW_KEY_LAST;
+	private final static Keyboard INSTANCE = new Keyboard();
 	private static boolean keysPressed[] = new boolean[keys];
 	private static boolean keysDown[] = new boolean[keys];
 	private static boolean keysReleased[] = new boolean[keys];
@@ -53,11 +54,13 @@ public class Keyboard {
 
 	public static void keyPressed(int keycode) {
 		keysPressed[keycode] = true;
+		EventDispatcher.INSTANCE.dispatchEvent(new KeyEvent(INSTANCE, keycode, GLFW_PRESS, 0));
 	}
 
 	public static void keyReleased(int keycode) {
 		keysReleased[keycode] = true;
 		keysDown[keycode] = false;
+		EventDispatcher.INSTANCE.dispatchEvent(new KeyEvent(INSTANCE, keycode, GLFW_RELEASE, 0));
 	}
 
 	public static void keyTyped(KeyEvent e) {

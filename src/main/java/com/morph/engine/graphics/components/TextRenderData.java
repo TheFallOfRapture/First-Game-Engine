@@ -128,15 +128,16 @@ public class TextRenderData extends RenderData {
     }
 
     public void clearText() {
-        updateIndices(data -> {
-            for (int i = 0; i < text.length(); i++) {
-                removeCharacter(0);
-            }
+        updateAll(data -> {
+            data.getVertices().clear();
+            data.getIndices().clear();
         });
         this.text = "";
         this.cursorPosition = new Vector2f(0, 0);
         charCursorPosition = 0;
         previousPointLength = 0;
+        width = 0;
+        height = 0;
     }
 
     public float getWidth() {

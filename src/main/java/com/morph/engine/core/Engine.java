@@ -69,15 +69,4 @@ public class Engine extends OpenGame {
 	public void handleInput() {
 
 	}
-
-	@EventListener(KeyEvent.class)
-	public void onKeyEvent(KeyEvent e) {
-		System.out.println("LOL");
-
-		if (e.getAction() == GLFW.GLFW_PRESS) {
-			char c = (char) e.getKeyCode();
-			if (c == GLFW.GLFW_KEY_BACKSPACE) testGUI.removeChar();
-			else testGUI.addChar(c);
-		}
-	}
 }

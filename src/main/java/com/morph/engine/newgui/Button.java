@@ -3,11 +3,8 @@ package com.morph.engine.newgui;
 import com.morph.engine.graphics.LoadedFont;
 import com.morph.engine.graphics.Texture;
 import com.morph.engine.graphics.shaders.GUITintTransitionShader;
-import com.morph.engine.graphics.shaders.GUITransitionShader;
-import com.morph.engine.graphics.shaders.TransitionShader;
 import com.morph.engine.math.Vector2f;
 import com.morph.engine.util.RenderDataUtils;
-import com.morph.engine.graphics.shaders.BasicTexturedShader;
 import com.morph.engine.graphics.Color;
 import com.morph.engine.physics.components.Transform2D;
 
@@ -24,7 +21,7 @@ public class Button extends Container {
 		this.font = font;
 		this.size = size;
 
-		TestDynamicText textObj = new TestDynamicText(text, font, size, color,
+		TextElement textObj = new TextElement(text, font, size, color,
 				transform.getPosition().sub(transform.getScale().mul(new Vector2f(0.5f, 0.5f))), depth - 1);
 
 		float scaleRatio = (float) size / (float) LoadedFont.SIZE;
