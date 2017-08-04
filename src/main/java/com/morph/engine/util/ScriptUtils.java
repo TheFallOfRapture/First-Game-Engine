@@ -24,16 +24,14 @@ import static java.nio.file.StandardWatchEventKinds.*;
  * Created on 7/5/2017.
  */
 public class ScriptUtils {
-    private static HashMap<String, ScriptEngine> supportedScriptEngines;
-    private static HashMap<String, List<Entity>> scriptedEntities;
-    private static SimpleBindings bindings;
+    private static HashMap<String, ScriptEngine> supportedScriptEngines = new HashMap<>();
+    private static HashMap<String, List<Entity>> scriptedEntities = new HashMap<>();
+    private static SimpleBindings bindings = new SimpleBindings();
     private static WatchService watchService;
+    private static boolean isRunning;
+    private static Thread scriptUpdateThread;
 
-    public static void init(Game game) {
-        supportedScriptEngines = new HashMap<>();
-        scriptedEntities = new HashMap<>();
-        bindings = new SimpleBindings();
-
+    public static boolean init(Game game) {
         KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory kotlinEngine = new KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory();
         PyScriptEngineFactory pythonEngine = new PyScriptEngineFactory();
 
@@ -52,7 +50,38 @@ public class ScriptUtils {
             WatchKey key = Paths.get(System.getProperty("user.dir") + "/src/main/resources/scripts/").register(watchService, ENTRY_MODIFY);
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
+
+        scriptUpdateThread = new Thread(() -> start(game), "Script Update Thread");
+        scriptUpdateThread.start();
+
+        return true;
+    }
+
+    private static void run(Game game) {
+        while (isRunning) {
+            pollEvents(game);
+        }
+
+        try {
+            Thread.currentThread().join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static synchronized void start(Game game) {
+        if (isRunning) return;
+
+        isRunning = true;
+        run(game);
+    }
+
+    public static synchronized void stop() {
+        if (!isRunning) return;
+
+        isRunning = false;
     }
 
     public static void pollEvents(Game game) {

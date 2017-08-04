@@ -53,11 +53,21 @@ public class Keyboard {
 	}
 
 	public static void keyPressed(int keycode) {
+		if (keycode < 0 || keycode >= keys) {
+			System.err.println("Key event outside of handled keys");
+			return;
+		}
+
 		keysPressed[keycode] = true;
 		EventDispatcher.INSTANCE.dispatchEvent(new KeyEvent(INSTANCE, keycode, GLFW_PRESS, 0));
 	}
 
 	public static void keyReleased(int keycode) {
+		if (keycode < 0 || keycode >= keys) {
+			System.err.println("Key event outside of handled keys");
+			return;
+		}
+
 		keysReleased[keycode] = true;
 		keysDown[keycode] = false;
 		EventDispatcher.INSTANCE.dispatchEvent(new KeyEvent(INSTANCE, keycode, GLFW_RELEASE, 0));

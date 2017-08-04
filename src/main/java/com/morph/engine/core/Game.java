@@ -1,11 +1,9 @@
 package com.morph.engine.core;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import java.nio.file.WatchService;
+import java.util.concurrent.*;
 
 import com.morph.engine.entities.Entity;
 import com.morph.engine.events.EventDispatcher;
@@ -62,8 +60,6 @@ public abstract class Game implements Runnable {
 		EventDispatcher.INSTANCE.addEventHandler(this);
 
 		Game.screenOrtho = getScreenOrtho();
-
-		ScriptUtils.init(this);
 	}
 
 	public void start() {
@@ -125,9 +121,19 @@ public abstract class Game implements Runnable {
 
 	protected void destroy() {
 		display.destroy();
+		ScriptUtils.stop();
+
+		try {
+			Thread.currentThread().join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void init() {
+		Thread scriptInitThread = new Thread(() -> ScriptUtils.init(this), "Script Initialization Thread");
+		scriptInitThread.start();
+
 		display = new GLDisplay(width, height, title);
 		renderingEngine = new GLRenderingEngine(this);
 		scriptSystem = new ScriptSystem(this);
@@ -140,6 +146,12 @@ public abstract class Game implements Runnable {
 
 		if (fullscreen)
 			display.setFullscreen(width, height);
+
+		try {
+			scriptInitThread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 
 		initGame();
 
@@ -187,8 +199,6 @@ public abstract class Game implements Runnable {
 				}
 			}
 		}
-
-		ScriptUtils.pollEvents(this);
 	}
 
 	public void addSystem(GameSystem gs) {
