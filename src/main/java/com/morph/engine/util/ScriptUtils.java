@@ -119,6 +119,21 @@ public class ScriptUtils {
         }
     }
 
+    public static Object readScript(String script, String lang) {
+        ScriptEngine engine = supportedScriptEngines.get(lang);
+        Object result = null;
+
+        try {
+            result = engine.eval(script, bindings);
+            System.out.println("Script source: " + script);
+        } catch (ScriptException e) {
+            e.printStackTrace();
+        }
+
+        bindings.clear();
+        return result;
+    }
+
     public static <T extends GameBehavior> T getScriptBehavior(String filename) {
         String scriptSource = "";
         String fullFilename = System.getProperty("user.dir") + "/src/main/resources/scripts/" + filename;

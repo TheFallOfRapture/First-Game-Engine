@@ -29,8 +29,10 @@ public class TextElement extends Element {
         this.color = color;
         this.size = size;
 
-        this.bottomLeft = getRenderData().getVertices().get(0).getPosition().getXY();
-        this.topRight = getRenderData().getVertices().get(getRenderData().getVertices().size() - 2).getPosition().getXY();
+        if (text != "") {
+            this.bottomLeft = getRenderData().getVertices().get(0).getPosition().getXY();
+            this.topRight = getRenderData().getVertices().get(getRenderData().getVertices().size() - 2).getPosition().getXY();
+        }
     }
 
     public TextElement(String text, String font, int size, Color color, Vector2f position) {

@@ -1,5 +1,6 @@
 package com.morph.engine.core;
 
+import com.morph.engine.core.gui.ConsoleGUI;
 import com.morph.engine.core.gui.EngineGUI;
 import com.morph.engine.entities.Entity;
 import com.morph.engine.entities.EntityFactory;
@@ -32,6 +33,7 @@ public class Engine extends OpenGame {
 		testGUI = new EngineGUI(this, width, height);
 
 		addGUI(testGUI);
+		openConsole();
 
 		KotlinTestKt.printMsg("Hello, world! Kotlin 1.1.1 is working in Morph 0.5.0!");
 

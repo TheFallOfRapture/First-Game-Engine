@@ -9,7 +9,7 @@ import com.morph.engine.script.GameBehavior
 class TestBehavior2 : GameBehavior() {
     override fun init() {
         val player: Entity? = getEntityByName("player")
-        println("${player} | We've got support for multiple scripts!")
+        println("$player | We've got support for multiple scripts!")
     }
 }
 

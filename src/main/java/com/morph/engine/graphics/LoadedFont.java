@@ -164,6 +164,8 @@ public class LoadedFont {
     }
 
     public float kerningLookup(char c1, char c2) {
+        if (c1 == '\n' || c2 == '\n') return 0;
+
         return kerningTable[c1 - 32][c2 - 32];
     }
 
