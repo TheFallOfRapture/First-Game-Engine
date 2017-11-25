@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.*;
 
+import com.morph.engine.core.gui.ConsoleGUI;
+import com.morph.engine.debug.Console;
 import com.morph.engine.entities.Entity;
 import com.morph.engine.events.EventDispatcher;
 import com.morph.engine.graphics.GLDisplay;
@@ -43,6 +45,8 @@ public abstract class Game implements Runnable {
 	private List<GUI> guis;
 
 	private ScriptSystem scriptSystem;
+	private Console console;
+	private ConsoleGUI consoleGUI;
 
 	public static Matrix4f screenOrtho;
 
@@ -58,6 +62,8 @@ public abstract class Game implements Runnable {
 		behaviors = new HashMap<>();
 		this.fullscreen = fullscreen;
 		EventDispatcher.INSTANCE.addEventHandler(this);
+		this.console = new Console(Console.ScriptType.KOTLIN);
+		this.consoleGUI = new ConsoleGUI(this, console, width, height);
 
 		Game.screenOrtho = getScreenOrtho();
 	}
@@ -309,5 +315,17 @@ public abstract class Game implements Runnable {
 
 	public Matrix4f getScreenOrtho() {
 		return MatrixUtils.getOrthographicProjectionMatrix(height, 0, 0, width, -1, 1);
+	}
+
+	public Console getConsole() {
+		return console;
+	}
+
+	public void openConsole() {
+		addGUI(consoleGUI);
+	}
+
+	public void closeConsole() {
+		removeGUI(consoleGUI);
 	}
 }

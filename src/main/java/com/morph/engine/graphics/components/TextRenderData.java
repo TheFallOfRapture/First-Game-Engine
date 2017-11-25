@@ -24,7 +24,7 @@ public class TextRenderData extends RenderData {
         this.cursorPosition = new Vector2f(0, 0);
         this.font = font;
         setTint(color);
-        addString(text);
+        if (text != "") addString(text);
     }
 
     public void addCharacter(char c) {
@@ -44,8 +44,6 @@ public class TextRenderData extends RenderData {
 
         Vector2f offsetMin = new Vector2f(offsetData[0], -offsetData[3]);
         Vector2f offsetMax = new Vector2f(offsetData[2], -offsetData[1]);
-
-        System.out.println(cursorPosition);
 
         updateAll(data -> {
             data.addVertex(cursorPosition.add(offsetMin), texCoords[3]);
@@ -71,8 +69,8 @@ public class TextRenderData extends RenderData {
     }
 
     public void newLine() {
-        cursorPosition.add(new Vector2f(0, font.getYAdvance()));
         cursorPosition.setX(0);
+        cursorPosition.setY(cursorPosition.getY() - (font.getYAdvance() * font.getScale()));
         text += "\n";
     }
 

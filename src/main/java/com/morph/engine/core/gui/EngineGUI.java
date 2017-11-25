@@ -62,13 +62,17 @@ public class EngineGUI extends GUI {
         addElement(testBtn1);
         addElement(testBtn2);
 
+<<<<<<< HEAD
         addElement(textField = new TextField("Type here", font, 32, new Color(1, 1, 1), new Vector2f(toolbarWidth + 50, 300)));
+=======
+//        addElement(textField = new TextField("Type text here", "C:/Windows/Fonts/Roboto-Regular.ttf", 32, new Color(1, 1, 1), new Vector2f(toolbarWidth + 50, 300)));
+>>>>>>> 7433692da928f6b18e814f89748c0fb0090f6715
     }
 
-    @EventListener(KeyEvent.class)
-    public void onKeyEvent(KeyEvent e) {
-        textField.handleGUIKeyEvent(e);
-    }
+//    @EventListener(KeyEvent.class)
+//    public void onKeyEvent(KeyEvent e) {
+//        textField.handleGUIKeyEvent(e);
+//    }
 
     @Override
     public void unload() {

@@ -54,24 +54,6 @@ public class GLRenderingEngine extends GameSystem {
 		render(e.getRenderData(), e.getTransform());
 	}
 
-	public void render(GLDisplay display, List<Entity> entities) {
-		glClear(GL_COLOR_BUFFER_BIT);
-		entities.stream().filter(this::acceptEntity)
-				.forEach(e -> render(e.getComponent(RenderData.class), e.getComponent(Transform.class)));
-		display.update();
-	}
-
-	public void render(GLDisplay display, List<Entity> entities, Tilemap tilemap) {
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		entities.stream().filter(this::acceptEntity)
-				.forEach(e -> render(e.getComponent(RenderData.class), e.getComponent(Transform.class)));
-
-		renderTilemap(tilemap);
-
-		display.update();
-	}
-
 	public void register(Entity e) {
 		gameRenderables.add(0, e);
 	}
@@ -88,7 +70,6 @@ public class GLRenderingEngine extends GameSystem {
 		guiRenderables.remove(e);
 	}
 
-	// TODO: Replace old rendering pattern with new render pattern
 	public void render(GLDisplay display) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -97,20 +78,6 @@ public class GLRenderingEngine extends GameSystem {
 		guiRenderables.forEach(this::render);
 
 		display.update();
-	}
-
-	private void renderTilemap(Tilemap tilemap) {
-		for (int y = 0; y < tilemap.getHeight(); y++) {
-			for (int x = 0; x < tilemap.getWidth(); x++) {
-				Tile tile = tilemap.getTile(x, y);
-
-				Transform t = tilemap.genTileTransform(x, y);
-				RenderData rd = tile.getComponent(RenderData.class);
-
-				if (!(tile instanceof TileEmpty))
-					render(rd, t);
-			}
-		}
 	}
 
 	public void setClearColor(Color clearColor) {
@@ -125,6 +92,7 @@ public class GLRenderingEngine extends GameSystem {
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 
+	// TODO: Replace projection matrix loading with better implementation
 	public static void setProjectionMatrix(Matrix4f m) {
 		GLRenderingEngine.projectionMatrix = m;
 	}

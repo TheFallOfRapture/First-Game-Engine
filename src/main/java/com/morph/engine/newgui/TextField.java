@@ -68,6 +68,7 @@ public class TextField extends TextElement {
     public void addString(String s) {
         this.text += s;
         getRenderData().addString(s);
+//        for (int i = 0; i < s.length(); i++) addCharacter(s.charAt(i));
     }
 
     public void handleGUIKeyEvent(KeyEvent e) {
@@ -75,7 +76,7 @@ public class TextField extends TextElement {
             case GLFW_PRESS:
                 if (e.getKeyCode() == GLFW_KEY_BACKSPACE) removeCharacter();
                 else if (e.getKeyCode() == GLFW_KEY_ESCAPE) clearText();
-                else addCharacter(getCharFromKeyData(e.getKeyCode(), Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT) || Keyboard.isKeyDown(GLFW_KEY_RIGHT_SHIFT)));
+                else if (e.getKeyCode() != GLFW_KEY_LEFT_SHIFT && e.getKeyCode() != GLFW_KEY_RIGHT_SHIFT) addCharacter(getCharFromKeyData(e.getKeyCode(), Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT) || Keyboard.isKeyDown(GLFW_KEY_RIGHT_SHIFT)));
                 break;
         }
     }
@@ -104,7 +105,7 @@ public class TextField extends TextElement {
     96 126
     97-122 map to uppercase
      */
-    private char getCharFromKeyData(int keycode, boolean shift) {
+    protected char getCharFromKeyData(int keycode, boolean shift) {
         int key = keycode;
 
         boolean isAlphabetical = keycode >= 65 && keycode <= 90;
