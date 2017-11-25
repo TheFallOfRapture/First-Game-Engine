@@ -8,13 +8,19 @@ public class ConsoleEvent extends Event {
     }
 
     private EventType type;
+    private String message;
 
-    public ConsoleEvent(Console source, EventType type) {
+    public ConsoleEvent(Console source, EventType type, String message) {
         super(source);
         this.type = type;
+        this.message = message;
     }
 
     public EventType getType() {
         return type;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }
