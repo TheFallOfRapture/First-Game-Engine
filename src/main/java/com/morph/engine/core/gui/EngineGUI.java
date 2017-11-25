@@ -36,7 +36,7 @@ public class EngineGUI extends GUI {
         float toolbarWidth = 250;
         float bottomBarHeight = 150;
 
-        String font = "C:/Windows/Fonts/Calibri.ttf";
+        String font = "fonts/RobotoCondensed-Regular.ttf";
 
         addElement(new TextElement("File", font, 16, new Vector2f(5, height - menuBarHeight + 10)));
         addElement(new TextElement("Edit", font, 16, new Vector2f(45, height - menuBarHeight + 10)));
@@ -62,7 +62,7 @@ public class EngineGUI extends GUI {
         addElement(testBtn1);
         addElement(testBtn2);
 
-        addElement(textField = new TextField("Type here", "C:/Windows/Fonts/Roboto-Regular.ttf", 32, new Color(1, 1, 1), new Vector2f(toolbarWidth + 50, 300)));
+        addElement(textField = new TextField("Type here", font, 32, new Color(1, 1, 1), new Vector2f(toolbarWidth + 50, 300)));
     }
 
     @EventListener(KeyEvent.class)
