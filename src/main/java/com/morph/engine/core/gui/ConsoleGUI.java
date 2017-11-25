@@ -2,10 +2,7 @@ package com.morph.engine.core.gui;
 
 import com.morph.engine.core.Game;
 import com.morph.engine.debug.Console;
-import com.morph.engine.events.ConsoleUpdateEvent;
-import com.morph.engine.events.EventDispatcher;
-import com.morph.engine.events.EventListener;
-import com.morph.engine.events.KeyEvent;
+import com.morph.engine.events.*;
 import com.morph.engine.graphics.Color;
 import com.morph.engine.graphics.Texture;
 import com.morph.engine.math.Vector2f;
@@ -53,10 +50,12 @@ public class ConsoleGUI extends GUI {
         consoleInput.handleGUIKeyEvent(e);
     }
 
-    @EventListener(ConsoleUpdateEvent.class)
-    public void onConsoleUpdateEvent(ConsoleUpdateEvent e) {
-        System.out.println("Reading to console: " + console.getLastLine());
-        consoleOutput.addString(console.getLastLine() + "\n");
+    @EventListener(ConsoleEvent.class)
+    public void onConsoleEvent(ConsoleEvent e) {
+        if (e.getType() == ConsoleEvent.EventType.UPDATE) {
+            System.out.println("Reading to console: " + console.getLastLine());
+            consoleOutput.addString(console.getLastLine() + "\n");
+        }
     }
 
     @Override

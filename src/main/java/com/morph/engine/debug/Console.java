@@ -1,11 +1,9 @@
 package com.morph.engine.debug;
 
-import com.morph.engine.events.ConsoleUpdateEvent;
+import com.morph.engine.events.ConsoleEvent;
 import com.morph.engine.events.EventDispatcher;
 import com.morph.engine.util.ScriptUtils;
 
-import java.io.InputStream;
-import java.util.Scanner;
 import java.util.logging.Logger;
 
 /**
@@ -23,6 +21,7 @@ public class Console {
 
     public Console(Console.ScriptType type) {
         this.type = type;
+        EventDispatcher.INSTANCE.addEventHandler(this);
     }
 
     public void readIn(String line) {
@@ -30,7 +29,7 @@ public class Console {
         this.text += line;
         runLine(line);
 
-        EventDispatcher.INSTANCE.dispatchEvent(new ConsoleUpdateEvent(this));
+        EventDispatcher.INSTANCE.dispatchEvent(new ConsoleEvent(this, ConsoleEvent.EventType.UPDATE));
     }
 
     public String getText() {
