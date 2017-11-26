@@ -1,7 +1,9 @@
 package com.morph.engine.util;
 
 import com.morph.engine.core.Game;
+import com.morph.engine.debug.Console;
 import com.morph.engine.entities.Entity;
+import com.morph.engine.script.ConsoleScript;
 import com.morph.engine.script.EntityBehavior;
 import com.morph.engine.script.GameBehavior;
 import com.morph.engine.script.ScriptContainer;
@@ -119,13 +121,24 @@ public class ScriptUtils {
         }
     }
 
-    public static Object readScript(String script, String lang) {
+    private static String genScript(String script) {
+        return "import com.morph.engine.script.ConsoleScript\n" +
+               "class CustomScript : ConsoleScript() {\n" +
+               "    override fun run() = " + script + "\n" +
+               "}\n" +
+               "CustomScript()" ;
+    }
+
+    public static Object readScript(String script, String lang, Console console) {
         ScriptEngine engine = supportedScriptEngines.get(lang);
         Object result = null;
 
         try {
-            result = engine.eval(script, bindings);
-            System.out.println("Script source: " + script);
+            ConsoleScript behavior = (ConsoleScript) engine.eval(genScript(script), bindings);
+            System.out.println("Script source: " + genScript(script));
+            System.out.println(behavior);
+            behavior.setConsole(console);
+            behavior.run();
         } catch (ScriptException e) {
             e.printStackTrace();
         }

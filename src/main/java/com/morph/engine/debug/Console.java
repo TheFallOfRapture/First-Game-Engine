@@ -26,7 +26,6 @@ public class Console {
     }
 
     public void readIn(String line) {
-        print(line);
         runLine(line);
     }
 
@@ -50,20 +49,13 @@ public class Console {
             case MULTI:
                 String[] parts = line.split(":");
                 parts[1] = parts[1].trim();
-                ScriptUtils.readScript(parts[1], parts[0]);
+                ScriptUtils.readScript(parts[1], parts[0], this);
                 break;
             case KOTLIN:
-                ScriptUtils.readScript(line, "kts");
+                ScriptUtils.readScript(line, "kts", this);
                 break;
             case PYTHON:
-                ScriptUtils.readScript(line, "py");
-        }
-    }
-
-    @EventListener(ConsoleEvent.class)
-    public void onConsoleEvent(ConsoleEvent e) {
-        if (e.getType() == ConsoleEvent.EventType.PRINT) {
-            print(e.getMessage());
+                ScriptUtils.readScript(line, "py", this);
         }
     }
 }

@@ -68,7 +68,6 @@ public class TextField extends TextElement {
     public void addString(String s) {
         this.text += s;
         getRenderData().addString(s);
-//        for (int i = 0; i < s.length(); i++) addCharacter(s.charAt(i));
     }
 
     public void handleGUIKeyEvent(KeyEvent e) {

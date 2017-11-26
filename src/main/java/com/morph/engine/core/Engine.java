@@ -10,6 +10,7 @@ import com.morph.engine.events.KeyEvent;
 import com.morph.engine.graphics.Color;
 import com.morph.engine.graphics.GLRenderingEngine;
 import com.morph.engine.graphics.shaders.TintShader;
+import com.morph.engine.input.Keyboard;
 import com.morph.engine.math.MatrixUtils;
 
 import com.morph.engine.script.ScriptContainer;
@@ -33,7 +34,6 @@ public class Engine extends OpenGame {
 		testGUI = new EngineGUI(this, width, height);
 
 		addGUI(testGUI);
-		openConsole();
 
 		KotlinTestKt.printMsg("Hello, world! Kotlin 1.1.1 is working in Morph 0.5.0!");
 
@@ -69,6 +69,8 @@ public class Engine extends OpenGame {
 
 	@Override
 	public void handleInput() {
-
+		if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_GRAVE_ACCENT)) {
+			toggleConsole();
+		}
 	}
 }

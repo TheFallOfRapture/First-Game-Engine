@@ -8,7 +8,9 @@ import java.util.concurrent.*;
 import com.morph.engine.core.gui.ConsoleGUI;
 import com.morph.engine.debug.Console;
 import com.morph.engine.entities.Entity;
+import com.morph.engine.events.ConsoleEvent;
 import com.morph.engine.events.EventDispatcher;
+import com.morph.engine.events.EventListener;
 import com.morph.engine.graphics.GLDisplay;
 import com.morph.engine.graphics.GLRenderingEngine;
 import com.morph.engine.input.Keyboard;
@@ -48,7 +50,13 @@ public abstract class Game implements Runnable {
 	private Console console;
 	private ConsoleGUI consoleGUI;
 
+	private boolean isConsoleOpen = false;
+
 	public static Matrix4f screenOrtho;
+
+	public static final int VERSION_MAJOR = 0;
+	public static final int VERSION_MINOR = 5;
+	public static final int VERSION_PATCH = 15;
 
 	public Game(int width, int height, String title, float fps, boolean fullscreen) {
 		this.width = width;
@@ -323,9 +331,16 @@ public abstract class Game implements Runnable {
 
 	public void openConsole() {
 		addGUI(consoleGUI);
+		isConsoleOpen = true;
 	}
 
 	public void closeConsole() {
 		removeGUI(consoleGUI);
+		isConsoleOpen = false;
+	}
+
+	public void toggleConsole() {
+		if (isConsoleOpen) closeConsole();
+		else openConsole();
 	}
 }

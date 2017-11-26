@@ -55,6 +55,8 @@ public class ConsoleGUI extends GUI {
         if (e.getType() == ConsoleEvent.EventType.UPDATE) {
             System.out.println("Reading to console: " + console.getLastLine());
             consoleOutput.addString(console.getLastLine() + "\n");
+        } else if (e.getType() == ConsoleEvent.EventType.PRINT) {
+            console.print(e.getMessage());
         }
     }
 
