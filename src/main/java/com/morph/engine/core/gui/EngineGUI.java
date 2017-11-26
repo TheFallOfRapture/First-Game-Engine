@@ -16,8 +16,6 @@ import com.morph.engine.physics.components.Transform2D;
 public class EngineGUI extends GUI {
     private Button testBtn1;
     private Button testBtn2;
-    private TextElement text;
-    private TextField textField;
 
     private int width;
     private int height;
@@ -61,14 +59,7 @@ public class EngineGUI extends GUI {
 
         addElement(testBtn1);
         addElement(testBtn2);
-
-//        addElement(textField = new TextField("Type text here", "C:/Windows/Fonts/Roboto-Regular.ttf", 32, new Color(1, 1, 1), new Vector2f(toolbarWidth + 50, 300)));
     }
-
-//    @EventListener(KeyEvent.class)
-//    public void onKeyEvent(KeyEvent e) {
-//        textField.handleGUIKeyEvent(e);
-//    }
 
     @Override
     public void unload() {
