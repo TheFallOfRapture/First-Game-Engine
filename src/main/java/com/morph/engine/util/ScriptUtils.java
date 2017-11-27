@@ -19,6 +19,8 @@ import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 import static java.nio.file.StandardWatchEventKinds.*;
 
@@ -32,6 +34,8 @@ public class ScriptUtils {
     private static WatchService watchService;
     private static boolean isRunning;
     private static Thread scriptUpdateThread;
+    private static boolean initialized;
+    private static List<String> queuedBehaviors = new ArrayList<>();
 
     public static boolean init(Game game) {
         KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory kotlinEngine = new KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory();
@@ -57,6 +61,8 @@ public class ScriptUtils {
 
         scriptUpdateThread = new Thread(() -> start(game), "Script Update Thread");
         scriptUpdateThread.start();
+
+        initialized = true;
 
         return true;
     }
@@ -147,6 +153,12 @@ public class ScriptUtils {
         return result;
     }
 
+
+    // TODO: When initialization is finished, return all requested script behaviors.
+    public static <T extends GameBehavior> CompletableFuture<T> waitForScriptBehavior(String filename) {
+        return CompletableFuture.supplyAsync(getScriptBehavior(filename));
+    }
+
     public static <T extends GameBehavior> T getScriptBehavior(String filename) {
         String scriptSource = "";
         String fullFilename = System.getProperty("user.dir") + "/src/main/resources/scripts/" + filename;
@@ -176,5 +188,13 @@ public class ScriptUtils {
         bindings.clear();
 
         return behavior;
+    }
+
+    public static boolean isInitialized() {
+        return initialized;
+    }
+
+    public static void queueBehavior(String filename) {
+        queuedBehaviors.add(filename);
     }
 }

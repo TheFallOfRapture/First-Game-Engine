@@ -16,8 +16,6 @@ import com.morph.engine.physics.components.Transform2D;
 public class EngineGUI extends GUI {
     private Button testBtn1;
     private Button testBtn2;
-    private TextElement text;
-    private TextField textField;
 
     private int width;
     private int height;
