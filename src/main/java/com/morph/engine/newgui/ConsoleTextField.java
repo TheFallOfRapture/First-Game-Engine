@@ -40,9 +40,14 @@ public class ConsoleTextField extends TextField {
                 if (e.getKeyCode() == GLFW_KEY_BACKSPACE) removeCharacter();
                 else if (e.getKeyCode() == GLFW_KEY_ESCAPE) clearText();
                 else if (e.getKeyCode() == GLFW_KEY_ENTER) processLine();
-                else if (e.getKeyCode() != GLFW_KEY_LEFT_SHIFT && e.getKeyCode() != GLFW_KEY_RIGHT_SHIFT) addCharacter(getCharFromKeyData(e.getKeyCode(), Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT) || Keyboard.isKeyDown(GLFW_KEY_RIGHT_SHIFT)));
+                else if (!isIllegalCharacter(e.getKeyCode())) addCharacter(getCharFromKeyData(e.getKeyCode(), Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT) || Keyboard.isKeyDown(GLFW_KEY_RIGHT_SHIFT)));
                 break;
         }
+    }
+
+    private boolean isIllegalCharacter(int c) {
+        return c == GLFW_KEY_LEFT_SHIFT
+                || c == GLFW_KEY_RIGHT_SHIFT;
     }
 
     private void processLine() {

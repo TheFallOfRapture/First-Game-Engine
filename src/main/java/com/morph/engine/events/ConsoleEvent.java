@@ -1,16 +1,14 @@
 package com.morph.engine.events;
 
-import com.morph.engine.debug.Console;
-
 public class ConsoleEvent extends Event {
     public enum EventType {
-        UPDATE, PRINT
+        UPDATE, CLEAR
     }
 
     private EventType type;
     private String message;
 
-    public ConsoleEvent(Console source, EventType type, String message) {
+    public ConsoleEvent(Object source, EventType type, String message) {
         super(source);
         this.type = type;
         this.message = message;

@@ -1,5 +1,6 @@
 package com.morph.engine.newgui;
 
+import com.morph.engine.debug.Console;
 import com.morph.engine.graphics.components.RenderData;
 import com.morph.engine.math.Vector2f;
 import com.morph.engine.physics.components.Transform2D;
@@ -28,9 +29,9 @@ public abstract class Element {
         this.data = data;
         this.depth = depth;
 
-        this.onIdle = () -> System.out.println("Idle : " + this);
-        this.onClick = () -> System.out.println("Click : " + this);
-        this.onHover = () -> System.out.println("Hover : " + this);
+        this.onIdle = () -> Console.out.println("Idle : " + this);
+        this.onClick = () -> Console.out.println("Click : " + this);
+        this.onHover = () -> Console.out.println("Hover : " + this);
 
         state = new StateMachine(new State("IDLE"));
         state.addPossibilities("IDLE", "HOVER", "CLICK");
@@ -46,9 +47,9 @@ public abstract class Element {
         this.transform = transform;
         this.data = data;
 
-        this.onIdle = () -> System.out.println("Idle : " + this);
-        this.onClick = () -> System.out.println("Click : " + this);
-        this.onHover = () -> System.out.println("Hover : " + this);
+        this.onIdle = () -> Console.out.println("Idle : " + this);
+        this.onClick = () -> Console.out.println("Click : " + this);
+        this.onHover = () -> Console.out.println("Hover : " + this);
 
         state = new StateMachine(new State("IDLE"));
         state.addPossibilities("IDLE", "HOVER", "CLICK");
@@ -63,9 +64,9 @@ public abstract class Element {
     public Element(Transform2D transform) {
         this.transform = transform;
 
-        this.onIdle = () -> System.out.println("Idle : " + this);
-        this.onClick = () -> System.out.println("Click : " + this);
-        this.onHover = () -> System.out.println("Hover : " + this);
+        this.onIdle = () -> Console.out.println("Idle : " + this);
+        this.onClick = () -> Console.out.println("Click : " + this);
+        this.onHover = () -> Console.out.println("Hover : " + this);
 
         state = new StateMachine(new State("IDLE"));
         state.addPossibilities("IDLE", "HOVER", "CLICK");

@@ -27,16 +27,17 @@ public class ConsoleGUI extends GUI {
         this.console = console;
         this.width = width;
         this.height = height;
-
-        EventDispatcher.INSTANCE.addEventHandler(this);
     }
 
     @Override
-    public void load() {
+    public void init() {
+        EventDispatcher.INSTANCE.addEventHandler(this);
+
         Panel consoleBG = new Panel(new Vector2f(0, height - 500), new Vector2f(width, 500), new Color(0, 1, 0, 0.3f), new Texture("textures/solid.png"));
         Panel consoleInputBG = new Panel(new Vector2f(0, height - 520), new Vector2f(width, 20), new Color(0, 0, 1, 0.3f), new Texture("textures/solid.png"));
         consoleInput = new ConsoleTextField(console, "", "C:/Windows/Fonts/Roboto-Regular.ttf", 16, new Color(1, 1, 1), new Vector2f(0, height - 515), -1200);
         consoleOutput = new TextField("Morph 0.5.15 - Console Output\n", "C:/Windows/Fonts/Roboto-Regular.ttf", 16, new Color(1, 1, 1, 0.7f), new Vector2f(10, height - 20), -1200);
+        consoleOutput.addString(console.getText());
         consoleBG.setDepth(-1000);
         consoleInputBG.setDepth(-1000);
         addElement(consoleBG);
@@ -45,18 +46,26 @@ public class ConsoleGUI extends GUI {
         addElement(consoleOutput);
     }
 
+    @Override
+    public void load() {
+        consoleOutput.setText(console.getText());
+    }
+
     @EventListener(KeyEvent.class)
     public void onKeyEvent(KeyEvent e) {
-        consoleInput.handleGUIKeyEvent(e);
+        if (isOpen()) {
+            consoleInput.handleGUIKeyEvent(e);
+            System.out.println(e.getKeyCode());
+        }
     }
 
     @EventListener(ConsoleEvent.class)
     public void onConsoleEvent(ConsoleEvent e) {
         if (e.getType() == ConsoleEvent.EventType.UPDATE) {
-            System.out.println("Reading to console: " + console.getLastLine());
-            consoleOutput.addString(console.getLastLine() + "\n");
-        } else if (e.getType() == ConsoleEvent.EventType.PRINT) {
-            console.print(e.getMessage());
+            consoleOutput.addString(console.getLastLine());
+        } else if (e.getType() == ConsoleEvent.EventType.CLEAR) {
+            consoleOutput.clearText();
+            Console.out.println("Cleared console text.");
         }
     }
 

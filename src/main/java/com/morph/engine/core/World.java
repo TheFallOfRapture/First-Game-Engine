@@ -42,4 +42,8 @@ public abstract class World {
                 .get(0)
                 .getFirst();
     }
+
+    public boolean addEntity(Entity e) {
+        return getEntities().add(e);
+    }
 }

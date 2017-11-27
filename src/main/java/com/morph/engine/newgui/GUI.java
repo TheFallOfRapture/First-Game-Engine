@@ -11,12 +11,14 @@ import java.util.List;
 public abstract class GUI {
     private List<Element> elements;
     private Game game;
+    private boolean open = false;
 
     public GUI(Game game) {
         elements = new ArrayList<>();
         this.game = game;
     }
 
+    public abstract void init();
     public abstract void load();
     public abstract void unload();
 
@@ -25,7 +27,6 @@ public abstract class GUI {
         if (e instanceof Container) {
             ((Container)e).getChildren(true).forEach(this::addElement);
         }
-        game.addElement(e);
     }
 
     public void removeElement(Element e) {
@@ -33,7 +34,6 @@ public abstract class GUI {
         if (e instanceof Container) {
             ((Container)e).getChildren(true).forEach(this::removeElement);
         }
-        game.removeElement(e);
     }
 
     public void fixedUpdate(float dt) {}
@@ -44,5 +44,17 @@ public abstract class GUI {
 
     public List<Element> getElements() {
         return elements;
+    }
+
+    public boolean isOpen() {
+        return open;
+    }
+
+    public void open() {
+        open = true;
+    }
+
+    public void close() {
+        open = false;
     }
 }

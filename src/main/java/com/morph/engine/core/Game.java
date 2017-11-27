@@ -50,8 +50,6 @@ public abstract class Game implements Runnable {
 	private Console console;
 	private ConsoleGUI consoleGUI;
 
-	private boolean isConsoleOpen = false;
-
 	public static Matrix4f screenOrtho;
 
 	public static final int VERSION_MAJOR = 0;
@@ -70,7 +68,7 @@ public abstract class Game implements Runnable {
 		behaviors = new HashMap<>();
 		this.fullscreen = fullscreen;
 		EventDispatcher.INSTANCE.addEventHandler(this);
-		this.console = new Console(Console.ScriptType.KOTLIN);
+		this.console = new Console(Console.ScriptType.KOTLIN, this);
 		this.consoleGUI = new ConsoleGUI(this, console, width, height);
 
 		Game.screenOrtho = getScreenOrtho();
@@ -170,6 +168,8 @@ public abstract class Game implements Runnable {
 		initGame();
 
 		systems.forEach(GameSystem::initSystem);
+
+		consoleGUI.init();
 	}
 
 	private void update() {
@@ -261,15 +261,22 @@ public abstract class Game implements Runnable {
 		e.forEach(this::addElement);
 	}
 
+	public void removeElements(List<Element> e) {
+		e.forEach(this::removeElement);
+	}
+
 	public void addGUI(GUI gui) {
 		guis.add(gui);
 		gui.load();
+		addElements(gui.getElements());
+		gui.open();
 	}
 
 	public void removeGUI(GUI gui) {
 		guis.remove(gui);
 		gui.unload();
-		gui.getElements().forEach(this::removeElement);
+		removeElements(gui.getElements());
+		gui.close();
 	}
 
 	public void fixedUpdate(float dt) {
@@ -331,16 +338,22 @@ public abstract class Game implements Runnable {
 
 	public void openConsole() {
 		addGUI(consoleGUI);
-		isConsoleOpen = true;
 	}
 
 	public void closeConsole() {
 		removeGUI(consoleGUI);
-		isConsoleOpen = false;
 	}
 
 	public void toggleConsole() {
-		if (isConsoleOpen) closeConsole();
+		if (consoleGUI.isOpen()) closeConsole();
 		else openConsole();
+	}
+
+	public void addEntity(Entity e) {
+		getWorld().addEntity(e);
+	}
+
+	public boolean isConsoleOpen() {
+		return consoleGUI.isOpen();
 	}
 }

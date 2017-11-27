@@ -21,9 +21,9 @@ public class ListWorld extends World {
         return entities;
     }
 
-    public void addEntity(Entity e) {
-        entities.add(e);
+    public boolean addEntity(Entity e) {
         game.renderingEngine.register(e);
+        return entities.add(e);
     }
 
     public void addEntities(List<? extends Entity> e) {

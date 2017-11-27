@@ -1,27 +1,118 @@
 package com.morph.engine.debug;
 
+import com.morph.engine.core.Game;
 import com.morph.engine.events.ConsoleEvent;
 import com.morph.engine.events.EventDispatcher;
 import com.morph.engine.events.EventListener;
 import com.morph.engine.util.ScriptUtils;
+import org.jetbrains.annotations.NotNull;
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.logging.Logger;
 
 /**
  * Created on 11/24/2017.
  */
 public class Console {
+    private static class ConsoleOutputStream extends OutputStream {
+        @Override
+        public void write(@NotNull byte[] buffer, int offset, int length) {
+            String text = new String(buffer, offset, length);
+            Console.print(text);
+        }
+
+        @Override
+        public void write(int b) {
+            write(new byte[]{(byte)b}, 0, 1);
+        }
+    }
+
+    public static class ConsolePrintStream extends PrintStream {
+        private ConsolePrintStream(@NotNull ConsoleOutputStream out) {
+            super(out);
+        }
+
+        @Override
+        public void println() {
+            super.println();
+            Console.newLine();
+        }
+
+        @Override
+        public void println(boolean x) {
+            super.println(x);
+            Console.newLine();
+        }
+
+        @Override
+        public void println(char x) {
+            super.println(x);
+            Console.newLine();
+        }
+
+        @Override
+        public void println(int x) {
+            super.println(x);
+            Console.newLine();
+        }
+
+        @Override
+        public void println(long x) {
+            super.println(x);
+            Console.newLine();
+        }
+
+        @Override
+        public void println(float x) {
+            super.println(x);
+            Console.newLine();
+        }
+
+        @Override
+        public void println(double x) {
+            super.println(x);
+            Console.newLine();
+        }
+
+        @Override
+        public void println(@NotNull char[] x) {
+            super.println(x);
+            Console.newLine();
+        }
+
+        @Override
+        public void println(String x) {
+            super.println(x);
+            Console.newLine();
+        }
+
+        @Override
+        public void println(Object x) {
+            super.println(x);
+            Console.newLine();
+        }
+    }
+
     public enum ScriptType {
         KOTLIN, PYTHON, MULTI
     }
 
-    private String text;
+    private static String text = "";
     private ScriptType type;
-    private Logger logger;
-    private String currentLine;
+    private static String currentLine = "";
+    private Game game;
 
-    public Console(Console.ScriptType type) {
+    private static ConsoleOutputStream outBytes = new ConsoleOutputStream();
+    private static ConsoleOutputStream errBytes = new ConsoleOutputStream();
+
+    public static ConsolePrintStream out = new ConsolePrintStream(outBytes);
+    public static ConsolePrintStream err = new ConsolePrintStream(errBytes);
+
+    public Console(Console.ScriptType type, Game game) {
         this.type = type;
+        this.game = game;
         EventDispatcher.INSTANCE.addEventHandler(this);
     }
 
@@ -29,15 +120,22 @@ public class Console {
         runLine(line);
     }
 
-    public void print(String line) {
-        this.currentLine = line;
-        this.text += line;
+    private static void print(String line) {
+        Console.currentLine = line;
+        Console.text += line;
 
-        EventDispatcher.INSTANCE.dispatchEvent(new ConsoleEvent(this, ConsoleEvent.EventType.UPDATE, ""));
+        EventDispatcher.INSTANCE.dispatchEvent(new ConsoleEvent(null, ConsoleEvent.EventType.UPDATE, ""));
+    }
+
+    private static void newLine() {
+        Console.currentLine = "\n";
+        Console.text += "\n";
+
+        EventDispatcher.INSTANCE.dispatchEvent(new ConsoleEvent(null, ConsoleEvent.EventType.UPDATE, ""));
     }
 
     public String getText() {
-        return text;
+        return Console.text;
     }
 
     public String getLastLine() {
@@ -57,5 +155,16 @@ public class Console {
             case PYTHON:
                 ScriptUtils.readScript(line, "py", this);
         }
+    }
+
+    public Game getGame() {
+        return game;
+    }
+
+    public void clear() {
+        Console.text = "";
+        Console.currentLine = "";
+
+        EventDispatcher.INSTANCE.dispatchEvent(new ConsoleEvent(null, ConsoleEvent.EventType.CLEAR, ""));
     }
 }

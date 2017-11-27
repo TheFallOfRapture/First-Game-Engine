@@ -30,8 +30,7 @@ public class EngineGUI extends GUI {
         EventDispatcher.INSTANCE.addEventHandler(this);
     }
 
-    @Override
-    public void load() {
+    public void init() {
         float menuBarHeight = 30;
         float toolbarWidth = 250;
         float bottomBarHeight = 150;
@@ -61,14 +60,10 @@ public class EngineGUI extends GUI {
 
         addElement(testBtn1);
         addElement(testBtn2);
-
-//        addElement(textField = new TextField("Type text here", "C:/Windows/Fonts/Roboto-Regular.ttf", 32, new Color(1, 1, 1), new Vector2f(toolbarWidth + 50, 300)));
     }
 
-//    @EventListener(KeyEvent.class)
-//    public void onKeyEvent(KeyEvent e) {
-//        textField.handleGUIKeyEvent(e);
-//    }
+    @Override
+    public void load() {}
 
     @Override
     public void unload() {

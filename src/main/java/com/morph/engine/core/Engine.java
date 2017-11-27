@@ -1,12 +1,9 @@
 package com.morph.engine.core;
 
-import com.morph.engine.core.gui.ConsoleGUI;
 import com.morph.engine.core.gui.EngineGUI;
 import com.morph.engine.entities.Entity;
 import com.morph.engine.entities.EntityFactory;
 import com.morph.engine.events.EventDispatcher;
-import com.morph.engine.events.EventListener;
-import com.morph.engine.events.KeyEvent;
 import com.morph.engine.graphics.Color;
 import com.morph.engine.graphics.GLRenderingEngine;
 import com.morph.engine.graphics.shaders.TintShader;
@@ -32,6 +29,7 @@ public class Engine extends OpenGame {
 		GLRenderingEngine.setProjectionMatrix(MatrixUtils.getOrthographicProjectionMatrix(height, 0, 0, width, -5, 5));
 
 		testGUI = new EngineGUI(this, width, height);
+		testGUI.init();
 
 		addGUI(testGUI);
 
