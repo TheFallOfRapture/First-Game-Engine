@@ -29,72 +29,6 @@ public class Console {
         }
     }
 
-    public static class ConsolePrintStream extends PrintStream {
-        private ConsolePrintStream(@NotNull ConsoleOutputStream out) {
-            super(out);
-        }
-
-        @Override
-        public void println() {
-            super.println();
-            Console.newLine();
-        }
-
-        @Override
-        public void println(boolean x) {
-            super.println(x);
-            Console.newLine();
-        }
-
-        @Override
-        public void println(char x) {
-            super.println(x);
-            Console.newLine();
-        }
-
-        @Override
-        public void println(int x) {
-            super.println(x);
-            Console.newLine();
-        }
-
-        @Override
-        public void println(long x) {
-            super.println(x);
-            Console.newLine();
-        }
-
-        @Override
-        public void println(float x) {
-            super.println(x);
-            Console.newLine();
-        }
-
-        @Override
-        public void println(double x) {
-            super.println(x);
-            Console.newLine();
-        }
-
-        @Override
-        public void println(@NotNull char[] x) {
-            super.println(x);
-            Console.newLine();
-        }
-
-        @Override
-        public void println(String x) {
-            super.println(x);
-            Console.newLine();
-        }
-
-        @Override
-        public void println(Object x) {
-            super.println(x);
-            Console.newLine();
-        }
-    }
-
     public enum ScriptType {
         KOTLIN, PYTHON, MULTI
     }
@@ -107,8 +41,8 @@ public class Console {
     private static ConsoleOutputStream outBytes = new ConsoleOutputStream();
     private static ConsoleOutputStream errBytes = new ConsoleOutputStream();
 
-    public static ConsolePrintStream out = new ConsolePrintStream(outBytes);
-    public static ConsolePrintStream err = new ConsolePrintStream(errBytes);
+    public static PrintStream out = new PrintStream(outBytes);
+    public static PrintStream err = new PrintStream(errBytes);
 
     public Console(Console.ScriptType type, Game game) {
         this.type = type;

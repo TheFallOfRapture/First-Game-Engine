@@ -72,6 +72,8 @@ public abstract class Game implements Runnable {
 		this.consoleGUI = new ConsoleGUI(this, console, width, height);
 
 		Game.screenOrtho = getScreenOrtho();
+
+//		System.setOut(Console.out);
 	}
 
 	public void start() {
@@ -143,8 +145,7 @@ public abstract class Game implements Runnable {
 	}
 
 	private void init() {
-		Thread scriptInitThread = new Thread(() -> ScriptUtils.init(this), "Script Initialization Thread");
-		scriptInitThread.start();
+		ScriptUtils.launchInitializationTask(this);
 
 		display = new GLDisplay(width, height, title);
 		renderingEngine = new GLRenderingEngine(this);
@@ -158,12 +159,6 @@ public abstract class Game implements Runnable {
 
 		if (fullscreen)
 			display.setFullscreen(width, height);
-
-		try {
-			scriptInitThread.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 
 		initGame();
 

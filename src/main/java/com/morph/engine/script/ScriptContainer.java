@@ -23,7 +23,7 @@ public class ScriptContainer extends Component {
     }
 
     public void addBehavior(String filename) {
-
+        addBehaviorStrict(filename);
     }
 
     private void addBehaviorStrict(String filename) {

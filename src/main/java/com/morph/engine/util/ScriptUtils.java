@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import static java.nio.file.StandardWatchEventKinds.*;
@@ -35,7 +36,7 @@ public class ScriptUtils {
     private static boolean isRunning;
     private static Thread scriptUpdateThread;
     private static boolean initialized;
-    private static List<String> queuedBehaviors = new ArrayList<>();
+    private static CompletableFuture<Void> initTask;
 
     public static boolean init(Game game) {
         KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory kotlinEngine = new KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory();
@@ -73,7 +74,7 @@ public class ScriptUtils {
         }
 
         try {
-            Thread.currentThread().join();
+            scriptUpdateThread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -135,14 +136,15 @@ public class ScriptUtils {
                "CustomScript()" ;
     }
 
-    public static Object readScript(String script, String lang, Console console) {
-        ScriptEngine engine = supportedScriptEngines.get(lang);
+    public static CompletableFuture<Object> readScriptAsync(String script, String lang, Console console) {
+        return getScriptEngine(lang).thenApplyAsync(engine -> readScriptDI(script, engine, console));
+    }
+
+    private static Object readScriptDI(String script, ScriptEngine engine, Console console) {
         Object result = null;
 
         try {
             ConsoleScript behavior = (ConsoleScript) engine.eval(genScript(script), bindings);
-            System.out.println("Script source: " + genScript(script));
-            System.out.println(behavior);
             behavior.setConsole(console);
             behavior.run();
         } catch (ScriptException e) {
@@ -153,18 +155,39 @@ public class ScriptUtils {
         return result;
     }
 
+    public static Object readScript(String script, String lang, Console console) {
+        ScriptEngine engine = null;
+        try {
+            engine = getScriptEngine(lang).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
 
-    // TODO: When initialization is finished, return all requested script behaviors.
-    public static <T extends GameBehavior> CompletableFuture<T> waitForScriptBehavior(String filename) {
-        return CompletableFuture.supplyAsync(getScriptBehavior(filename));
+        Object result = readScriptDI(script, engine, console);
+
+        bindings.clear();
+        return result;
     }
 
-    public static <T extends GameBehavior> T getScriptBehavior(String filename) {
+    public static CompletableFuture<Void> launchInitializationTask(Game game) {
+        return initTask = CompletableFuture.runAsync(() -> ScriptUtils.init(game));
+    }
+
+
+    // TODO: When initialization is finished, return all requested script behaviors.
+    public static CompletableFuture<ScriptEngine> getScriptEngine(String lang) {
+        return initTask.thenApplyAsync((a) -> supportedScriptEngines.get(lang));
+    }
+
+    public static <T extends GameBehavior> CompletableFuture<T> getScriptBehaviorAsync(String filename) {
+        return getScriptEngine(getFileExtension(filename)).thenApply(engine -> getScriptBehaviorDI(filename, engine));
+    }
+
+    private static <T extends GameBehavior> T getScriptBehaviorDI(String filename, ScriptEngine engine) {
         String scriptSource = "";
         String fullFilename = System.getProperty("user.dir") + "/src/main/resources/scripts/" + filename;
 
         String extension = fullFilename.substring(fullFilename.indexOf(".") + 1);
-        ScriptEngine engine = supportedScriptEngines.get(extension);
 
         try {
             scriptSource = IOUtils.getFileAsStringAbsolute(fullFilename);
@@ -180,7 +203,6 @@ public class ScriptUtils {
                 System.out.println("No result from eval, getting script variable");
                 behavior = (T) bindings.get("script");
             }
-            System.out.println(behavior.getClass().getSimpleName());
         } catch (ScriptException e) {
             e.printStackTrace();
         }
@@ -190,11 +212,26 @@ public class ScriptUtils {
         return behavior;
     }
 
-    public static boolean isInitialized() {
-        return initialized;
+    private static String getFileExtension(String filename) {
+        String fullFilename = System.getProperty("user.dir") + "/src/main/resources/scripts/" + filename;
+        return fullFilename.substring(fullFilename.indexOf(".") + 1);
     }
 
-    public static void queueBehavior(String filename) {
-        queuedBehaviors.add(filename);
+    public static <T extends GameBehavior> T getScriptBehavior(String filename) {
+        String extension = getFileExtension(filename);
+        ScriptEngine engine = null;
+        try {
+            engine = getScriptEngine(extension).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        T behavior = getScriptBehaviorDI(filename, engine);
+
+        return behavior;
+    }
+
+    public static boolean isInitialized() {
+        return initialized;
     }
 }

@@ -22,7 +22,7 @@ public class ConsoleGUI extends GUI {
     private ConsoleTextField consoleInput;
     private TextField consoleOutput;
 
-    private final int FONT_SIZE = 20;
+    private final int FONT_SIZE = 21;
 
     public ConsoleGUI(Game game, Console console, int width, int height) {
         super(game);
@@ -56,17 +56,18 @@ public class ConsoleGUI extends GUI {
     public void onKeyEvent(KeyEvent e) {
         if (isOpen()) {
             consoleInput.handleGUIKeyEvent(e);
-            System.out.println(e.getKeyCode());
         }
     }
 
     @EventListener(ConsoleEvent.class)
     public void onConsoleEvent(ConsoleEvent e) {
-        if (e.getType() == ConsoleEvent.EventType.UPDATE) {
-            consoleOutput.addString(console.getLastLine());
-        } else if (e.getType() == ConsoleEvent.EventType.CLEAR) {
-            consoleOutput.clearText();
-            Console.out.println("Cleared console text.");
+        if (isOpen()) {
+            if (e.getType() == ConsoleEvent.EventType.UPDATE) {
+                consoleOutput.addString(console.getLastLine());
+            } else if (e.getType() == ConsoleEvent.EventType.CLEAR) {
+                consoleOutput.clearText();
+                Console.out.println("Cleared console text.");
+            }
         }
     }
 
