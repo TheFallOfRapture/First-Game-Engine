@@ -180,8 +180,8 @@ public class ScriptUtils {
 
 
     // TODO: When initialization is finished, return all requested script behaviors.
-    public static CompletableFuture<ScriptEngine> getScriptEngine(String lang) {
-        return initTask.thenApplyAsync((a) -> supportedScriptEngines.get(lang));
+    private static CompletableFuture<ScriptEngine> getScriptEngine(String lang) {
+        return initTask.thenApply((a) -> supportedScriptEngines.get(lang));
     }
 
     public static <T extends GameBehavior> CompletableFuture<T> getScriptBehaviorAsync(String filename) {

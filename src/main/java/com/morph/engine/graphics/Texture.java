@@ -22,7 +22,7 @@ public class Texture {
 	private String filename;
 	
 	public Texture(String filename) {
-		this.filename = filename != null ? filename : "textures/empty.png";
+		this.filename = filename != null ? filename : "textures/solid.png";
 		TextureResource oldResource = loadedTextures.get(this.filename);
 		if (oldResource != null) {
 			this.resource = oldResource;
