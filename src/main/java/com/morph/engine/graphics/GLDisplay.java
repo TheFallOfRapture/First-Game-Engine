@@ -1,5 +1,6 @@
 package com.morph.engine.graphics;
 
+import com.morph.engine.events.ExitEvent;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
 
@@ -60,6 +61,8 @@ public class GLDisplay {
 			if (action == GLFW_RELEASE)
 				Mouse.mouseReleased(button);
 		});
+
+		glfwSetWindowCloseCallback(window, (window) -> EventDispatcher.INSTANCE.dispatchEvent(new ExitEvent(this)));
 		
 		GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 		

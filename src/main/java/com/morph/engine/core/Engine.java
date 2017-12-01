@@ -10,6 +10,8 @@ import com.morph.engine.graphics.shaders.TintShader;
 import com.morph.engine.input.Keyboard;
 import com.morph.engine.math.MatrixUtils;
 
+import com.morph.engine.math.Vector2f;
+import com.morph.engine.physics.components.Transform2D;
 import com.morph.engine.script.ScriptContainer;
 import com.morph.engine.util.KotlinTestKt;
 import org.lwjgl.glfw.GLFW;
@@ -36,15 +38,16 @@ public class Engine extends OpenGame {
 		KotlinTestKt.printMsg("Hello, world! Kotlin 1.1.1 is working in Morph 0.5.0!");
 
 		Entity player = EntityFactory.getCustomTintRectangle("player", 20, 20, new Color(0, 1, 0), new TintShader());
+		player.getComponent(Transform2D.class).translate(new Vector2f(50, 50));
 		ScriptContainer sc = new ScriptContainer(this);
 		player.addComponent(sc);
-		sc.addBehavior("EScript.kts");
-		sc.addBehavior("TestPythonScript.py");
+		sc.addBehaviorAsync("EScript.kts");
+		sc.addBehaviorAsync("TestPythonScript.py");
 
 		addEntity(player);
 
-		attachBehavior("TestBehavior.kts");
-		attachBehavior("TestBehavior2.kts");
+		attachBehaviorAsync("TestBehavior.kts");
+		attachBehaviorAsync("TestBehavior2.kts");
 	}
 
 	@Override

@@ -32,13 +32,13 @@ public class ScriptUtils {
     private static HashMap<String, ScriptEngine> supportedScriptEngines = new HashMap<>();
     private static HashMap<String, List<Entity>> scriptedEntities = new HashMap<>();
     private static SimpleBindings bindings = new SimpleBindings();
-    private static WatchService watchService;
     private static boolean isRunning;
     private static Thread scriptUpdateThread;
     private static boolean initialized;
     private static CompletableFuture<Void> initTask;
 
     public static boolean init(Game game) {
+        Console.out.println("Morph Script Engine 0.5.15 initializing... Please wait...");
         KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory kotlinEngine = new KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory();
         PyScriptEngineFactory pythonEngine = new PyScriptEngineFactory();
 
@@ -52,14 +52,6 @@ public class ScriptUtils {
         System.out.println(Paths.get(System.getProperty("user.dir") + "/src/main/resources/scripts/Test.kts").getFileName());
         System.out.println("Python support test: " + supportedScriptEngines.get("py").getFactory().getLanguageName());
 
-        try {
-            watchService = FileSystems.getDefault().newWatchService();
-            WatchKey key = Paths.get(System.getProperty("user.dir") + "/src/main/resources/scripts/").register(watchService, ENTRY_MODIFY);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-
         scriptUpdateThread = new Thread(() -> start(game), "Script Update Thread");
         scriptUpdateThread.start();
 
@@ -69,12 +61,17 @@ public class ScriptUtils {
     }
 
     private static void run(Game game) {
-        while (isRunning) {
-            pollEvents(game);
+        try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
+            WatchKey key = Paths.get(System.getProperty("user.dir") + "/src/main/resources/scripts/").register(watchService, ENTRY_MODIFY);
+            while (isRunning) {
+                pollEvents(watchService, game);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         try {
-            scriptUpdateThread.join();
+            Thread.currentThread().join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -87,13 +84,21 @@ public class ScriptUtils {
         run(game);
     }
 
-    public static synchronized void stop() {
+    public static void stop() {
         if (!isRunning) return;
 
         isRunning = false;
     }
 
-    public static void pollEvents(Game game) {
+    public static synchronized void stopPolling() {
+        try {
+            scriptUpdateThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void pollEvents(WatchService watchService, Game game) {
         WatchKey key;
         if ((key = watchService.poll()) != null) {
             for (WatchEvent e : key.pollEvents()) {
@@ -137,7 +142,7 @@ public class ScriptUtils {
     }
 
     public static CompletableFuture<Object> readScriptAsync(String script, String lang, Console console) {
-        return getScriptEngine(lang).thenApplyAsync(engine -> readScriptDI(script, engine, console));
+        return getScriptEngine(lang).thenApply(engine -> readScriptDI(script, engine, console));
     }
 
     private static Object readScriptDI(String script, ScriptEngine engine, Console console) {

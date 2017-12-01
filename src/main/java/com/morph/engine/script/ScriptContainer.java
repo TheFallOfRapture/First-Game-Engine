@@ -26,6 +26,17 @@ public class ScriptContainer extends Component {
         addBehaviorStrict(filename);
     }
 
+    public void addBehaviorAsync(String filename) {
+        ScriptUtils.getScriptBehaviorAsync(filename).thenAccept(behavior -> {
+            EntityBehavior eBehavior = (EntityBehavior) behavior;
+            eBehavior.setGame(game);
+            eBehavior.setSelf(parent);
+            behaviors.put(filename, eBehavior);
+            eBehavior.init();
+            eBehavior.start();
+        });
+    }
+
     private void addBehaviorStrict(String filename) {
         EntityBehavior behavior = ScriptUtils.getScriptBehavior(filename);
         behavior.setGame(game);
