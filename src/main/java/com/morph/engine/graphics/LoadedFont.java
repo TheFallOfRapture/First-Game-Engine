@@ -55,6 +55,8 @@ public class LoadedFont {
 
             ByteBuffer fontBuffer = IOUtils.getFileAsByteBuffer(font, 160 * 1024);
 
+            STBTruetype.stbtt_PackSetOversampling(context, 2, 2);
+
             STBTruetype.stbtt_PackBegin(context, pixels, LoadedFont.BITMAP_WIDTH, LoadedFont.BITMAP_HEIGHT, 0, 1);
             STBTruetype.stbtt_PackFontRange(context, fontBuffer, 0, LoadedFont.SIZE, 32, packedChars);
 
@@ -64,8 +66,6 @@ public class LoadedFont {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        System.out.println(CHARSET);
 
         kerningTable = new float[CHARSET.length()][CHARSET.length()];
 

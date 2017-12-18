@@ -4,6 +4,7 @@ import com.morph.engine.core.Game;
 import com.morph.engine.script.debug.Console;
 import com.morph.engine.entities.Component;
 import com.morph.engine.entities.Entity;
+import com.morph.engine.math.*;
 import com.morph.engine.util.EntityGenUtils;
 
 public abstract class ConsoleScript implements Runnable {
@@ -35,6 +36,10 @@ public abstract class ConsoleScript implements Runnable {
         Entity e = EntityGenUtils.createEntityRectangle(name, width, height, isTrigger, components);
         console.getGame().getWorld().addEntity(e);
         echo("Created new entity " + name + " (ID #" + e.getID() + ")");
+    }
+
+    protected Entity getEntity(String name) {
+        return console.getGame().getWorld().getEntityByName(name);
     }
 
     protected void clear() {

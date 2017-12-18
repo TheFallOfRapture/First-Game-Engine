@@ -33,7 +33,7 @@ public class TextRenderData extends RenderData {
             return;
         }
 
-        System.out.println(c);
+        if (c == '\r') return;
 
         LoadedCharacter charData = font.getCharacter(c);
         float[] offsetData = charData.getOffsetData();

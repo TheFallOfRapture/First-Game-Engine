@@ -23,7 +23,7 @@ public class ConsoleGUI extends GUI {
     private ConsoleTextField consoleInput;
     private TextField consoleOutput;
 
-    private final int FONT_SIZE = 20;
+    private final int FONT_SIZE = 21;
 
     public ConsoleGUI(Game game, Console console, int width, int height) {
         super(game);
@@ -42,8 +42,8 @@ public class ConsoleGUI extends GUI {
 
         Panel consoleBG = new Panel(new Vector2f(0, height - 500), new Vector2f(width, 500), new Color(0, 1, 0, 0.3f), new Texture("textures/solid.png"));
         Panel consoleInputBG = new Panel(new Vector2f(0, height - 520), new Vector2f(width, 20), new Color(0, 0, 1, 0.3f), new Texture("textures/solid.png"));
-        consoleInput = new ConsoleTextField(console, "", "C:/Windows/Fonts/Roboto-Regular.ttf", FONT_SIZE, new Color(1, 1, 1), new Vector2f(0, height - 515), -1200);
-        consoleOutput = new TextField("Morph 0.5.15 - Console Output\n", "C:/Windows/Fonts/Roboto-Regular.ttf", FONT_SIZE, new Color(1, 1, 1, 0.7f), new Vector2f(10, height - 20), -1200);
+        consoleInput = new ConsoleTextField(console, "", "C:/Windows/Fonts/FiraCode-Retina.ttf", FONT_SIZE, new Color(1, 1, 1), new Vector2f(0, height - 515), -1200);
+        consoleOutput = new TextField("Morph 0.5.15 - Console Output\n", "C:/Windows/Fonts/FiraCode-Retina.ttf", FONT_SIZE, new Color(1, 1, 1, 0.7f), new Vector2f(10, height - 20), -1200);
         consoleBG.setDepth(-1000);
         consoleInputBG.setDepth(-1000);
         addElement(consoleBG);
@@ -61,7 +61,6 @@ public class ConsoleGUI extends GUI {
     private void onKeyEvent(KeyEvent e) {
         if (isOpen()) {
             consoleInput.handleGUIKeyEvent(e);
-            System.out.println(e.getKeyCode());
         }
     }
 

@@ -7,6 +7,8 @@ import java.util.List;
 import com.morph.engine.core.gui.ConsoleGUI;
 import com.morph.engine.script.debug.Console;
 import com.morph.engine.events.EventDispatcher;
+import com.morph.engine.events.EventListener;
+import com.morph.engine.events.ExitEvent;
 import com.morph.engine.graphics.GLDisplay;
 import com.morph.engine.graphics.GLRenderingEngine;
 import com.morph.engine.input.Keyboard;
@@ -50,6 +52,8 @@ public abstract class Game implements Runnable {
 	public static final int VERSION_MINOR = 6;
 	public static final int VERSION_PATCH = 0;
 
+	private long delta;
+
 	public Game(int width, int height, String title, float fps, boolean fullscreen) {
 		this.width = width;
 		this.height = height;
@@ -65,6 +69,8 @@ public abstract class Game implements Runnable {
 		this.consoleGUI = new ConsoleGUI(this, console, width, height);
 
 		Game.screenOrtho = getScreenOrtho();
+
+//		System.setOut(Console.out);
 	}
 
 	public void start() {
@@ -87,6 +93,8 @@ public abstract class Game implements Runnable {
 			long newTime = System.nanoTime();
 			double frameTime = (newTime - currentTime) / 1000000000.0;
 			currentTime = newTime;
+
+			delta = newTime - currentTime;
 
 			accumulator += frameTime;
 
@@ -136,8 +144,7 @@ public abstract class Game implements Runnable {
 	}
 
 	private void init() {
-		Thread scriptInitThread = new Thread(() -> ScriptUtils.init(this), "Script Initialization Thread");
-		scriptInitThread.start();
+		ScriptUtils.launchInitializationTask(this);
 
 		display = new GLDisplay(width, height, title);
 		renderingEngine = new GLRenderingEngine(this);
@@ -151,12 +158,6 @@ public abstract class Game implements Runnable {
 
 		if (fullscreen)
 			display.setFullscreen(width, height);
-
-		try {
-			scriptInitThread.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 
 		initGame();
 
@@ -219,8 +220,8 @@ public abstract class Game implements Runnable {
 	protected void pollEvents() {
 		display.pollEvents();
 
-		if (display.isCloseRequested())
-			stop();
+//		if (display.isCloseRequested())
+//			stop();
 	}
 
 	public void stop() {
@@ -294,11 +295,24 @@ public abstract class Game implements Runnable {
 		behavior.start();
 	}
 
+	public void attachBehaviorAsync(String filename) {
+		ScriptUtils.getScriptBehaviorAsync(filename).thenAccept(behavior -> {
+			behavior.setGame(this);
+			behaviors.put(filename, behavior);
+			behavior.init();
+			behavior.start();
+		});
+	}
+
 	public void replaceBehavior(String filename, GameBehavior newBehavior) {
 		System.out.println("Behavior " + filename + " has been modified.");
 		newBehavior.setGame(this);
 		behaviors.replace(filename, newBehavior);
 		newBehavior.start();
+	}
+
+	public double getActualFPS() {
+		return (1.0 / delta) * 1000000000.0;
 	}
 
 	public abstract void initGame();
@@ -340,5 +354,11 @@ public abstract class Game implements Runnable {
 
 	public boolean isConsoleOpen() {
 		return consoleGUI.isOpen();
+	}
+
+	@EventListener(ExitEvent.class)
+	public void handleExitEvent(ExitEvent e) {
+		System.out.println("Morph is closing...");
+		stop();
 	}
 }

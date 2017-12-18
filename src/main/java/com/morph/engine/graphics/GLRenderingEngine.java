@@ -7,6 +7,7 @@ import com.morph.engine.graphics.components.RenderData;
 import com.morph.engine.math.Matrix4f;
 import com.morph.engine.newgui.Element;
 import com.morph.engine.physics.components.Transform;
+import com.morph.engine.physics.components.Transform2D;
 import com.morph.engine.tiles.Tile;
 import com.morph.engine.tiles.TileEmpty;
 import com.morph.engine.tiles.Tilemap;
@@ -74,8 +75,9 @@ public class GLRenderingEngine extends GameSystem {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		gameRenderables.forEach(this::render);
-		guiRenderables.sort((e1, e2) -> e2.getDepth() - e1.getDepth());
-		guiRenderables.forEach(this::render);
+//		System.out.println("There are " + gameRenderables.size() + " entities currently being rendered.");
+//		guiRenderables.sort((e1, e2) -> e2.getDepth() - e1.getDepth());
+//		guiRenderables.forEach(this::render);
 
 		display.update();
 	}

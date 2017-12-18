@@ -31,6 +31,7 @@ public class Console {
         }
     }
 
+<<<<<<< HEAD:src/main/java/com/morph/engine/script/debug/Console.java
     public static class ConsolePrintStream extends PrintStream {
         private ConsolePrintStream(@NotNull ConsoleOutputStream out) {
             super(out);
@@ -99,6 +100,8 @@ public class Console {
 
     private static PublishSubject<EventType> events = PublishSubject.create();
 
+=======
+>>>>>>> a0ccaa266818b69545ae881d3cb1295f70683bd4:src/main/java/com/morph/engine/debug/Console.java
     public enum ScriptType {
         KOTLIN, PYTHON, MULTI
     }
@@ -111,8 +114,8 @@ public class Console {
     private static ConsoleOutputStream outBytes = new ConsoleOutputStream();
     private static ConsoleOutputStream errBytes = new ConsoleOutputStream();
 
-    public static ConsolePrintStream out = new ConsolePrintStream(outBytes);
-    public static ConsolePrintStream err = new ConsolePrintStream(errBytes);
+    public static PrintStream out = new PrintStream(outBytes);
+    public static PrintStream err = new PrintStream(errBytes);
 
     public Console(Console.ScriptType type, Game game) {
         this.type = type;
