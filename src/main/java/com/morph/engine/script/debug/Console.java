@@ -31,7 +31,6 @@ public class Console {
         }
     }
 
-<<<<<<< HEAD:src/main/java/com/morph/engine/script/debug/Console.java
     public static class ConsolePrintStream extends PrintStream {
         private ConsolePrintStream(@NotNull ConsoleOutputStream out) {
             super(out);
@@ -100,8 +99,6 @@ public class Console {
 
     private static PublishSubject<EventType> events = PublishSubject.create();
 
-=======
->>>>>>> a0ccaa266818b69545ae881d3cb1295f70683bd4:src/main/java/com/morph/engine/debug/Console.java
     public enum ScriptType {
         KOTLIN, PYTHON, MULTI
     }
