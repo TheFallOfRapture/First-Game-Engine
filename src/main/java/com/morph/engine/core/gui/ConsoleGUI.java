@@ -11,6 +11,9 @@ import com.morph.engine.newgui.ConsoleTextField;
 import com.morph.engine.newgui.GUI;
 import com.morph.engine.newgui.Panel;
 import com.morph.engine.newgui.TextField;
+import io.reactivex.Flowable;
+
+import java.util.Objects;
 
 /**
  * Created on 11/24/2017.
@@ -30,10 +33,6 @@ public class ConsoleGUI extends GUI {
         this.console = console;
         this.width = width;
         this.height = height;
-
-        Keyboard.getKeyPresses().subscribe(this::onKeyEvent);
-        Console.events().filter(Console.EventType.CLEAR::equals).subscribe(e -> onConsoleClear(), e -> System.err.println("Error clearing the console."));
-        Console.events().filter(Console.EventType.UPDATE::equals).subscribe(e -> onConsoleUpdate(), e -> System.err.println("Error updating the console."));
     }
 
     @Override
@@ -50,6 +49,18 @@ public class ConsoleGUI extends GUI {
         addElement(consoleInputBG);
         addElement(consoleInput);
         addElement(consoleOutput);
+
+        Keyboard.getKeyPresses().subscribe(this::onKeyEvent);
+
+        Console.events()
+                .filter(Console.EventType.UPDATE::equals)
+                .map(e -> console.getLastLine())
+                .filter(Objects::nonNull)
+                .subscribe(consoleOutput::addString, e -> System.err.println("Error updating the console."));
+
+        Console.events()
+                .filter(Console.EventType.CLEAR::equals)
+                .subscribe(e -> onConsoleClear(), e -> System.err.println("Error clearing the console."));
     }
 
     @Override
@@ -75,10 +86,12 @@ public class ConsoleGUI extends GUI {
 //    }
 
     private void onConsoleUpdate() {
+        System.out.println("Updating the console...");
         consoleOutput.addString(console.getLastLine());
     }
 
     private void onConsoleClear() {
+        System.out.println("Clearing the console...");
         consoleOutput.clearText();
         Console.out.println("Cleared console text.");
     }

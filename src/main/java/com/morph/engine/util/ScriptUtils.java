@@ -7,6 +7,9 @@ import com.morph.engine.script.ConsoleScript;
 import com.morph.engine.script.EntityBehavior;
 import com.morph.engine.script.GameBehavior;
 import com.morph.engine.script.ScriptContainer;
+import io.reactivex.*;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import org.jetbrains.kotlin.script.jsr223.KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory;
 import org.python.jsr223.PyScriptEngineFactory;
 
@@ -20,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import static java.nio.file.StandardWatchEventKinds.*;
 
@@ -32,11 +34,29 @@ public class ScriptUtils {
     private static HashMap<String, List<Entity>> scriptedEntities = new HashMap<>();
     private static SimpleBindings bindings = new SimpleBindings();
     private static boolean isRunning;
-    private static Thread scriptUpdateThread;
     private static boolean initialized;
-    private static CompletableFuture<Void> initTask;
+    private static Completable initTask;
+    private static Flowable<Boolean> scriptUpdateTask;
+    private static Game game;
 
-    public static boolean init(Game game) {
+    public static void init(Game game) {
+        initTask = Completable.fromCallable(() -> ScriptUtils.load(game)).doOnComplete(() -> initTask = Completable.complete());
+
+        scriptUpdateTask = Flowable.fromCallable(() -> {
+            start(game);
+            return false;
+        }).doOnComplete(() -> {
+            if (!isRunning) {
+                scriptUpdateTask.onTerminateDetach();
+            }
+        });
+
+        initTask.subscribeOn(Schedulers.io()).doOnComplete(() -> scriptUpdateTask.subscribe()).subscribe();
+    }
+
+    public static boolean load(Game game) {
+        ScriptUtils.game = game;
+
         Console.out.println("Morph Script Engine 0.5.15 initializing... Please wait...");
         KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory kotlinEngine = new KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory();
         PyScriptEngineFactory pythonEngine = new PyScriptEngineFactory();
@@ -50,9 +70,6 @@ public class ScriptUtils {
 
         System.out.println(Paths.get(System.getProperty("user.dir") + "/src/main/resources/scripts/Test.kts").getFileName());
         System.out.println("Python support test: " + supportedScriptEngines.get("py").getFactory().getLanguageName());
-
-        scriptUpdateThread = new Thread(() -> start(game), "Script Update Thread");
-        scriptUpdateThread.start();
 
         initialized = true;
 
@@ -68,15 +85,9 @@ public class ScriptUtils {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        try {
-            Thread.currentThread().join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
-    private static synchronized void start(Game game) {
+    private static void start(Game game) {
         if (isRunning) return;
 
         isRunning = true;
@@ -87,14 +98,6 @@ public class ScriptUtils {
         if (!isRunning) return;
 
         isRunning = false;
-    }
-
-    public static synchronized void stopPolling() {
-        try {
-            scriptUpdateThread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     public static void pollEvents(WatchService watchService, Game game) {
@@ -140,8 +143,8 @@ public class ScriptUtils {
                "CustomScript()" ;
     }
 
-    public static CompletableFuture<Object> readScriptAsync(String script, String lang, Console console) {
-        return getScriptEngine(lang).thenApply(engine -> readScriptDI(script, engine, console));
+    public static Single<Object> readScriptAsync(String script, String lang, Console console) {
+        return getScriptEngine(lang).map(engine -> readScriptDI(script, engine, console));
     }
 
     private static Object readScriptDI(String script, ScriptEngine engine, Console console) {
@@ -160,12 +163,7 @@ public class ScriptUtils {
     }
 
     public static Object readScript(String script, String lang, Console console) {
-        ScriptEngine engine = null;
-        try {
-            engine = getScriptEngine(lang).get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
+        ScriptEngine engine = getScriptEngine(lang).blockingGet();
 
         Object result = readScriptDI(script, engine, console);
 
@@ -173,18 +171,15 @@ public class ScriptUtils {
         return result;
     }
 
-    public static CompletableFuture<Void> launchInitializationTask(Game game) {
-        return initTask = CompletableFuture.runAsync(() -> ScriptUtils.init(game));
-    }
-
-
     // TODO: When initialization is finished, return all requested script behaviors.
-    private static CompletableFuture<ScriptEngine> getScriptEngine(String lang) {
-        return initTask.thenApply((a) -> supportedScriptEngines.get(lang));
+    private static Single<ScriptEngine> getScriptEngine(String lang) {
+        return initTask.andThen((SingleSource<ScriptEngine>)s ->
+            s.onSuccess(supportedScriptEngines.get(lang))
+        );
     }
 
-    public static <T extends GameBehavior> CompletableFuture<T> getScriptBehaviorAsync(String filename) {
-        return getScriptEngine(getFileExtension(filename)).thenApply(engine -> getScriptBehaviorDI(filename, engine));
+    public static Single<GameBehavior> getScriptBehaviorAsync(String filename) {
+        return getScriptEngine(getFileExtension(filename)).flatMap(scriptEngine -> Single.just(getScriptBehaviorDI(filename, scriptEngine)));
     }
 
     private static <T extends GameBehavior> T getScriptBehaviorDI(String filename, ScriptEngine engine) {
@@ -223,12 +218,7 @@ public class ScriptUtils {
 
     public static <T extends GameBehavior> T getScriptBehavior(String filename) {
         String extension = getFileExtension(filename);
-        ScriptEngine engine = null;
-        try {
-            engine = getScriptEngine(extension).get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
+        ScriptEngine engine = getScriptEngine(extension).blockingGet();
 
         T behavior = getScriptBehaviorDI(filename, engine);
 
@@ -237,5 +227,13 @@ public class ScriptUtils {
 
     public static boolean isInitialized() {
         return initialized;
+    }
+
+    public static Flowable<Boolean> getScriptUpdateTask() {
+        return scriptUpdateTask;
+    }
+
+    public static Completable getInitializationTask() {
+        return initTask;
     }
 }

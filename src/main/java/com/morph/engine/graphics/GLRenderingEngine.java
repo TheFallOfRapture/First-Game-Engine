@@ -76,8 +76,8 @@ public class GLRenderingEngine extends GameSystem {
 
 		gameRenderables.forEach(this::render);
 //		System.out.println("There are " + gameRenderables.size() + " entities currently being rendered.");
-//		guiRenderables.sort((e1, e2) -> e2.getDepth() - e1.getDepth());
-//		guiRenderables.forEach(this::render);
+		guiRenderables.sort((e1, e2) -> e2.getDepth() - e1.getDepth());
+		guiRenderables.forEach(this::render);
 
 		display.update();
 	}

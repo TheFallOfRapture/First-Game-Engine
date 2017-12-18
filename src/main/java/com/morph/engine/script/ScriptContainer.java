@@ -27,7 +27,7 @@ public class ScriptContainer extends Component {
     }
 
     public void addBehaviorAsync(String filename) {
-        ScriptUtils.getScriptBehaviorAsync(filename).thenAccept(behavior -> {
+        ScriptUtils.getScriptBehaviorAsync(filename).subscribe(behavior -> {
             EntityBehavior eBehavior = (EntityBehavior) behavior;
             eBehavior.setGame(game);
             eBehavior.setSelf(parent);

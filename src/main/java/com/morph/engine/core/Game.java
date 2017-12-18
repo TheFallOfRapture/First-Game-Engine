@@ -22,6 +22,7 @@ import com.morph.engine.newgui.GUI;
 import com.morph.engine.script.GameBehavior;
 import com.morph.engine.script.ScriptSystem;
 import com.morph.engine.util.ScriptUtils;
+import io.reactivex.schedulers.Schedulers;
 
 public abstract class Game implements Runnable {
 	protected int width, height;
@@ -77,9 +78,10 @@ public abstract class Game implements Runnable {
 		if (isRunning)
 			return;
 
+		isRunning = true;
+
 		init();
 
-		isRunning = true;
 		long currentTime = System.nanoTime();
 		double accumulator = 0.0;
 		while (isRunning) {
@@ -144,7 +146,7 @@ public abstract class Game implements Runnable {
 	}
 
 	private void init() {
-		ScriptUtils.launchInitializationTask(this);
+		ScriptUtils.init(this);
 
 		display = new GLDisplay(width, height, title);
 		renderingEngine = new GLRenderingEngine(this);
@@ -296,7 +298,7 @@ public abstract class Game implements Runnable {
 	}
 
 	public void attachBehaviorAsync(String filename) {
-		ScriptUtils.getScriptBehaviorAsync(filename).thenAccept(behavior -> {
+		ScriptUtils.getScriptBehaviorAsync(filename).subscribe(behavior -> {
 			behavior.setGame(this);
 			behaviors.put(filename, behavior);
 			behavior.init();

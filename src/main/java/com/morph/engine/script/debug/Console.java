@@ -1,9 +1,12 @@
 package com.morph.engine.script.debug;
 
 import com.morph.engine.core.Game;
+import com.morph.engine.util.Feed;
+import com.morph.engine.util.Listener;
 import com.morph.engine.util.ScriptUtils;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
-import io.reactivex.subjects.PublishSubject;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -97,7 +100,24 @@ public class Console {
         }
     }
 
-    private static PublishSubject<EventType> events = PublishSubject.create();
+    private static Feed<EventType> eventFeed = new Feed<>();
+
+    private static Flowable<EventType> events = Flowable.create(emitter -> {
+        Listener<EventType> eventListener = new Listener<EventType>() {
+            @Override
+            public void onNext(EventType eventType) {
+                emitter.onNext(eventType);
+                if (!Console.game.isRunning())
+                    emitter.onComplete();
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                emitter.onError(t);
+            }
+        };
+        eventFeed.register(eventListener);
+    }, BackpressureStrategy.BUFFER);
 
     public enum ScriptType {
         KOTLIN, PYTHON, MULTI
@@ -106,7 +126,7 @@ public class Console {
     private static String text = "";
     private ScriptType type;
     private static String currentLine = "";
-    private Game game;
+    private static Game game;
 
     private static ConsoleOutputStream outBytes = new ConsoleOutputStream();
     private static ConsoleOutputStream errBytes = new ConsoleOutputStream();
@@ -116,9 +136,7 @@ public class Console {
 
     public Console(Console.ScriptType type, Game game) {
         this.type = type;
-        this.game = game;
-
-//        EventDispatcher.INSTANCE.addEventHandler(this);
+        Console.game = game;
     }
 
     public void readIn(String line) {
@@ -128,17 +146,16 @@ public class Console {
     private static void print(String line) {
         Console.currentLine = line;
         Console.text += line;
+        System.out.println("NEW UPDATE EVENT SHOULD HAVE BEEN FIRED");
 
-//        EventDispatcher.INSTANCE.dispatchEvent(new ConsoleEvent(null, ConsoleEvent.EventType.UPDATE, ""));
-        events.onNext(EventType.UPDATE);
+        eventFeed.onNext(EventType.UPDATE);
     }
 
     private static void newLine() {
         Console.currentLine = "\n";
         Console.text += "\n";
 
-//        EventDispatcher.INSTANCE.dispatchEvent(new ConsoleEvent(null, ConsoleEvent.EventType.UPDATE, ""));
-        events.onNext(EventType.UPDATE);
+        eventFeed.onNext(EventType.UPDATE);
     }
 
     public String getText() {
@@ -172,12 +189,11 @@ public class Console {
         Console.text = "";
         Console.currentLine = "";
 
-//        EventDispatcher.INSTANCE.dispatchEvent(new ConsoleEvent(null, ConsoleEvent.EventType.CLEAR, ""));
-        events.onNext(EventType.CLEAR);
+        eventFeed.onNext(EventType.CLEAR);
     }
 
     @Contract(pure = true)
-    public static Observable<EventType> events() {
+    public static Flowable<EventType> events() {
         return events;
     }
 }
