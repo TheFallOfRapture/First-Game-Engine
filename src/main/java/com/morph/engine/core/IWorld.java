@@ -10,40 +10,29 @@ import java.util.stream.Collectors;
 /**
  * Created by Fernando on 1/19/2017.
  */
-public abstract class World {
-    protected Game game;
+public interface IWorld {
+    Game getGame();
+    List<Entity> getEntities();
 
-    public World(Game game) {
-        this.game = game;
-    }
-
-    public Game getGame() {
-        return game;
-    }
-
-    public abstract List<Entity> getEntities();
-
-    public Entity getEntityByName(String name) {
+    default Entity getEntityByName(String name) {
         return getEntities()
                 .parallelStream()
                 .map(e -> new Pair<>(e, e.getName()))
                 .filter(pair -> pair.getSecond().equals(name))
-                .collect(Collectors.toCollection(ArrayList::new))
+                .collect(Collectors.toList())
                 .get(0)
                 .getFirst();
     }
 
-    public Entity getEntityByID(int id) {
+    default Entity getEntityByID(int id) {
         return getEntities()
                 .parallelStream()
                 .map(e -> new Pair<>(e, e.getID()))
                 .filter(pair -> pair.getSecond().equals(id))
-                .collect(Collectors.toCollection(ArrayList::new))
+                .collect(Collectors.toList())
                 .get(0)
                 .getFirst();
     }
 
-    public boolean addEntity(Entity e) {
-        return getEntities().add(e);
-    }
+    boolean addEntity(Entity e); // TODO: Should this really be required?
 }

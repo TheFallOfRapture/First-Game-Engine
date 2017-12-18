@@ -1,6 +1,5 @@
 package com.morph.engine.events;
 
-import com.morph.engine.graphics.GLDisplay;
 import com.morph.engine.input.Keyboard;
 
 public class KeyEvent extends Event {

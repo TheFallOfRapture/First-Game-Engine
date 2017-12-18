@@ -2,8 +2,9 @@ package com.morph.engine.input;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-import com.morph.engine.events.EventDispatcher;
 import com.morph.engine.events.KeyEvent;
+import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
 
 public class Keyboard {
 	private final static int keys = GLFW_KEY_LAST;
@@ -11,6 +12,9 @@ public class Keyboard {
 	private static boolean keysPressed[] = new boolean[keys];
 	private static boolean keysDown[] = new boolean[keys];
 	private static boolean keysReleased[] = new boolean[keys];
+
+	private static PublishSubject<KeyEvent> keyPresses = PublishSubject.create();
+	private static PublishSubject<KeyEvent> keyReleases = PublishSubject.create();
 	
 	/**
 	 * Key Pressed Event:
@@ -59,7 +63,8 @@ public class Keyboard {
 		}
 
 		keysPressed[keycode] = true;
-		EventDispatcher.INSTANCE.dispatchEvent(new KeyEvent(INSTANCE, keycode, GLFW_PRESS, 0));
+//		EventDispatcher.INSTANCE.dispatchEvent(new KeyEvent(INSTANCE, keycode, GLFW_PRESS, 0));
+		keyPresses.onNext(new KeyEvent(INSTANCE, keycode, GLFW_PRESS, 0));
 	}
 
 	public static void keyReleased(int keycode) {
@@ -70,7 +75,8 @@ public class Keyboard {
 
 		keysReleased[keycode] = true;
 		keysDown[keycode] = false;
-		EventDispatcher.INSTANCE.dispatchEvent(new KeyEvent(INSTANCE, keycode, GLFW_RELEASE, 0));
+//		EventDispatcher.INSTANCE.dispatchEvent(new KeyEvent(INSTANCE, keycode, GLFW_RELEASE, 0));
+		keyReleases.onNext(new KeyEvent(INSTANCE, keycode, GLFW_RELEASE, 0));
 	}
 
 	public static void keyTyped(KeyEvent e) {
@@ -78,4 +84,11 @@ public class Keyboard {
 		
 	}
 
+	public static Observable<KeyEvent> getKeyPresses() {
+		return keyPresses;
+	}
+
+	public static Observable<KeyEvent> getKeyReleases() {
+		return keyReleases;
+	}
 }

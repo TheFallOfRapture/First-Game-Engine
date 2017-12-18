@@ -1,7 +1,7 @@
 package com.morph.engine.util;
 
 import com.morph.engine.core.Game;
-import com.morph.engine.debug.Console;
+import com.morph.engine.script.debug.Console;
 import com.morph.engine.entities.Entity;
 import com.morph.engine.script.ConsoleScript;
 import com.morph.engine.script.EntityBehavior;
@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 
 import static java.nio.file.StandardWatchEventKinds.*;
 

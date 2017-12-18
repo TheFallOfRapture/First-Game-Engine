@@ -1,7 +1,8 @@
 package com.morph.engine.core.gui;
 
 import com.morph.engine.core.Game;
-import com.morph.engine.debug.Console;
+import com.morph.engine.input.Keyboard;
+import com.morph.engine.script.debug.Console;
 import com.morph.engine.events.*;
 import com.morph.engine.graphics.Color;
 import com.morph.engine.graphics.Texture;
@@ -29,11 +30,15 @@ public class ConsoleGUI extends GUI {
         this.console = console;
         this.width = width;
         this.height = height;
+
+        Keyboard.getKeyPresses().subscribe(this::onKeyEvent);
+        Console.events().filter(Console.EventType.CLEAR::equals).subscribe(e -> onConsoleClear(), e -> System.err.println("Error clearing the console."));
+        Console.events().filter(Console.EventType.UPDATE::equals).subscribe(e -> onConsoleUpdate(), e -> System.err.println("Error updating the console."));
     }
 
     @Override
     public void init() {
-        EventDispatcher.INSTANCE.addEventHandler(this);
+//        EventDispatcher.INSTANCE.addEventHandler(this);
 
         Panel consoleBG = new Panel(new Vector2f(0, height - 500), new Vector2f(width, 500), new Color(0, 1, 0, 0.3f), new Texture("textures/solid.png"));
         Panel consoleInputBG = new Panel(new Vector2f(0, height - 520), new Vector2f(width, 20), new Color(0, 0, 1, 0.3f), new Texture("textures/solid.png"));
@@ -52,22 +57,31 @@ public class ConsoleGUI extends GUI {
         consoleOutput.setText(console.getText());
     }
 
-    @EventListener(KeyEvent.class)
-    public void onKeyEvent(KeyEvent e) {
+//    @EventListener(KeyEvent.class)
+    private void onKeyEvent(KeyEvent e) {
         if (isOpen()) {
             consoleInput.handleGUIKeyEvent(e);
             System.out.println(e.getKeyCode());
         }
     }
 
-    @EventListener(ConsoleEvent.class)
-    public void onConsoleEvent(ConsoleEvent e) {
-        if (e.getType() == ConsoleEvent.EventType.UPDATE) {
-            consoleOutput.addString(console.getLastLine());
-        } else if (e.getType() == ConsoleEvent.EventType.CLEAR) {
-            consoleOutput.clearText();
-            Console.out.println("Cleared console text.");
-        }
+//    @EventListener(ConsoleEvent.class)
+//    public void onConsoleEvent(ConsoleEvent e) {
+//        if (e.getType() == ConsoleEvent.EventType.UPDATE) {
+//            consoleOutput.addString(console.getLastLine());
+//        } else if (e.getType() == ConsoleEvent.EventType.CLEAR) {
+//            consoleOutput.clearText();
+//            Console.out.println("Cleared console text.");
+//        }
+//    }
+
+    private void onConsoleUpdate() {
+        consoleOutput.addString(console.getLastLine());
+    }
+
+    private void onConsoleClear() {
+        consoleOutput.clearText();
+        Console.out.println("Cleared console text.");
     }
 
     @Override

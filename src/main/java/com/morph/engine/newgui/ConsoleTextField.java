@@ -1,15 +1,10 @@
 package com.morph.engine.newgui;
 
-import com.morph.engine.debug.Console;
+import com.morph.engine.script.debug.Console;
 import com.morph.engine.events.KeyEvent;
 import com.morph.engine.graphics.Color;
 import com.morph.engine.input.Keyboard;
 import com.morph.engine.math.Vector2f;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static org.lwjgl.glfw.GLFW.*;
 

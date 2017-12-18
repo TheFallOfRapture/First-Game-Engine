@@ -1,5 +1,7 @@
 package com.morph.engine.math;
 
+import java.util.function.Function;
+
 public class Vector2f {
 	private float x, y;
 	public Vector2f(float x, float y) {
@@ -137,6 +139,10 @@ public class Vector2f {
 
 	public float dot(Vector2f v) {
 		return (x * v.getX()) + (y * v.getY());
+	}
+
+	public Vector2f map(Function<Float, Float> fun) {
+		return new Vector2f(fun.apply(x), fun.apply(y));
 	}
 
 	public static Vector2f reflect(Vector2f n, Vector2f v) {

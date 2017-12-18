@@ -11,7 +11,8 @@ import java.util.List;
 /**
  * Created by Fernando on 1/19/2017.
  */
-public class TileWorld extends World {
+public class TileWorld implements IWorld {
+    private Game game;
     private int width;
     private int height;
     private float xOffset;
@@ -20,7 +21,7 @@ public class TileWorld extends World {
     private Entity[] entities;
 
     public TileWorld(Game game, int width, int height, float tileSize) {
-        super(game);
+        this.game = game;
         this.width = width;
         this.height = height;
         this.xOffset = 0;
@@ -30,8 +31,25 @@ public class TileWorld extends World {
     }
 
     @Override
+    public Game getGame() {
+        return game;
+    }
+
+    @Override
     public List<Entity> getEntities() {
         return Arrays.asList(entities);
+    }
+
+    @Override
+    public Entity getEntityByID(int id) {
+        return null;
+    }
+
+    // TODO: Strict implementation = return false
+    @Override
+    public boolean addEntity(Entity e) {
+        Vector2f tilePos = e.getComponent(Transform2D.class).getPosition().invScale(tileSize).map(x -> (float) Math.floor(x));
+        return addEntity(e, (int) tilePos.getX(), (int) tilePos.getY());
     }
 
     public int getWidth() {

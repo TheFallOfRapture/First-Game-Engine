@@ -3,14 +3,10 @@ package com.morph.engine.core;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.*;
 
 import com.morph.engine.core.gui.ConsoleGUI;
-import com.morph.engine.debug.Console;
-import com.morph.engine.entities.Entity;
-import com.morph.engine.events.ConsoleEvent;
+import com.morph.engine.script.debug.Console;
 import com.morph.engine.events.EventDispatcher;
-import com.morph.engine.events.EventListener;
 import com.morph.engine.graphics.GLDisplay;
 import com.morph.engine.graphics.GLRenderingEngine;
 import com.morph.engine.input.Keyboard;
@@ -21,7 +17,6 @@ import com.morph.engine.math.Vector2f;
 import com.morph.engine.newgui.Container;
 import com.morph.engine.newgui.Element;
 import com.morph.engine.newgui.GUI;
-import com.morph.engine.physics.PhysicsEngine;
 import com.morph.engine.script.GameBehavior;
 import com.morph.engine.script.ScriptSystem;
 import com.morph.engine.util.ScriptUtils;
@@ -29,11 +24,10 @@ import com.morph.engine.util.ScriptUtils;
 public abstract class Game implements Runnable {
 	protected int width, height;
 	protected String title;
-	protected PhysicsEngine physicsEngine;
 	protected boolean isRunning = false;
 	protected boolean fullscreen;
 
-	protected World world;
+	protected IWorld world;
 	protected List<GameSystem> systems;
 
 	protected HashMap<String, GameBehavior> behaviors;
@@ -53,15 +47,14 @@ public abstract class Game implements Runnable {
 	public static Matrix4f screenOrtho;
 
 	public static final int VERSION_MAJOR = 0;
-	public static final int VERSION_MINOR = 5;
-	public static final int VERSION_PATCH = 15;
+	public static final int VERSION_MINOR = 6;
+	public static final int VERSION_PATCH = 0;
 
 	public Game(int width, int height, String title, float fps, boolean fullscreen) {
 		this.width = width;
 		this.height = height;
 		this.title = title;
 		this.dt = 1.0f / fps;
-		physicsEngine = new PhysicsEngine();
 		systems = new ArrayList<>();
 		guiElements = new ArrayList<>();
 		guis = new ArrayList<>();
@@ -314,7 +307,7 @@ public abstract class Game implements Runnable {
 	public abstract void postGameUpdate();
 	public abstract void handleInput();
 
-	public abstract World getWorld();
+	public abstract IWorld getWorld();
 
 	public final void render() {
 		renderingEngine.render(display);
@@ -322,10 +315,6 @@ public abstract class Game implements Runnable {
 
 	public boolean isRunning() {
 		return isRunning;
-	}
-
-	public List<Entity> getEntities() {
-		return world.getEntities();
 	}
 
 	public Matrix4f getScreenOrtho() {
@@ -347,10 +336,6 @@ public abstract class Game implements Runnable {
 	public void toggleConsole() {
 		if (consoleGUI.isOpen()) closeConsole();
 		else openConsole();
-	}
-
-	public void addEntity(Entity e) {
-		getWorld().addEntity(e);
 	}
 
 	public boolean isConsoleOpen() {

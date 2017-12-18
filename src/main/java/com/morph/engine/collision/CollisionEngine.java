@@ -14,6 +14,7 @@ import com.morph.engine.math.MathUtils;
 import com.morph.engine.math.Vector2f;
 import com.morph.engine.math.Vector3f;
 import com.morph.engine.physics.components.Velocity2D;
+import org.jetbrains.annotations.NotNull;
 
 // Reference: noonat.github.io/intersect/
 
@@ -28,8 +29,8 @@ public class CollisionEngine extends GameSystem {
 	
 	protected void systemFixedUpdate(float dt) {
 		List<Entity> collidables = new ArrayList<Entity>();
-		for (int i = game.getEntities().size() - 1; i >= 0; i--) {
-			Entity e = game.getEntities().get(i);
+		for (int i = game.getWorld().getEntities().size() - 1; i >= 0; i--) {
+			Entity e = game.getWorld().getEntities().get(i);
 			if (e != null && acceptEntity(e)) {
 				collidables.add(e);
 			}
@@ -168,40 +169,23 @@ public class CollisionEngine extends GameSystem {
 			// A STILL | B MOVING
 			Vector2f delta = vB.scale(dt);
 			Collision c = checkStaticDynamic(boxA, boxB, delta, boxB.getHalfSize());
-			if (c != null) {
-				float time = MathUtils.clamp(c.getTime(), 0f, 1f);
-				Vector2f pos = boxB.getCenter().add(delta).scale(time);
-				Vector2f dir = delta.normalize();
-				Vector2f hitPos = c.getPosition().add(boxB.getHalfSize().mul(dir));
-				Collision newC = new Collision(a, b, hitPos, c.getIntersection(), c.getNormal(), time);
-				return new SweepCollision(newC, pos, time);
-			} else {
-				Vector2f pos = boxB.getCenter().add(delta);
-				float time = 1;
-				return new SweepCollision(c, pos, time);
-			}
+			return getSweepCollision(a, b, boxB, delta, c);
 		}
 		
 		if (vB.getX() == 0 && vB.getY() == 0) { // A MOVING | B STILL
 			Vector2f delta = vA.scale(dt);
 			Collision c = checkStaticDynamic(boxB, boxA, delta, boxA.getHalfSize());
-			if (c != null) {
-				float time = MathUtils.clamp(c.getTime(), 0f, 1f);
-				Vector2f pos = boxA.getCenter().add(delta).scale(time);
-				Vector2f dir = delta.normalize();
-				Vector2f hitPos = c.getPosition().add(boxA.getHalfSize().mul(dir));
-				Collision newC = new Collision(b, a, hitPos, c.getIntersection(), c.getNormal(), time);
-				return new SweepCollision(newC, pos, time);
-			} else {
-				Vector2f pos = boxA.getCenter().add(delta);
-				float time = 1;
-				return new SweepCollision(c, pos, time);
-			}
+			return getSweepCollision(b, a, boxA, delta, c);
 		}
 		
 		// A MOVING | B MOVING (CALCULATE AS IF A WAS STILL)
 		Vector2f delta = vB.sub(vA).scale(dt);
 		Collision c = checkDoubleDynamic(boxA, boxB, vA, vB, boxB.getHalfSize(), dt);
+		return getSweepCollision(a, b, boxB, delta, c);
+	}
+
+	@NotNull
+	private static SweepCollision getSweepCollision(Entity a, Entity b, BoundingBox2D boxB, Vector2f delta, Collision c) {
 		if (c != null) {
 			float time = MathUtils.clamp(c.getTime(), 0f, 1f);
 			Vector2f pos = boxB.getCenter().add(delta).scale(time);
@@ -215,7 +199,7 @@ public class CollisionEngine extends GameSystem {
 			return new SweepCollision(c, pos, time);
 		}
 	}
-	
+
 	public static Collision checkDoubleStatic(BoundingBox2D a, BoundingBox2D b) {
 		Vector2f delta = b.getCenter().sub(a.getCenter());
 		Vector2f proj = b.getHalfSize().add(a.getHalfSize()).sub(delta.abs());

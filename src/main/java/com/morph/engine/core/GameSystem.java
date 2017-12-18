@@ -14,8 +14,8 @@ public abstract class GameSystem {
 	public abstract void initSystem();
 	
 	public final void preUpdate() {
-		for (int i = game.getEntities().size() - 1; i >= 0; i--) {
-			Entity e = game.getEntities().get(i);
+		for (int i = game.getWorld().getEntities().size() - 1; i >= 0; i--) {
+			Entity e = game.getWorld().getEntities().get(i);
 			if (e != null && acceptEntity(e)) {
 				preUpdate(e);
 			}
@@ -25,8 +25,8 @@ public abstract class GameSystem {
 	}
 	
 	public final void update() {
-		for (int i = game.getEntities().size() - 1; i >= 0; i--) {
-			Entity e = game.getEntities().get(i);
+		for (int i = game.getWorld().getEntities().size() - 1; i >= 0; i--) {
+			Entity e = game.getWorld().getEntities().get(i);
 			if (e != null && acceptEntity(e)) {
 				update(e);
 			}
@@ -36,8 +36,8 @@ public abstract class GameSystem {
 	}
 	
 	public final void fixedUpdate(float dt) {
-		for (int i = game.getEntities().size() - 1; i >= 0; i--) {
-			Entity e = game.getEntities().get(i);
+		for (int i = game.getWorld().getEntities().size() - 1; i >= 0; i--) {
+			Entity e = game.getWorld().getEntities().get(i);
 			if (e != null && acceptEntity(e)) {
 				fixedUpdate(e, dt);
 			}
@@ -47,8 +47,8 @@ public abstract class GameSystem {
 	}
 	
 	public final void postUpdate() {
-		for (int i = game.getEntities().size() - 1; i >= 0; i--) {
-			Entity e = game.getEntities().get(i);
+		for (int i = game.getWorld().getEntities().size() - 1; i >= 0; i--) {
+			Entity e = game.getWorld().getEntities().get(i);
 			if (e != null && acceptEntity(e)) {
 				postUpdate(e);
 			}

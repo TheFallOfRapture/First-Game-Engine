@@ -33,6 +33,8 @@ public class TextRenderData extends RenderData {
             return;
         }
 
+        System.out.println(c);
+
         LoadedCharacter charData = font.getCharacter(c);
         float[] offsetData = charData.getOffsetData();
         Vector2f[] texCoords = charData.getTexCoords();

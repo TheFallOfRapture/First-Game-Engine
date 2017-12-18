@@ -18,7 +18,7 @@ import com.morph.engine.math.Vector4f;
 import com.morph.engine.physics.components.Transform;
 
 @Deprecated
-public class RenderingEngine extends GameSystem {
+public class CustomRenderingEngine extends GameSystem {
 	private HashMap<Integer, Vertex> vertices;
 	private List<Fragment> fragments;
 	private List<Triangle> triangles;
@@ -27,7 +27,7 @@ public class RenderingEngine extends GameSystem {
 	
 	private AtomicInteger vertexIDGenerator;
 	
-	public RenderingEngine(Game game) {
+	public CustomRenderingEngine(Game game) {
 		super(game);
 		vertices = new HashMap<Integer, Vertex>();
 		fragments = new ArrayList<Fragment>();

@@ -8,17 +8,23 @@ import java.util.List;
 /**
  * Created by Fernando on 1/19/2017.
  */
-public class ListWorld extends World {
+public class ListWorld implements IWorld {
+    private Game game;
     private List<Entity> entities;
 
     public ListWorld(Game game) {
-        super(game);
+        this.game = game;
         this.entities = new ArrayList<>();
     }
 
     @Override
     public List<Entity> getEntities() {
         return entities;
+    }
+
+    @Override
+    public Game getGame() {
+        return game;
     }
 
     public boolean addEntity(Entity e) {

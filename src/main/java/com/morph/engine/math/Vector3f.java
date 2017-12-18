@@ -1,5 +1,7 @@
 package com.morph.engine.math;
 
+import java.util.function.Function;
+
 public class Vector3f {
 	private float x, y, z;
 	public Vector3f(float x, float y, float z) {
@@ -129,6 +131,10 @@ public class Vector3f {
 
 	public Vector3f negate() {
 		return new Vector3f(-x, -y, -z);
+	}
+
+	public Vector3f map(Function<Float, Float> fun) {
+		return new Vector3f(fun.apply(x), fun.apply(y), fun.apply(z));
 	}
 
 	public static Vector3f reflect(Vector3f n, Vector3f v) {

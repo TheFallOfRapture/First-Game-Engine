@@ -1,21 +1,23 @@
-package com.morph.engine.debug;
+package com.morph.engine.script.debug;
 
 import com.morph.engine.core.Game;
-import com.morph.engine.events.ConsoleEvent;
-import com.morph.engine.events.EventDispatcher;
-import com.morph.engine.events.EventListener;
 import com.morph.engine.util.ScriptUtils;
+import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.logging.Logger;
 
 /**
  * Created on 11/24/2017.
  */
 public class Console {
+    public enum EventType {
+        UPDATE, CLEAR
+    }
+
     private static class ConsoleOutputStream extends OutputStream {
         @Override
         public void write(@NotNull byte[] buffer, int offset, int length) {
@@ -95,6 +97,8 @@ public class Console {
         }
     }
 
+    private static PublishSubject<EventType> events = PublishSubject.create();
+
     public enum ScriptType {
         KOTLIN, PYTHON, MULTI
     }
@@ -113,7 +117,8 @@ public class Console {
     public Console(Console.ScriptType type, Game game) {
         this.type = type;
         this.game = game;
-        EventDispatcher.INSTANCE.addEventHandler(this);
+
+//        EventDispatcher.INSTANCE.addEventHandler(this);
     }
 
     public void readIn(String line) {
@@ -124,14 +129,16 @@ public class Console {
         Console.currentLine = line;
         Console.text += line;
 
-        EventDispatcher.INSTANCE.dispatchEvent(new ConsoleEvent(null, ConsoleEvent.EventType.UPDATE, ""));
+//        EventDispatcher.INSTANCE.dispatchEvent(new ConsoleEvent(null, ConsoleEvent.EventType.UPDATE, ""));
+        events.onNext(EventType.UPDATE);
     }
 
     private static void newLine() {
         Console.currentLine = "\n";
         Console.text += "\n";
 
-        EventDispatcher.INSTANCE.dispatchEvent(new ConsoleEvent(null, ConsoleEvent.EventType.UPDATE, ""));
+//        EventDispatcher.INSTANCE.dispatchEvent(new ConsoleEvent(null, ConsoleEvent.EventType.UPDATE, ""));
+        events.onNext(EventType.UPDATE);
     }
 
     public String getText() {
@@ -165,6 +172,12 @@ public class Console {
         Console.text = "";
         Console.currentLine = "";
 
-        EventDispatcher.INSTANCE.dispatchEvent(new ConsoleEvent(null, ConsoleEvent.EventType.CLEAR, ""));
+//        EventDispatcher.INSTANCE.dispatchEvent(new ConsoleEvent(null, ConsoleEvent.EventType.CLEAR, ""));
+        events.onNext(EventType.CLEAR);
+    }
+
+    @Contract(pure = true)
+    public static Observable<EventType> events() {
+        return events;
     }
 }

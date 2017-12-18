@@ -1,6 +1,6 @@
 package com.morph.engine.newgui;
 
-import com.morph.engine.debug.Console;
+import com.morph.engine.script.debug.Console;
 import com.morph.engine.graphics.components.RenderData;
 import com.morph.engine.math.Vector2f;
 import com.morph.engine.physics.components.Transform2D;

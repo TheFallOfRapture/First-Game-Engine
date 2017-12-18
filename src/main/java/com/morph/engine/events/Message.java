@@ -1,7 +1,5 @@
 package com.morph.engine.events;
 
-import com.morph.engine.entities.Component;
-
 /**
  * Created by Fernando on 1/12/2017.
  */

@@ -37,6 +37,7 @@ task sourcesJar(type : Jar, dependsOn : classes) {
 
 repositories {
 	mavenCentral()
+	jcenter()
 	maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 	maven { url "https://jitpack.io" }
 }
@@ -71,6 +72,7 @@ dependencies {
 	runtime "org.lwjgl:lwjgl-stb:${lwjglVersion}:${lwjglNatives}"
 	runtime "org.lwjgl:lwjgl-xxhash:${lwjglVersion}:${lwjglNatives}"
 	// LWJGL dependencies END
+	compile 'io.reactivex.rxjava2:rxkotlin:2.2.0'
 	compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:1.1.2-5"
 	compile "org.jetbrains.kotlin:kotlin-compiler:1.1.2-5"
 	compile "org.jetbrains.kotlin:kotlin-script-util:1.1.2-5"
