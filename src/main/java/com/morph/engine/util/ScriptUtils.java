@@ -10,6 +10,7 @@ import com.morph.engine.script.ScriptContainer;
 import io.reactivex.*;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.SingleSubject;
 import org.jetbrains.kotlin.script.jsr223.KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory;
 import org.python.jsr223.PyScriptEngineFactory;
 
@@ -22,7 +23,6 @@ import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import static java.nio.file.StandardWatchEventKinds.*;
 
@@ -36,22 +36,19 @@ public class ScriptUtils {
     private static boolean isRunning;
     private static boolean initialized;
     private static Completable initTask;
-    private static Flowable<Boolean> scriptUpdateTask;
+    private static Flowable<GameBehavior> scriptUpdateTask;
+    private static Disposable scriptUpdaterHandle;
     private static Game game;
 
     public static void init(Game game) {
-        initTask = Completable.fromCallable(() -> ScriptUtils.load(game)).doOnComplete(() -> initTask = Completable.complete());
-
-        scriptUpdateTask = Flowable.fromCallable(() -> {
-            start(game);
-            return false;
-        }).doOnComplete(() -> {
-            if (!isRunning) {
-                scriptUpdateTask.onTerminateDetach();
-            }
-        });
-
-        initTask.subscribeOn(Schedulers.io()).doOnComplete(() -> scriptUpdateTask.subscribe()).subscribe();
+        initTask = Single.just(game).observeOn(Schedulers.single()).flatMapCompletable(g -> Completable.fromCallable(() -> ScriptUtils.load(g)));
+        initTask.subscribe(() -> scriptUpdaterHandle = Flowable.create(ScriptUtils::runReactive, BackpressureStrategy.BUFFER)
+                .map(event -> Paths.get("scripts/").resolve(event.context()).getFileName().toString())
+                .flatMapSingle(ScriptUtils::getScriptBehaviorAsync)
+                .subscribe(behavior -> {
+                    if (behavior instanceof EntityBehavior) scriptedEntities.get(behavior.getName()).forEach(entity -> entity.getComponent(ScriptContainer.class).replaceBehavior(behavior.getName(), (EntityBehavior)behavior));
+                    else game.replaceBehavior(behavior.getName(), behavior);
+                }));
     }
 
     public static boolean load(Game game) {
@@ -74,6 +71,66 @@ public class ScriptUtils {
         initialized = true;
 
         return true;
+    }
+
+    public static void stopRx() {
+        scriptUpdaterHandle.dispose();
+    }
+
+    private static void runReactive(FlowableEmitter<WatchEvent<Path>> subscriber) {
+        try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
+            Paths.get(System.getProperty("user.dir") + "/src/main/resources/scripts/").register(watchService, ENTRY_MODIFY);
+            while (isRunning) {
+                WatchKey key;
+                if ((key = watchService.poll()) != null) {
+                    for (WatchEvent e : key.pollEvents()) {
+                        WatchEvent.Kind<?> kind = e.kind();
+
+                        if (kind == OVERFLOW) continue;
+
+                        WatchEvent<Path> event = (WatchEvent<Path>)e;
+                        subscriber.onNext(event);
+                    }
+
+                    key.reset();
+                }
+            }
+        } catch (IOException e) {
+            subscriber.onError(e);
+        }
+    }
+
+    private static Flowable<GameBehavior> runRx(Game game) {
+        return Flowable.create(emitter -> {
+            try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
+                Paths.get(System.getProperty("user.dir") + "/src/main/resources/scripts/").register(watchService, ENTRY_MODIFY);
+                while (true) {
+                    WatchKey key;
+                    if ((key = watchService.poll()) != null) {
+                        for (WatchEvent e : key.pollEvents()) {
+                            WatchEvent.Kind<?> kind = e.kind();
+
+                            if (kind == OVERFLOW) continue;
+
+                            WatchEvent<Path> event = (WatchEvent<Path>)e;
+                            Path filename = event.context();
+
+                            Path file = Paths.get("scripts/").resolve(filename);
+                            String simpleName = file.getFileName().toString();
+
+                            System.out.println(simpleName);
+                            GameBehavior newBehavior = getScriptBehavior(simpleName);
+
+                            emitter.onNext(newBehavior);
+                        }
+
+                        key.reset();
+                    }
+                }
+            } catch (IOException e) {
+                emitter.onError(e);
+            }
+        }, BackpressureStrategy.BUFFER);
     }
 
     private static void run(Game game) {
@@ -173,9 +230,9 @@ public class ScriptUtils {
 
     // TODO: When initialization is finished, return all requested script behaviors.
     private static Single<ScriptEngine> getScriptEngine(String lang) {
-        return initTask.andThen((SingleSource<ScriptEngine>)s ->
-            s.onSuccess(supportedScriptEngines.get(lang))
-        );
+        SingleSubject<ScriptEngine> engineSingle = SingleSubject.create();
+        initTask.doOnComplete(() -> engineSingle.onSuccess(supportedScriptEngines.get(lang)));
+        return engineSingle;
     }
 
     public static Single<GameBehavior> getScriptBehaviorAsync(String filename) {
@@ -202,6 +259,7 @@ public class ScriptUtils {
                 System.out.println("No result from eval, getting script variable");
                 behavior = (T) bindings.get("script");
             }
+            behavior.setName(filename);
         } catch (ScriptException e) {
             e.printStackTrace();
         }
@@ -229,7 +287,7 @@ public class ScriptUtils {
         return initialized;
     }
 
-    public static Flowable<Boolean> getScriptUpdateTask() {
+    public static Flowable<GameBehavior> getScriptUpdateTask() {
         return scriptUpdateTask;
     }
 
