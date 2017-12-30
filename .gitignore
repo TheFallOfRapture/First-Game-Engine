@@ -76,3 +76,6 @@ tags
 .iml
 .ipr
 .iws
+
+# Crash Logs
+.log
