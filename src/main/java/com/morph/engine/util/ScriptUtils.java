@@ -10,6 +10,9 @@ import com.morph.engine.script.ScriptContainer;
 import io.reactivex.*;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.CompletableSubject;
+import io.reactivex.subjects.PublishSubject;
+import io.reactivex.subjects.ReplaySubject;
 import io.reactivex.subjects.SingleSubject;
 import org.jetbrains.kotlin.script.jsr223.KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory;
 import org.python.jsr223.PyScriptEngineFactory;
@@ -20,9 +23,9 @@ import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static java.nio.file.StandardWatchEventKinds.*;
 
@@ -39,12 +42,16 @@ public class ScriptUtils {
     private static Flowable<GameBehavior> scriptUpdateTask;
     private static Disposable scriptUpdaterHandle;
     private static Game game;
+    private static PublishSubject<Boolean> closeRequests = PublishSubject.create();
+
+    private static final List<String> SCRIPT_ENGINE_EXTENSIONS = Arrays.asList("kts");
 
     public static void init(Game game) {
-        initTask = Single.just(game).observeOn(Schedulers.single()).flatMapCompletable(g -> Completable.fromCallable(() -> ScriptUtils.load(g)));
-        initTask.subscribe(() -> scriptUpdaterHandle = Flowable.create(ScriptUtils::runReactive, BackpressureStrategy.BUFFER)
+        initTask = Single.just(game).observeOn(Schedulers.io()).flatMapCompletable(g -> Completable.fromCallable(() -> ScriptUtils.load(g))).cache();
+
+        initTask.subscribeOn(Schedulers.io()).subscribe(() -> scriptUpdaterHandle = Flowable.create(ScriptUtils::runReactive, BackpressureStrategy.BUFFER)
                 .map(event -> Paths.get("scripts/").resolve(event.context()).getFileName().toString())
-                .flatMapSingle(ScriptUtils::getScriptBehaviorAsync)
+                .flatMapMaybe(ScriptUtils::getScriptBehaviorAsync)
                 .subscribe(behavior -> {
                     if (behavior instanceof EntityBehavior) scriptedEntities.get(behavior.getName()).forEach(entity -> entity.getComponent(ScriptContainer.class).replaceBehavior(behavior.getName(), (EntityBehavior)behavior));
                     else game.replaceBehavior(behavior.getName(), behavior);
@@ -63,12 +70,14 @@ public class ScriptUtils {
         manager.registerEngineExtension("py", pythonEngine);
 
         supportedScriptEngines.put("kts", kotlinEngine.getScriptEngine());
-        supportedScriptEngines.put("py", pythonEngine.getScriptEngine());
+//        supportedScriptEngines.put("py", pythonEngine.getScriptEngine());
 
         System.out.println(Paths.get(System.getProperty("user.dir") + "/src/main/resources/scripts/Test.kts").getFileName());
-        System.out.println("Python support test: " + supportedScriptEngines.get("py").getFactory().getLanguageName());
+//        System.out.println("Python support test: " + supportedScriptEngines.get("py").getFactory().getLanguageName());
 
         initialized = true;
+
+        Console.out.println("[Morph Script Engine 0.5.15] Engine initialized.");
 
         return true;
     }
@@ -77,7 +86,13 @@ public class ScriptUtils {
         scriptUpdaterHandle.dispose();
     }
 
-    private static void runReactive(FlowableEmitter<WatchEvent<Path>> subscriber) {
+    private static void runReactive(Emitter<WatchEvent<Path>> subscriber) {
+        closeRequests.subscribe(val -> {
+            if (val) isRunning = false;
+        });
+
+        isRunning = true;
+
         try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
             Paths.get(System.getProperty("user.dir") + "/src/main/resources/scripts/").register(watchService, ENTRY_MODIFY);
             while (isRunning) {
@@ -98,39 +113,6 @@ public class ScriptUtils {
         } catch (IOException e) {
             subscriber.onError(e);
         }
-    }
-
-    private static Flowable<GameBehavior> runRx(Game game) {
-        return Flowable.create(emitter -> {
-            try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
-                Paths.get(System.getProperty("user.dir") + "/src/main/resources/scripts/").register(watchService, ENTRY_MODIFY);
-                while (true) {
-                    WatchKey key;
-                    if ((key = watchService.poll()) != null) {
-                        for (WatchEvent e : key.pollEvents()) {
-                            WatchEvent.Kind<?> kind = e.kind();
-
-                            if (kind == OVERFLOW) continue;
-
-                            WatchEvent<Path> event = (WatchEvent<Path>)e;
-                            Path filename = event.context();
-
-                            Path file = Paths.get("scripts/").resolve(filename);
-                            String simpleName = file.getFileName().toString();
-
-                            System.out.println(simpleName);
-                            GameBehavior newBehavior = getScriptBehavior(simpleName);
-
-                            emitter.onNext(newBehavior);
-                        }
-
-                        key.reset();
-                    }
-                }
-            } catch (IOException e) {
-                emitter.onError(e);
-            }
-        }, BackpressureStrategy.BUFFER);
     }
 
     private static void run(Game game) {
@@ -154,7 +136,7 @@ public class ScriptUtils {
     public static void stop() {
         if (!isRunning) return;
 
-        isRunning = false;
+        closeRequests.onNext(true);
     }
 
     public static void pollEvents(WatchService watchService, Game game) {
@@ -200,13 +182,11 @@ public class ScriptUtils {
                "CustomScript()" ;
     }
 
-    public static Single<Object> readScriptAsync(String script, String lang, Console console) {
-        return getScriptEngine(lang).map(engine -> readScriptDI(script, engine, console));
+    public static Completable readScriptAsync(String script, String lang, Console console) {
+        return getScriptEngine(lang).flatMapCompletable(engine -> Completable.fromAction(() -> readScriptDI(script, engine, console)));
     }
 
-    private static Object readScriptDI(String script, ScriptEngine engine, Console console) {
-        Object result = null;
-
+    private static void readScriptDI(String script, ScriptEngine engine, Console console) {
         try {
             ConsoleScript behavior = (ConsoleScript) engine.eval(genScript(script), bindings);
             behavior.setConsole(console);
@@ -216,27 +196,28 @@ public class ScriptUtils {
         }
 
         bindings.clear();
-        return result;
     }
 
-    public static Object readScript(String script, String lang, Console console) {
+    public static void readScriptBlocking(String script, String lang, Console console) {
         ScriptEngine engine = getScriptEngine(lang).blockingGet();
-
-        Object result = readScriptDI(script, engine, console);
-
-        bindings.clear();
-        return result;
+        readScriptDI(script, engine, console);
     }
 
     // TODO: When initialization is finished, return all requested script behaviors.
-    private static Single<ScriptEngine> getScriptEngine(String lang) {
-        SingleSubject<ScriptEngine> engineSingle = SingleSubject.create();
-        initTask.doOnComplete(() -> engineSingle.onSuccess(supportedScriptEngines.get(lang)));
-        return engineSingle;
+    private static Maybe<ScriptEngine> getScriptEngine(String lang) {
+        return initTask.andThen(resolveScriptEngine(lang));
     }
 
-    public static Single<GameBehavior> getScriptBehaviorAsync(String filename) {
-        return getScriptEngine(getFileExtension(filename)).flatMap(scriptEngine -> Single.just(getScriptBehaviorDI(filename, scriptEngine)));
+    private static Maybe<ScriptEngine> resolveScriptEngine(String lang) {
+        if (supportedScriptEngines.containsKey(lang)) {
+            return Maybe.fromCallable(() -> supportedScriptEngines.get(lang));
+        } else {
+            return Maybe.empty();
+        }
+    }
+
+    public static Maybe<GameBehavior> getScriptBehaviorAsync(String filename) {
+        return getScriptEngine(getFileExtension(filename)).flatMap(scriptEngine -> Maybe.just(getScriptBehaviorDI(filename, scriptEngine)));
     }
 
     private static <T extends GameBehavior> T getScriptBehaviorDI(String filename, ScriptEngine engine) {
@@ -293,5 +274,9 @@ public class ScriptUtils {
 
     public static Completable getInitializationTask() {
         return initTask;
+    }
+
+    public static boolean isSupported(String lang) {
+        return SCRIPT_ENGINE_EXTENSIONS.contains(lang);
     }
 }
