@@ -38,6 +38,11 @@ public class Mouse {
 			public void onError(Throwable t) {
 				emitter.onError(t);
 			}
+
+			@Override
+			public void onComplete() {
+				emitter.onComplete();
+			}
 		};
 		mouseEventFeed.register(listener);
 	}, BackpressureStrategy.BUFFER);

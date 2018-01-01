@@ -106,13 +106,16 @@ public class Console {
             @Override
             public void onNext(EventType eventType) {
                 emitter.onNext(eventType);
-                if (!Console.game.isRunning())
-                    emitter.onComplete();
             }
 
             @Override
             public void onError(Throwable t) {
                 emitter.onError(t);
+            }
+
+            @Override
+            public void onComplete() {
+                emitter.onComplete();
             }
         };
         eventFeed.register(eventListener);
@@ -136,6 +139,8 @@ public class Console {
     public Console(Console.ScriptType type, Game game) {
         this.type = type;
         Console.game = game;
+
+        game.getEvents().filter(e -> e == Game.GameAction.CLOSE).subscribe(e -> eventFeed.onComplete());
     }
 
     public void readIn(String line) {

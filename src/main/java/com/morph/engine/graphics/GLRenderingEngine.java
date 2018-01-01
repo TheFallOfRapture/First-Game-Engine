@@ -8,9 +8,6 @@ import com.morph.engine.math.Matrix4f;
 import com.morph.engine.newgui.Element;
 import com.morph.engine.physics.components.Transform;
 import com.morph.engine.physics.components.Transform2D;
-import com.morph.engine.tiles.Tile;
-import com.morph.engine.tiles.TileEmpty;
-import com.morph.engine.tiles.Tilemap;
 
 import static org.lwjgl.system.MemoryUtil.*;
 

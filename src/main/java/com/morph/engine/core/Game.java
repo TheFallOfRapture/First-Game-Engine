@@ -64,10 +64,10 @@ public abstract class Game implements Runnable {
 	private Feed<GameAction> gameActionFeed = new Feed<>();
 
 	public enum GameAction {
-		INIT, PRE_UPDATE, UPDATE, FIXED_UPDATE, POST_UPDATE, RENDER
+		INIT, PRE_UPDATE, UPDATE, FIXED_UPDATE, POST_UPDATE, RENDER, CLOSE
 	}
 
-	private Flowable<GameAction> gameEvents = Flowable.create(gameActionFeed::emit, BackpressureStrategy.BUFFER);
+	private Flowable<GameAction> events = Flowable.create(gameActionFeed::emit, BackpressureStrategy.BUFFER);
 
 	public Game(int width, int height, String title, float fps, boolean fullscreen) {
 		this.width = width;
@@ -84,47 +84,6 @@ public abstract class Game implements Runnable {
 		this.consoleGUI = new ConsoleGUI(this, console, width, height);
 
 		Game.screenOrtho = getScreenOrtho();
-
-		// TODO: Oh my god please move this somewhere else
-		Flowable.zip(gameEvents.filter(e -> e == GameAction.UPDATE), Mouse.getStandardMouseEvents(), Pair::new).subscribe(pair -> {
-			GameAction g = pair.getFirst();
-			Mouse.StdMouseEvent m = pair.getSecond();
-
-			Vector2f mousePos = Mouse.getScreenMousePosition();
-
-			if (m.getButton() == 0 && m.getAction() == Mouse.StdMouseAction.PRESS)
-				System.out.println("pressed");
-
-			for (GUI gui : guis) {
-				for (Element e : gui.getElements()) {
-					switch (e.getState()) {
-						case "IDLE":
-							if (mousePos != null && e.contains(mousePos)) {
-								if (m.getButton() == 0 && m.getAction() == Mouse.StdMouseAction.PRESS) {
-									e.setState("CLICK");
-								} else {
-									e.setState("HOVER");
-								}
-							}
-							break;
-						case "HOVER":
-							if (mousePos != null && e.contains(mousePos)) {
-								if (m.getButton() == 0 && m.getAction() == Mouse.StdMouseAction.PRESS) {
-									e.setState("CLICK");
-								}
-							} else {
-								e.setState("IDLE");
-							}
-							break;
-						case "CLICK":
-							if (m.getButton() == 0 && m.getAction() == Mouse.StdMouseAction.RELEASE) {
-								e.setState("IDLE");
-							}
-							break;
-					}
-				}
-			}
-		});
 
 //		System.setOut(Console.out);
 	}
@@ -225,6 +184,49 @@ public abstract class Game implements Runnable {
 		systems.forEach(GameSystem::initSystem);
 
 		consoleGUI.init();
+
+		display.getEvents().filter(e -> e == GLDisplay.GLDisplayAction.CLOSE).subscribe(e -> handleExitEvent());
+
+		// TODO: Oh my god please move this somewhere else
+		Flowable.zip(events.filter(e -> e == GameAction.UPDATE), Mouse.getStandardMouseEvents(), Pair::new).subscribe(pair -> {
+			GameAction g = pair.getFirst();
+			Mouse.StdMouseEvent m = pair.getSecond();
+
+			Vector2f mousePos = Mouse.getScreenMousePosition();
+
+			if (m.getButton() == 0 && m.getAction() == Mouse.StdMouseAction.PRESS)
+				System.out.println("pressed");
+
+			for (GUI gui : guis) {
+				for (Element e : gui.getElements()) {
+					switch (e.getState()) {
+						case "IDLE":
+							if (mousePos != null && e.contains(mousePos)) {
+								if (m.getButton() == 0 && m.getAction() == Mouse.StdMouseAction.PRESS) {
+									e.setState("CLICK");
+								} else {
+									e.setState("HOVER");
+								}
+							}
+							break;
+						case "HOVER":
+							if (mousePos != null && e.contains(mousePos)) {
+								if (m.getButton() == 0 && m.getAction() == Mouse.StdMouseAction.PRESS) {
+									e.setState("CLICK");
+								}
+							} else {
+								e.setState("IDLE");
+							}
+							break;
+						case "CLICK":
+							if (m.getButton() == 0 && m.getAction() == Mouse.StdMouseAction.RELEASE) {
+								e.setState("IDLE");
+							}
+							break;
+					}
+				}
+			}
+		});
 	}
 
 	private void update() {
@@ -290,6 +292,7 @@ public abstract class Game implements Runnable {
 			return;
 
 		isRunning = false;
+		gameActionFeed.onNext(GameAction.CLOSE);
 	}
 
 	public void run() {
@@ -421,9 +424,12 @@ public abstract class Game implements Runnable {
 		return consoleGUI.isOpen();
 	}
 
-	@EventListener(ExitEvent.class)
-	public void handleExitEvent(ExitEvent e) {
+	public void handleExitEvent() {
 		System.out.println("Morph is closing...");
 		stop();
+	}
+
+	public Flowable<GameAction> getEvents() {
+		return events;
 	}
 }

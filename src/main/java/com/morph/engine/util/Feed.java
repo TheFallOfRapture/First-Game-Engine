@@ -1,8 +1,6 @@
 package com.morph.engine.util;
 
-import io.reactivex.Flowable;
-import io.reactivex.FlowableEmitter;
-import io.reactivex.FlowableOnSubscribe;
+import io.reactivex.Emitter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +20,11 @@ public class Feed<T> {
         listeners.forEach(listener -> listener.onError(t));
     }
 
-    public void emit(FlowableEmitter<T> emitter) {
+    public void onComplete() {
+        listeners.forEach(Listener::onComplete);
+    }
+
+    public void emit(Emitter<T> emitter) {
         Listener<T> listener = new Listener<T>() {
             @Override
             public void onNext(T t) {
@@ -32,6 +34,11 @@ public class Feed<T> {
             @Override
             public void onError(Throwable t) {
                 emitter.onError(t);
+            }
+
+            @Override
+            public void onComplete() {
+                emitter.onComplete();
             }
         };
         register(listener);

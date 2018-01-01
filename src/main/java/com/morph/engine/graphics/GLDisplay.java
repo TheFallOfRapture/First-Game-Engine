@@ -1,6 +1,8 @@
 package com.morph.engine.graphics;
 
-import com.morph.engine.events.ExitEvent;
+import com.morph.engine.util.Feed;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
 
@@ -10,8 +12,6 @@ import com.morph.engine.input.Keyboard;
 import com.morph.engine.input.Mouse;
 import com.morph.engine.math.Vector2f;
 
-import static org.lwjgl.opengl.GL11.*;
-
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
@@ -19,6 +19,13 @@ public class GLDisplay {
 	private long window;
 	private int width, height;
 	private String title;
+
+	private Feed<GLDisplayAction> eventFeed = new Feed<>();
+	private Flowable<GLDisplayAction> events = Flowable.create(eventFeed::emit, BackpressureStrategy.BUFFER);
+
+	public enum GLDisplayAction {
+		OPEN, CLOSE
+	}
 	
 	public GLDisplay(int width, int height, String title) {
 		this.width = width;
@@ -27,6 +34,8 @@ public class GLDisplay {
 	}
 	
 	public void init() {
+		eventFeed.onNext(GLDisplayAction.OPEN);
+
 		GLFWErrorCallback.createPrint(System.err).set();
 		if (!glfwInit())
 			throw new IllegalStateException("Failed to initialize GLFW");
@@ -35,11 +44,6 @@ public class GLDisplay {
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-//		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-//		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-//		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-//		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
-		
 		window = GLFW.glfwCreateWindow(width, height, title, NULL, NULL);
 		if (window == NULL)
 			throw new RuntimeException("Failure to create the GLFW window");
@@ -52,7 +56,10 @@ public class GLDisplay {
 		
 		glfwSetMouseButtonCallback(window, Mouse::handleMouseEvent);
 
-		glfwSetWindowCloseCallback(window, (window) -> EventDispatcher.INSTANCE.dispatchEvent(new ExitEvent(this)));
+		glfwSetWindowCloseCallback(window, (window) -> {
+			eventFeed.onNext(GLDisplayAction.CLOSE);
+			eventFeed.onComplete();
+		});
 		
 		GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 		
@@ -75,10 +82,6 @@ public class GLDisplay {
 	public void destroy() {
 		glfwTerminate();
 		glfwSetErrorCallback(null).free();
-	}
-	
-	public boolean isCloseRequested() {
-		return glfwWindowShouldClose(window);
 	}
 	
 	public void setFullscreen(int resX, int resY) {
@@ -105,5 +108,9 @@ public class GLDisplay {
 	
 	public long getWindow() {
 		return window;
+	}
+
+	public Flowable<GLDisplayAction> getEvents() {
+		return events;
 	}
 }

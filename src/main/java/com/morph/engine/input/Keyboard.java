@@ -16,20 +16,7 @@ public class Keyboard {
 	private static Feed<StdKeyEvent> keyEventFeed = new Feed<>();
 
 	// PRESS, REPEAT, RELEASE
-	private static Flowable<StdKeyEvent> standardKeyEvents = Flowable.create(emitter -> {
-		Listener<StdKeyEvent> listener = new Listener<StdKeyEvent>() {
-			@Override
-			public void onNext(StdKeyEvent e) {
-				emitter.onNext(e);
-			}
-
-			@Override
-			public void onError(Throwable t) {
-				emitter.onError(t);
-			}
-		};
-		keyEventFeed.register(listener);
-	}, BackpressureStrategy.BUFFER);
+	private static Flowable<StdKeyEvent> standardKeyEvents = Flowable.create(keyEventFeed::emit, BackpressureStrategy.BUFFER);
 
 	// UP, DOWN
 	private static Flowable<BinKeyEvent> binaryKeyEvents = Flowable.create(emitter -> {
@@ -51,6 +38,11 @@ public class Keyboard {
 			@Override
 			public void onError(Throwable t) {
 				emitter.onError(t);
+			}
+
+			@Override
+			public void onComplete() {
+				emitter.onComplete();
 			}
 		};
 		keyEventFeed.register(listener);
