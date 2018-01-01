@@ -8,9 +8,17 @@ import com.morph.engine.entities.Entity;
  */
 public abstract class GameBehavior {
     private Game game;
+    private String name;
 
     public void setGame(Game game) {
         this.game = game;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
     }
 
     // Scripting API

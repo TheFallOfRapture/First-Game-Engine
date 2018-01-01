@@ -8,7 +8,12 @@ import com.morph.engine.script.EntityBehavior;
 import com.morph.engine.script.GameBehavior;
 import com.morph.engine.script.ScriptContainer;
 import io.reactivex.*;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.CompletableSubject;
+import io.reactivex.subjects.PublishSubject;
+import io.reactivex.subjects.ReplaySubject;
+import io.reactivex.subjects.SingleSubject;
 import org.jetbrains.kotlin.script.jsr223.KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory;
 import org.python.jsr223.PyScriptEngineFactory;
 
@@ -21,6 +26,9 @@ import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static java.nio.file.StandardWatchEventKinds.*;
 
@@ -34,18 +42,23 @@ public class ScriptUtils {
     private static boolean isRunning;
     private static boolean initialized;
     private static Completable initTask;
-    private static Flowable<Boolean> scriptUpdateTask;
+    private static Flowable<GameBehavior> scriptUpdateTask;
+    private static Disposable scriptUpdaterHandle;
     private static Game game;
+    private static PublishSubject<Boolean> closeRequests = PublishSubject.create();
+
+    private static final List<String> SCRIPT_ENGINE_EXTENSIONS = Arrays.asList("kts");
 
     public static void init(Game game) {
-        initTask = Completable.fromCallable(() -> ScriptUtils.load(game)).doOnComplete(() -> initTask = Completable.complete());
+        initTask = Single.just(game).observeOn(Schedulers.io()).flatMapCompletable(g -> Completable.fromCallable(() -> ScriptUtils.load(g))).cache();
 
-        scriptUpdateTask = Flowable.fromCallable(() -> {
-            start(game);
-            return false;
-        });
-
-        initTask.subscribeOn(Schedulers.io()).doOnComplete(() -> scriptUpdateTask.subscribe()).subscribe();
+        initTask.subscribeOn(Schedulers.io()).subscribe(() -> scriptUpdaterHandle = Flowable.create(ScriptUtils::runReactive, BackpressureStrategy.BUFFER)
+                .map(event -> Paths.get("scripts/").resolve(event.context()).getFileName().toString())
+                .flatMapMaybe(ScriptUtils::getScriptBehaviorAsync)
+                .subscribe(behavior -> {
+                    if (behavior instanceof EntityBehavior) scriptedEntities.get(behavior.getName()).forEach(entity -> entity.getComponent(ScriptContainer.class).replaceBehavior(behavior.getName(), (EntityBehavior)behavior));
+                    else game.replaceBehavior(behavior.getName(), behavior);
+                }));
     }
 
     private static boolean load(Game game) {
@@ -60,14 +73,49 @@ public class ScriptUtils {
         manager.registerEngineExtension("py", pythonEngine);
 
         supportedScriptEngines.put("kts", kotlinEngine.getScriptEngine());
-        supportedScriptEngines.put("py", pythonEngine.getScriptEngine());
+//        supportedScriptEngines.put("py", pythonEngine.getScriptEngine());
 
         System.out.println(Paths.get(System.getProperty("user.dir") + "/src/main/resources/scripts/Test.kts").getFileName());
-        System.out.println("Python support test: " + supportedScriptEngines.get("py").getFactory().getLanguageName());
+//        System.out.println("Python support test: " + supportedScriptEngines.get("py").getFactory().getLanguageName());
 
         initialized = true;
 
+        Console.out.println("[Morph Script Engine 0.5.15] Engine initialized.");
+
         return true;
+    }
+
+    public static void stopRx() {
+        scriptUpdaterHandle.dispose();
+    }
+
+    private static void runReactive(Emitter<WatchEvent<Path>> subscriber) {
+        closeRequests.subscribe(val -> {
+            if (val) isRunning = false;
+        });
+
+        isRunning = true;
+
+        try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
+            Paths.get(System.getProperty("user.dir") + "/src/main/resources/scripts/").register(watchService, ENTRY_MODIFY);
+            while (isRunning) {
+                WatchKey key;
+                if ((key = watchService.poll()) != null) {
+                    for (WatchEvent e : key.pollEvents()) {
+                        WatchEvent.Kind<?> kind = e.kind();
+
+                        if (kind == OVERFLOW) continue;
+
+                        WatchEvent<Path> event = (WatchEvent<Path>)e;
+                        subscriber.onNext(event);
+                    }
+
+                    key.reset();
+                }
+            }
+        } catch (IOException e) {
+            subscriber.onError(e);
+        }
     }
 
     private static void run(Game game) {
@@ -91,7 +139,7 @@ public class ScriptUtils {
     public static void stop() {
         if (!isRunning) return;
 
-        isRunning = false;
+        closeRequests.onNext(true);
     }
 
     public static void pollEvents(WatchService watchService, Game game) {
@@ -137,13 +185,11 @@ public class ScriptUtils {
                "CustomScript()" ;
     }
 
-    public static Single<Object> readScriptAsync(String script, String lang, Console console) {
-        return getScriptEngine(lang).map(engine -> readScriptDI(script, engine, console));
+    public static Completable readScriptAsync(String script, String lang, Console console) {
+        return getScriptEngine(lang).flatMapCompletable(engine -> Completable.fromAction(() -> readScriptDI(script, engine, console)));
     }
 
-    private static Object readScriptDI(String script, ScriptEngine engine, Console console) {
-        Object result = null;
-
+    private static void readScriptDI(String script, ScriptEngine engine, Console console) {
         try {
             ConsoleScript behavior = (ConsoleScript) engine.eval(genScript(script), bindings);
             behavior.setConsole(console);
@@ -153,27 +199,28 @@ public class ScriptUtils {
         }
 
         bindings.clear();
-        return result;
     }
 
-    public static Object readScript(String script, String lang, Console console) {
+    public static void readScriptBlocking(String script, String lang, Console console) {
         ScriptEngine engine = getScriptEngine(lang).blockingGet();
-
-        Object result = readScriptDI(script, engine, console);
-
-        bindings.clear();
-        return result;
+        readScriptDI(script, engine, console);
     }
 
     // TODO: When initialization is finished, return all requested script behaviors.
-    private static Single<ScriptEngine> getScriptEngine(String lang) {
-        return initTask.andThen((SingleSource<ScriptEngine>)s ->
-            s.onSuccess(supportedScriptEngines.get(lang))
-        );
+    private static Maybe<ScriptEngine> getScriptEngine(String lang) {
+        return initTask.andThen(resolveScriptEngine(lang));
     }
 
-    public static Single<GameBehavior> getScriptBehaviorAsync(String filename) {
-        return getScriptEngine(getFileExtension(filename)).flatMap(scriptEngine -> Single.just(getScriptBehaviorDI(filename, scriptEngine)));
+    private static Maybe<ScriptEngine> resolveScriptEngine(String lang) {
+        if (supportedScriptEngines.containsKey(lang)) {
+            return Maybe.fromCallable(() -> supportedScriptEngines.get(lang));
+        } else {
+            return Maybe.empty();
+        }
+    }
+
+    public static Maybe<GameBehavior> getScriptBehaviorAsync(String filename) {
+        return getScriptEngine(getFileExtension(filename)).flatMap(scriptEngine -> Maybe.just(getScriptBehaviorDI(filename, scriptEngine)));
     }
 
     private static <T extends GameBehavior> T getScriptBehaviorDI(String filename, ScriptEngine engine) {
@@ -196,6 +243,7 @@ public class ScriptUtils {
                 System.out.println("No result from eval, getting script variable");
                 behavior = (T) bindings.get("script");
             }
+            behavior.setName(filename);
         } catch (ScriptException e) {
             e.printStackTrace();
         }
@@ -223,11 +271,15 @@ public class ScriptUtils {
         return initialized;
     }
 
-    public static Flowable<Boolean> getScriptUpdateTask() {
+    public static Flowable<GameBehavior> getScriptUpdateTask() {
         return scriptUpdateTask;
     }
 
     public static Completable getInitializationTask() {
         return initTask;
+    }
+
+    public static boolean isSupported(String lang) {
+        return SCRIPT_ENGINE_EXTENSIONS.contains(lang);
     }
 }

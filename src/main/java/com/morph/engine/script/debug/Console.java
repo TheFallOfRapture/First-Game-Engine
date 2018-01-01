@@ -6,7 +6,6 @@ import com.morph.engine.util.Listener;
 import com.morph.engine.util.ScriptUtils;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
-import io.reactivex.Observable;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -170,13 +169,13 @@ public class Console {
             case MULTI:
                 String[] parts = line.split(":");
                 parts[1] = parts[1].trim();
-                ScriptUtils.readScript(parts[1], parts[0], this);
+                ScriptUtils.readScriptBlocking(parts[1], parts[0], this);
                 break;
             case KOTLIN:
-                ScriptUtils.readScript(line, "kts", this);
+                ScriptUtils.readScriptBlocking(line, "kts", this);
                 break;
             case PYTHON:
-                ScriptUtils.readScript(line, "py", this);
+                ScriptUtils.readScriptBlocking(line, "py", this);
         }
     }
 
