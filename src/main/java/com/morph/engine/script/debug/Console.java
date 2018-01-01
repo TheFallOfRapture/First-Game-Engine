@@ -146,7 +146,6 @@ public class Console {
     private static void print(String line) {
         Console.currentLine = line;
         Console.text += line;
-        System.out.println("NEW UPDATE EVENT SHOULD HAVE BEEN FIRED");
 
         eventFeed.onNext(EventType.UPDATE);
     }

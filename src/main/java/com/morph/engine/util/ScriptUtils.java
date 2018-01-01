@@ -8,7 +8,6 @@ import com.morph.engine.script.EntityBehavior;
 import com.morph.engine.script.GameBehavior;
 import com.morph.engine.script.ScriptContainer;
 import io.reactivex.*;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import org.jetbrains.kotlin.script.jsr223.KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory;
 import org.python.jsr223.PyScriptEngineFactory;
@@ -22,7 +21,6 @@ import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import static java.nio.file.StandardWatchEventKinds.*;
 
@@ -45,16 +43,12 @@ public class ScriptUtils {
         scriptUpdateTask = Flowable.fromCallable(() -> {
             start(game);
             return false;
-        }).doOnComplete(() -> {
-            if (!isRunning) {
-                scriptUpdateTask.onTerminateDetach();
-            }
         });
 
         initTask.subscribeOn(Schedulers.io()).doOnComplete(() -> scriptUpdateTask.subscribe()).subscribe();
     }
 
-    public static boolean load(Game game) {
+    private static boolean load(Game game) {
         ScriptUtils.game = game;
 
         Console.out.println("Morph Script Engine 0.5.15 initializing... Please wait...");

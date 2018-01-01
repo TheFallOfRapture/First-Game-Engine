@@ -23,6 +23,8 @@ public class Engine extends OpenGame {
 		super(width, height, "Game Engine", fps, fullscreen);
 
 		EventDispatcher.INSTANCE.addEventHandler(this);
+
+		Keyboard.getStandardKeyEvents().filter(e -> e.getKey() == GLFW.GLFW_KEY_GRAVE_ACCENT).subscribe(e -> toggleConsole());
 	}
 
 	@Override
@@ -70,8 +72,8 @@ public class Engine extends OpenGame {
 
 	@Override
 	public void handleInput() {
-		if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_GRAVE_ACCENT)) {
-			toggleConsole();
-		}
+//		if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_GRAVE_ACCENT)) {
+//			toggleConsole();
+//		}
 	}
 }
