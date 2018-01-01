@@ -37,8 +37,6 @@ public class ConsoleGUI extends GUI {
 
     @Override
     public void init() {
-//        EventDispatcher.INSTANCE.addEventHandler(this);
-
         Panel consoleBG = new Panel(new Vector2f(0, height - 500), new Vector2f(width, 500), new Color(0, 1, 0, 0.3f), new Texture("textures/solid.png"));
         Panel consoleInputBG = new Panel(new Vector2f(0, height - 520), new Vector2f(width, 20), new Color(0, 0, 1, 0.3f), new Texture("textures/solid.png"));
         consoleInput = new ConsoleTextField(console, "", "C:/Windows/Fonts/FiraCode-Retina.ttf", FONT_SIZE, new Color(1, 1, 1), new Vector2f(0, height - 515), -1200);
@@ -68,22 +66,11 @@ public class ConsoleGUI extends GUI {
         consoleOutput.setText(console.getText());
     }
 
-//    @EventListener(KeyEvent.class)
     private void onKeyEvent(KeyEvent e) {
         if (isOpen()) {
             consoleInput.handleGUIKeyEvent(e);
         }
     }
-
-//    @EventListener(ConsoleEvent.class)
-//    public void onConsoleEvent(ConsoleEvent e) {
-//        if (e.getType() == ConsoleEvent.EventType.UPDATE) {
-//            consoleOutput.addString(console.getLastLine());
-//        } else if (e.getType() == ConsoleEvent.EventType.CLEAR) {
-//            consoleOutput.clearText();
-//            Console.out.println("Cleared console text.");
-//        }
-//    }
 
     private void onConsoleUpdate() {
         System.out.println("Updating the console...");

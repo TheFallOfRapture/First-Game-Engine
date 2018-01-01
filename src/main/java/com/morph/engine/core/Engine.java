@@ -24,7 +24,9 @@ public class Engine extends OpenGame {
 
 		EventDispatcher.INSTANCE.addEventHandler(this);
 
-		Keyboard.getStandardKeyEvents().filter(e -> e.getKey() == GLFW.GLFW_KEY_GRAVE_ACCENT).subscribe(e -> toggleConsole());
+		Keyboard.getStandardKeyEvents()
+				.filter(e -> e.getAction() == Keyboard.StdKeyAction.PRESS && e.getKey() == GLFW.GLFW_KEY_GRAVE_ACCENT)
+				.subscribe(e -> toggleConsole());
 	}
 
 	@Override

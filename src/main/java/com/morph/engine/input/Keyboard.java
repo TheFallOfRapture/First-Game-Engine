@@ -22,7 +22,7 @@ public class Keyboard {
 	private static PublishSubject<KeyEvent> keyPresses = PublishSubject.create();
 	private static PublishSubject<KeyEvent> keyReleases = PublishSubject.create();
 
-	private static Feed<StdKeyEvent> keyEventFeed;
+	private static Feed<StdKeyEvent> keyEventFeed = new Feed<>();
 
 	// PRESS, REPEAT, RELEASE
 	private static Flowable<StdKeyEvent> standardKeyEvents = Flowable.create(emitter -> {
@@ -83,7 +83,7 @@ public class Keyboard {
 	 * 
 	 */
 
-	enum StdKeyAction {
+	public enum StdKeyAction {
 		PRESS, REPEAT, RELEASE
 	}
 
@@ -106,6 +106,10 @@ public class Keyboard {
 
 		public int getMods() {
 			return mods;
+		}
+
+		public boolean hasMod(int modCheck) {
+			return (mods & modCheck) != 0;
 		}
 	}
 
@@ -188,6 +192,8 @@ public class Keyboard {
 			Keyboard.keyPressed(key);
 		if (action == GLFW_RELEASE)
 			Keyboard.keyReleased(key);
+
+		handleKeyEventRx(key, action, mods); // TODO: Remove from this method and deprecate/remove the enclosing method.
 	}
 
 	public static void handleKeyEventRx(int key, int action, int mods) {

@@ -44,12 +44,7 @@ public class GLDisplay {
 		if (window == NULL)
 			throw new RuntimeException("Failure to create the GLFW window");
 		
-		glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
-				if (action == GLFW_PRESS)
-					Keyboard.keyPressed(key);
-				if (action == GLFW_RELEASE)
-					Keyboard.keyReleased(key);
-			});
+		glfwSetKeyCallback(window, Keyboard::handleKeyEvent);
 		
 		glfwSetWindowSizeCallback(window, (window, x, y) -> EventDispatcher.INSTANCE.dispatchEvent(new ResizeEvent(this, x, y, false)));
 		
