@@ -1,9 +1,6 @@
 package com.morph.engine.core.gui;
 
 import com.morph.engine.core.Game;
-import com.morph.engine.events.EventDispatcher;
-import com.morph.engine.events.EventListener;
-import com.morph.engine.events.KeyEvent;
 import com.morph.engine.graphics.Color;
 import com.morph.engine.graphics.Texture;
 import com.morph.engine.math.Vector2f;
@@ -24,8 +21,6 @@ public class EngineGUI extends GUI {
         super(game);
         this.width = gameWidth;
         this.height = gameHeight;
-
-        EventDispatcher.INSTANCE.addEventHandler(this);
     }
 
     public void init() {

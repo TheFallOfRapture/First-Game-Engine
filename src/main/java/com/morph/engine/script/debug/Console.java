@@ -4,8 +4,7 @@ import com.morph.engine.core.Game;
 import com.morph.engine.util.Feed;
 import com.morph.engine.util.Listener;
 import com.morph.engine.util.ScriptUtils;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -101,7 +100,7 @@ public class Console {
 
     private static Feed<EventType> eventFeed = new Feed<>();
 
-    private static Flowable<EventType> events = Flowable.create(emitter -> {
+    private static Observable<EventType> events = Observable.create(emitter -> {
         Listener<EventType> eventListener = new Listener<EventType>() {
             @Override
             public void onNext(EventType eventType) {
@@ -119,7 +118,7 @@ public class Console {
             }
         };
         eventFeed.register(eventListener);
-    }, BackpressureStrategy.BUFFER);
+    });
 
     public enum ScriptType {
         KOTLIN, PYTHON, MULTI
@@ -196,7 +195,7 @@ public class Console {
     }
 
     @Contract(pure = true)
-    public static Flowable<EventType> events() {
+    public static Observable<EventType> events() {
         return events;
     }
 }

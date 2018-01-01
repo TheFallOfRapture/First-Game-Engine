@@ -8,12 +8,10 @@ import com.morph.engine.script.EntityBehavior;
 import com.morph.engine.script.GameBehavior;
 import com.morph.engine.script.ScriptContainer;
 import io.reactivex.*;
+import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import io.reactivex.subjects.CompletableSubject;
 import io.reactivex.subjects.PublishSubject;
-import io.reactivex.subjects.ReplaySubject;
-import io.reactivex.subjects.SingleSubject;
 import org.jetbrains.kotlin.script.jsr223.KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory;
 import org.python.jsr223.PyScriptEngineFactory;
 
@@ -27,8 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.*;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 import static java.nio.file.StandardWatchEventKinds.*;
 
@@ -42,7 +38,7 @@ public class ScriptUtils {
     private static boolean isRunning;
     private static boolean initialized;
     private static Completable initTask;
-    private static Flowable<GameBehavior> scriptUpdateTask;
+    private static Observable<GameBehavior> scriptUpdateTask;
     private static Disposable scriptUpdaterHandle;
     private static Game game;
     private static PublishSubject<Boolean> closeRequests = PublishSubject.create();
@@ -52,7 +48,7 @@ public class ScriptUtils {
     public static void init(Game game) {
         initTask = Single.just(game).observeOn(Schedulers.io()).flatMapCompletable(g -> Completable.fromCallable(() -> ScriptUtils.load(g))).cache();
 
-        initTask.subscribeOn(Schedulers.io()).subscribe(() -> scriptUpdaterHandle = Flowable.create(ScriptUtils::runReactive, BackpressureStrategy.BUFFER)
+        initTask.subscribeOn(Schedulers.io()).subscribe(() -> scriptUpdaterHandle = Observable.create(ScriptUtils::runReactive)
                 .map(event -> Paths.get("scripts/").resolve(event.context()).getFileName().toString())
                 .flatMapMaybe(ScriptUtils::getScriptBehaviorAsync)
                 .subscribe(behavior -> {
@@ -271,7 +267,7 @@ public class ScriptUtils {
         return initialized;
     }
 
-    public static Flowable<GameBehavior> getScriptUpdateTask() {
+    public static Observable<GameBehavior> getScriptUpdateTask() {
         return scriptUpdateTask;
     }
 

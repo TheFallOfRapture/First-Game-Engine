@@ -3,7 +3,6 @@ package com.morph.engine.core.gui;
 import com.morph.engine.core.Game;
 import com.morph.engine.input.Keyboard;
 import com.morph.engine.script.debug.Console;
-import com.morph.engine.events.*;
 import com.morph.engine.graphics.Color;
 import com.morph.engine.graphics.Texture;
 import com.morph.engine.math.Vector2f;
@@ -11,7 +10,6 @@ import com.morph.engine.newgui.ConsoleTextField;
 import com.morph.engine.newgui.GUI;
 import com.morph.engine.newgui.Panel;
 import com.morph.engine.newgui.TextField;
-import io.reactivex.Flowable;
 
 import java.util.Objects;
 

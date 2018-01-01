@@ -6,12 +6,8 @@ import java.util.List;
 
 import com.morph.engine.core.gui.ConsoleGUI;
 import com.morph.engine.script.debug.Console;
-import com.morph.engine.events.EventDispatcher;
-import com.morph.engine.events.EventListener;
-import com.morph.engine.events.ExitEvent;
 import com.morph.engine.graphics.GLDisplay;
 import com.morph.engine.graphics.GLRenderingEngine;
-import com.morph.engine.input.Keyboard;
 import com.morph.engine.input.Mouse;
 import com.morph.engine.math.Matrix4f;
 import com.morph.engine.math.MatrixUtils;
@@ -22,13 +18,9 @@ import com.morph.engine.newgui.GUI;
 import com.morph.engine.script.GameBehavior;
 import com.morph.engine.script.ScriptSystem;
 import com.morph.engine.util.Feed;
-import com.morph.engine.util.Listener;
 import com.morph.engine.util.Pair;
 import com.morph.engine.util.ScriptUtils;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
-import io.reactivex.functions.BiFunction;
-import io.reactivex.schedulers.Schedulers;
+import io.reactivex.Observable;
 
 public abstract class Game implements Runnable {
 	protected int width, height;
@@ -67,7 +59,7 @@ public abstract class Game implements Runnable {
 		INIT, PRE_UPDATE, UPDATE, FIXED_UPDATE, POST_UPDATE, RENDER, CLOSE
 	}
 
-	private Flowable<GameAction> events = Flowable.create(gameActionFeed::emit, BackpressureStrategy.BUFFER);
+	private Observable<GameAction> events = Observable.create(gameActionFeed::emit);
 
 	public Game(int width, int height, String title, float fps, boolean fullscreen) {
 		this.width = width;
@@ -79,7 +71,6 @@ public abstract class Game implements Runnable {
 		guis = new ArrayList<>();
 		behaviors = new HashMap<>();
 		this.fullscreen = fullscreen;
-		EventDispatcher.INSTANCE.addEventHandler(this);
 		this.console = new Console(Console.ScriptType.KOTLIN, this);
 		this.consoleGUI = new ConsoleGUI(this, console, width, height);
 
@@ -188,7 +179,7 @@ public abstract class Game implements Runnable {
 		display.getEvents().filter(e -> e == GLDisplay.GLDisplayAction.CLOSE).subscribe(e -> handleExitEvent());
 
 		// TODO: Oh my god please move this somewhere else
-		Flowable.zip(events.filter(e -> e == GameAction.UPDATE), Mouse.getStandardMouseEvents(), Pair::new).subscribe(pair -> {
+		Observable.zip(events.filter(e -> e == GameAction.UPDATE), Mouse.getStandardMouseEvents(), Pair::new).subscribe(pair -> {
 			GameAction g = pair.getFirst();
 			Mouse.StdMouseEvent m = pair.getSecond();
 
@@ -429,7 +420,7 @@ public abstract class Game implements Runnable {
 		stop();
 	}
 
-	public Flowable<GameAction> getEvents() {
+	public Observable<GameAction> getEvents() {
 		return events;
 	}
 }

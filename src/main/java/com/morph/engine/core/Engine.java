@@ -3,7 +3,6 @@ package com.morph.engine.core;
 import com.morph.engine.core.gui.EngineGUI;
 import com.morph.engine.entities.Entity;
 import com.morph.engine.entities.EntityFactory;
-import com.morph.engine.events.EventDispatcher;
 import com.morph.engine.graphics.Color;
 import com.morph.engine.graphics.GLRenderingEngine;
 import com.morph.engine.graphics.shaders.TintShader;
@@ -21,8 +20,6 @@ public class Engine extends OpenGame {
 
 	public Engine(int width, int height, float fps, boolean fullscreen) {
 		super(width, height, "Game Engine", fps, fullscreen);
-
-		EventDispatcher.INSTANCE.addEventHandler(this);
 
 		Keyboard.getStandardKeyEvents()
 				.filter(e -> e.getAction() == Keyboard.StdKeyAction.PRESS && e.getKey() == GLFW.GLFW_KEY_GRAVE_ACCENT)

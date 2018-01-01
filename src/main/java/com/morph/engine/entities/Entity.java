@@ -1,7 +1,6 @@
 package com.morph.engine.entities;
 
 import com.morph.engine.collision.components.BoundingBox2D;
-import com.morph.engine.events.Message;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -17,7 +16,6 @@ public class Entity implements Cloneable {
 	private String name;
 	private int id;
 	private boolean destroyed;
-	private Queue<Message> messages;
 
 	public Entity() {
 		this.components = new ArrayList<Component>();
@@ -36,10 +34,6 @@ public class Entity implements Cloneable {
 		this.components = new ArrayList<>();
 		e.getAllComponents().forEach(c -> components.add(c.clone()));
 		components.forEach(c -> c.setParent(this));
-	}
-
-	public void sendMessage(Message m) {
-		components.stream().forEach(c -> c.processMessage(m));
 	}
 
 	public void addComponent(Component c) {

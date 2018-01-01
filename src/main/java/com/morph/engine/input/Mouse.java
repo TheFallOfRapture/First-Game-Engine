@@ -6,8 +6,8 @@ import java.nio.IntBuffer;
 
 import com.morph.engine.util.Feed;
 import com.morph.engine.util.Listener;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
+import io.reactivex.Maybe;
+import io.reactivex.Observable;
 import org.lwjgl.BufferUtils;
 
 import com.morph.engine.graphics.GLRenderingEngine;
@@ -18,9 +18,9 @@ import com.morph.engine.math.Vector4f;
 public class Mouse {
 	private static Feed<StdMouseEvent> mouseEventFeed = new Feed<>();
 
-	private static Flowable<StdMouseEvent> standardMouseEvents = Flowable.create(mouseEventFeed::emit, BackpressureStrategy.BUFFER);
+	private static Observable<StdMouseEvent> standardMouseEvents = Observable.create(mouseEventFeed::emit);
 
-	private static Flowable<BinMouseEvent> binaryMouseEvents = Flowable.create(emitter -> {
+	private static Observable<BinMouseEvent> binaryMouseEvents = Observable.create(emitter -> {
 		Listener<StdMouseEvent> listener = new Listener<StdMouseEvent>() {
 			@Override
 			public void onNext(StdMouseEvent stdMouseEvent) {
@@ -45,8 +45,9 @@ public class Mouse {
 			}
 		};
 		mouseEventFeed.register(listener);
-	}, BackpressureStrategy.BUFFER);
+	});
 
+	// TODO: Convert mouse position into Observable/Flowable.
 	private static Vector2f screenMousePosition;
 	private static Vector2f worldMousePosition;
 	
@@ -140,7 +141,7 @@ public class Mouse {
 		Vector2f normalizedMousePos = screenMousePosition.div(new Vector2f(width / 2f, height / 2f)).sub(new Vector2f(1, 1)).mul(new Vector2f(1, -1));
 		worldMousePosition = screenToWorld.mul(new Vector4f(normalizedMousePos, 0, 1)).getXY();
 	}
-	
+
 	public static Vector2f getScreenMousePosition() {
 		return screenMousePosition;
 	}
@@ -149,11 +150,12 @@ public class Mouse {
 		return worldMousePosition;
 	}
 
-	public static Flowable<StdMouseEvent> getStandardMouseEvents() {
-		return standardMouseEvents;
+	public static boolean queryUpDown(int button, BinMouseAction action) {
+		Maybe<BinMouseEvent> e = binaryMouseEvents.filter(event -> event.getButton() == button).lastElement();
+		return !e.isEmpty().blockingGet() && e.blockingGet().action == action;
 	}
 
-	public static Flowable<BinMouseEvent> getBinaryMouseEvents() {
-		return binaryMouseEvents;
+	public static Observable<StdMouseEvent> getStandardMouseEvents() {
+		return standardMouseEvents;
 	}
 }

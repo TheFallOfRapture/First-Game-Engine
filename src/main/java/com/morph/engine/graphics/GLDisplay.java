@@ -1,13 +1,10 @@
 package com.morph.engine.graphics;
 
 import com.morph.engine.util.Feed;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
 
-import com.morph.engine.events.EventDispatcher;
-import com.morph.engine.events.ResizeEvent;
 import com.morph.engine.input.Keyboard;
 import com.morph.engine.input.Mouse;
 import com.morph.engine.math.Vector2f;
@@ -21,7 +18,7 @@ public class GLDisplay {
 	private String title;
 
 	private Feed<GLDisplayAction> eventFeed = new Feed<>();
-	private Flowable<GLDisplayAction> events = Flowable.create(eventFeed::emit, BackpressureStrategy.BUFFER);
+	private Observable<GLDisplayAction> events = Observable.create(eventFeed::emit);
 
 	public enum GLDisplayAction {
 		OPEN, CLOSE
@@ -50,7 +47,7 @@ public class GLDisplay {
 
 		glfwSetKeyCallback(window, Keyboard::handleKeyEvent);
 		
-		glfwSetWindowSizeCallback(window, (window, x, y) -> EventDispatcher.INSTANCE.dispatchEvent(new ResizeEvent(this, x, y, false)));
+//		glfwSetWindowSizeCallback(window, (window, x, y) -> EventDispatcher.INSTANCE.dispatchEvent(new ResizeEvent(this, x, y, false)));
 		
 		glfwSetCursorPosCallback(window, (window, x, y) -> Mouse.setMousePosition(window, new Vector2f(x, y)));
 		
@@ -110,7 +107,7 @@ public class GLDisplay {
 		return window;
 	}
 
-	public Flowable<GLDisplayAction> getEvents() {
+	public Observable<GLDisplayAction> getEvents() {
 		return events;
 	}
 }

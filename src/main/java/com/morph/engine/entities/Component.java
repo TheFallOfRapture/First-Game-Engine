@@ -1,14 +1,10 @@
 package com.morph.engine.entities;
 
-import com.morph.engine.events.Message;
-
 public abstract class Component implements Cloneable {
 	protected Entity parent;
 	protected boolean initialized = false;
 	protected boolean requestDestroy = false;
 
-	public void processMessage(Message m) {}
-	
 	public Entity getParent() {
 		return parent;
 	}

@@ -4,22 +4,21 @@ import static com.morph.engine.input.Keyboard.StdKeyAction.PRESS;
 import static com.morph.engine.input.Keyboard.StdKeyAction.RELEASE;
 import static org.lwjgl.glfw.GLFW.*;
 
-import com.morph.engine.events.KeyEvent;
 import com.morph.engine.util.Feed;
 import com.morph.engine.util.Listener;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
-import io.reactivex.subjects.PublishSubject;
+
+import java.util.Arrays;
 
 public class Keyboard {
 	private static Feed<StdKeyEvent> keyEventFeed = new Feed<>();
 
 	// PRESS, REPEAT, RELEASE
-	private static Flowable<StdKeyEvent> standardKeyEvents = Flowable.create(keyEventFeed::emit, BackpressureStrategy.BUFFER);
+	private static Observable<StdKeyEvent> standardKeyEvents = Observable.create(keyEventFeed::emit);
 
 	// UP, DOWN
-	private static Flowable<BinKeyEvent> binaryKeyEvents = Flowable.create(emitter -> {
+	private static Observable<BinKeyEvent> binaryKeyEvents = Observable.create(emitter -> {
 		Listener<StdKeyEvent> listener = new Listener<StdKeyEvent>() {
 			@Override
 			public void onNext(StdKeyEvent stdKeyEvent) {
@@ -46,7 +45,7 @@ public class Keyboard {
 			}
 		};
 		keyEventFeed.register(listener);
-	}, BackpressureStrategy.BUFFER);
+	});
 
 	public enum StdKeyAction {
 		PRESS, REPEAT, RELEASE
@@ -121,11 +120,17 @@ public class Keyboard {
 		}
 	}
 
-	public static Flowable<StdKeyEvent> getStandardKeyEvents() {
-		return standardKeyEvents;
+	public static boolean queryUpDown(int key, BinKeyAction action) {
+		Maybe<BinKeyEvent> e = binaryKeyEvents.filter(event -> event.getKey() == key).lastElement();
+		return !e.isEmpty().blockingGet() && e.blockingGet().action == action;
 	}
 
-	public static Flowable<BinKeyEvent> getBinaryKeyEvents() {
-		return binaryKeyEvents;
+	public static boolean queryUpDownWithMods(int key, BinKeyAction action, int... mods) {
+		Maybe<BinKeyEvent> e = binaryKeyEvents.filter(event -> event.getKey() == key).lastElement();
+		return !e.isEmpty().blockingGet() && e.blockingGet().action == action && Arrays.stream(mods).allMatch(e.blockingGet()::hasMod);
+	}
+
+	public static Observable<StdKeyEvent> getStandardKeyEvents() {
+		return standardKeyEvents;
 	}
 }

@@ -1,7 +1,6 @@
 package com.morph.engine.newgui;
 
 import com.morph.engine.script.debug.Console;
-import com.morph.engine.events.KeyEvent;
 import com.morph.engine.graphics.Color;
 import com.morph.engine.input.Keyboard;
 import com.morph.engine.math.Vector2f;
