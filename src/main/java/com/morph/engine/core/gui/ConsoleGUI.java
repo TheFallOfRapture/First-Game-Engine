@@ -48,7 +48,7 @@ public class ConsoleGUI extends GUI {
         addElement(consoleInput);
         addElement(consoleOutput);
 
-        Keyboard.getKeyPresses().subscribe(this::onKeyEvent);
+        Keyboard.getStandardKeyEvents().subscribe(this::onKeyEvent);
 
         Console.events()
                 .filter(Console.EventType.UPDATE::equals)
@@ -66,7 +66,7 @@ public class ConsoleGUI extends GUI {
         consoleOutput.setText(console.getText());
     }
 
-    private void onKeyEvent(KeyEvent e) {
+    private void onKeyEvent(Keyboard.StdKeyEvent e) {
         if (isOpen()) {
             consoleInput.handleGUIKeyEvent(e);
         }

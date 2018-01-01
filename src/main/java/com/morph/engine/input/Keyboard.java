@@ -13,15 +13,6 @@ import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 
 public class Keyboard {
-	private final static int keys = GLFW_KEY_LAST;
-	private final static Keyboard INSTANCE = new Keyboard();
-	private static boolean keysPressed[] = new boolean[keys];
-	private static boolean keysDown[] = new boolean[keys];
-	private static boolean keysReleased[] = new boolean[keys];
-
-	private static PublishSubject<KeyEvent> keyPresses = PublishSubject.create();
-	private static PublishSubject<KeyEvent> keyReleases = PublishSubject.create();
-
 	private static Feed<StdKeyEvent> keyEventFeed = new Feed<>();
 
 	// PRESS, REPEAT, RELEASE
@@ -65,29 +56,11 @@ public class Keyboard {
 		keyEventFeed.register(listener);
 	}, BackpressureStrategy.BUFFER);
 
-	/**
-	 * Key Pressed Event:
-	 * Current Frame - Set keysPressed[keycode] to TRUE
-	 * Next Frame - Set keysPressed[keycode] to FALSE
-	 * 
-	 * Current Frame: 
-	 * keysPressed[keycode] = true
-	 * clear():
-	 *     keysPressedLastFrame[keycode] = true
-	 *     keysPressed[keycode] = false
-	 * 
-	 * Next Frame:
-	 * if (keysPressedLastFrame[keycode] && !keysReleasedLastFrame[keycode])
-	 *     keysDown[keycode] = true
-	 * 
-	 * 
-	 */
-
 	public enum StdKeyAction {
 		PRESS, REPEAT, RELEASE
 	}
 
-	enum BinKeyAction {
+	public enum BinKeyAction {
 		UP, DOWN
 	}
 
@@ -138,65 +111,8 @@ public class Keyboard {
 			return action;
 		}
 	}
-	
-	public static void clear() {
-		for (int i = 0; i < keys; i++) {
-			if (keysPressed[i])
-				keysDown[i] = true;
-			
-			keysPressed[i] = false;
-			keysReleased[i] = false;
-		}
-	}
-	
-	public static boolean isKeyPressed(int keycode) {
-		return keysPressed[keycode];
-	}
-	
-	public static boolean isKeyDown(int keycode) {
-		return keysDown[keycode];
-	}
-	
-	public static boolean isKeyReleased(int keycode) {
-		return keysReleased[keycode];
-	}
-
-	public static void keyPressed(int keycode) {
-		if (keycode < 0 || keycode >= keys) {
-			System.err.println("Key event outside of handled keys");
-			return;
-		}
-
-		keysPressed[keycode] = true;
-		keyPresses.onNext(new KeyEvent(INSTANCE, keycode, GLFW_PRESS, 0));
-	}
-
-	public static void keyReleased(int keycode) {
-		if (keycode < 0 || keycode >= keys) {
-			System.err.println("Key event outside of handled keys");
-			return;
-		}
-
-		keysReleased[keycode] = true;
-		keysDown[keycode] = false;
-		keyReleases.onNext(new KeyEvent(INSTANCE, keycode, GLFW_RELEASE, 0));
-	}
-
-	public static void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	public static void handleKeyEvent(long window, int key, int scancode, int action, int mods) {
-		if (action == GLFW_PRESS)
-			Keyboard.keyPressed(key);
-		if (action == GLFW_RELEASE)
-			Keyboard.keyReleased(key);
-
-		handleKeyEventRx(key, action, mods); // TODO: Remove from this method and deprecate/remove the enclosing method.
-	}
-
-	public static void handleKeyEventRx(int key, int action, int mods) {
 		keyEventFeed.onNext(new StdKeyEvent(getKeyAction(action), key, mods));
 	}
 
@@ -219,13 +135,5 @@ public class Keyboard {
 
 	public static Flowable<BinKeyEvent> getBinaryKeyEvents() {
 		return binaryKeyEvents;
-	}
-
-	public static Observable<KeyEvent> getKeyPresses() {
-		return keyPresses;
-	}
-
-	public static Observable<KeyEvent> getKeyReleases() {
-		return keyReleases;
 	}
 }

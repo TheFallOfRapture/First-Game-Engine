@@ -4,8 +4,11 @@ import static org.lwjgl.glfw.GLFW.*;
 
 import java.nio.IntBuffer;
 
+import com.morph.engine.util.Feed;
+import com.morph.engine.util.Listener;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.glfw.GLFWVidMode;
 
 import com.morph.engine.graphics.GLRenderingEngine;
 import com.morph.engine.math.Matrix4f;
@@ -13,22 +16,105 @@ import com.morph.engine.math.Vector2f;
 import com.morph.engine.math.Vector4f;
 
 public class Mouse {
+	private static Feed<StdMouseEvent> mouseEventFeed = new Feed<>();
+
+	private static Flowable<StdMouseEvent> standardMouseEvents = Flowable.create(mouseEventFeed::emit, BackpressureStrategy.BUFFER);
+
+	private static Flowable<BinMouseEvent> binaryMouseEvents = Flowable.create(emitter -> {
+		Listener<StdMouseEvent> listener = new Listener<StdMouseEvent>() {
+			@Override
+			public void onNext(StdMouseEvent stdMouseEvent) {
+				switch(stdMouseEvent.action) {
+					case PRESS:
+						emitter.onNext(new BinMouseEvent(BinMouseAction.DOWN, stdMouseEvent.getButton(), stdMouseEvent.getMods()));
+						break;
+					case RELEASE:
+						emitter.onNext(new BinMouseEvent(BinMouseAction.UP, stdMouseEvent.getButton(), stdMouseEvent.getMods()));
+						break;
+				}
+			}
+
+			@Override
+			public void onError(Throwable t) {
+				emitter.onError(t);
+			}
+		};
+		mouseEventFeed.register(listener);
+	}, BackpressureStrategy.BUFFER);
+
 	private static Vector2f screenMousePosition;
 	private static Vector2f worldMousePosition;
 	
 	private static Matrix4f screenToWorld;
-	
-	private static boolean[] buttonsPressed = new boolean[GLFW_MOUSE_BUTTON_LAST];
-	private static boolean[] buttonsDown = new boolean[GLFW_MOUSE_BUTTON_LAST];
-	private static boolean[] buttonsReleased = new boolean[GLFW_MOUSE_BUTTON_LAST];
-	
-	public static void clear() {
-		for (int i = 0; i < GLFW_MOUSE_BUTTON_LAST; i++) {
-			if (buttonsPressed[i])
-				buttonsDown[i] = true;
-			
-			buttonsPressed[i] = false;
-			buttonsReleased[i] = false;
+
+	public enum StdMouseAction {
+		PRESS, RELEASE
+	}
+
+	public enum BinMouseAction {
+		UP, DOWN
+	}
+
+	public static class GenericMouseEvent {
+		private int button;
+		private int mods;
+
+		public GenericMouseEvent(int button, int mods) {
+			this.button = button;
+			this.mods = mods;
+		}
+
+		public int getButton() {
+			return button;
+		}
+
+		public int getMods() {
+			return mods;
+		}
+
+		public boolean hasMod(int modCheck) {
+			return (mods & modCheck) != 0;
+		}
+	}
+
+	public static class StdMouseEvent extends GenericMouseEvent {
+		private StdMouseAction action;
+
+		public StdMouseEvent(StdMouseAction action, int button, int mods) {
+			super(button, mods);
+			this.action = action;
+		}
+
+		public StdMouseAction getAction() {
+			return action;
+		}
+	}
+
+	public static class BinMouseEvent extends GenericMouseEvent {
+		private BinMouseAction action;
+
+		public BinMouseEvent(BinMouseAction action, int button, int mods) {
+			super(button, mods);
+			this.action = action;
+		}
+
+		public BinMouseAction getAction() {
+			return action;
+		}
+	}
+
+	public static void handleMouseEvent(long window, int button, int action, int mods) {
+		mouseEventFeed.onNext(new StdMouseEvent(getAction(action), button, mods));
+	}
+
+	private static StdMouseAction getAction(int action) {
+		switch (action) {
+			case GLFW_PRESS:
+				return StdMouseAction.PRESS;
+			case GLFW_RELEASE:
+				return StdMouseAction.RELEASE;
+			default:
+				return null;
 		}
 	}
 	
@@ -57,25 +143,12 @@ public class Mouse {
 	public static Vector2f getWorldMousePosition() {
 		return worldMousePosition;
 	}
-	
-	public static void mousePressed(int button) {
-		buttonsPressed[button] = true;
+
+	public static Flowable<StdMouseEvent> getStandardMouseEvents() {
+		return standardMouseEvents;
 	}
-	
-	public static void mouseReleased(int button) {
-		buttonsReleased[button] = true;
-		buttonsDown[button] = false;
-	}
-	
-	public static boolean isMouseButtonPressed(int button) {
-		return buttonsPressed[button];
-	}
-	
-	public static boolean isMouseButtonDown(int button) {
-		return buttonsDown[button];
-	}
-	
-	public static boolean isMouseButtonReleased(int button) {
-		return buttonsReleased[button];
+
+	public static Flowable<BinMouseEvent> getBinaryMouseEvents() {
+		return binaryMouseEvents;
 	}
 }

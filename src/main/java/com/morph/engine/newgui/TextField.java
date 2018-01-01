@@ -70,13 +70,16 @@ public class TextField extends TextElement {
         getRenderData().addString(s);
     }
 
-    public void handleGUIKeyEvent(KeyEvent e) {
+    public void handleGUIKeyEvent(Keyboard.StdKeyEvent e) {
         switch (e.getAction()) {
-            case GLFW_PRESS:
-                if (e.getKeyCode() == GLFW_KEY_BACKSPACE) removeCharacter();
-                else if (e.getKeyCode() == GLFW_KEY_ESCAPE) clearText();
-                else if (!isIllegalCharacter(e.getKeyCode())) addCharacter(getCharFromKeyData(e.getKeyCode(), Keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT) || Keyboard.isKeyDown(GLFW_KEY_RIGHT_SHIFT)));
+            case PRESS:
+                if (e.getKey() == GLFW_KEY_BACKSPACE) removeCharacter();
+                else if (e.getKey() == GLFW_KEY_ESCAPE) clearText();
+                else if (!isIllegalCharacter(e.getKey())) addCharacter(getCharFromKeyData(e.getKey(), e.hasMod(GLFW_MOD_SHIFT)));
                 break;
+            case REPEAT:
+                if (e.getKey() == GLFW_KEY_BACKSPACE) removeCharacter();
+                else if (!isIllegalCharacter(e.getKey())) addCharacter(getCharFromKeyData(e.getKey(), e.hasMod(GLFW_MOD_SHIFT)));
         }
     }
 

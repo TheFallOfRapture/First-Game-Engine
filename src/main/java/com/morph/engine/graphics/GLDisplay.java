@@ -43,19 +43,14 @@ public class GLDisplay {
 		window = GLFW.glfwCreateWindow(width, height, title, NULL, NULL);
 		if (window == NULL)
 			throw new RuntimeException("Failure to create the GLFW window");
-		
+
 		glfwSetKeyCallback(window, Keyboard::handleKeyEvent);
 		
 		glfwSetWindowSizeCallback(window, (window, x, y) -> EventDispatcher.INSTANCE.dispatchEvent(new ResizeEvent(this, x, y, false)));
 		
 		glfwSetCursorPosCallback(window, (window, x, y) -> Mouse.setMousePosition(window, new Vector2f(x, y)));
 		
-		glfwSetMouseButtonCallback(window, (window, button, action, mods) -> {
-			if (action == GLFW_PRESS)
-				Mouse.mousePressed(button);
-			if (action == GLFW_RELEASE)
-				Mouse.mouseReleased(button);
-		});
+		glfwSetMouseButtonCallback(window, Mouse::handleMouseEvent);
 
 		glfwSetWindowCloseCallback(window, (window) -> EventDispatcher.INSTANCE.dispatchEvent(new ExitEvent(this)));
 		
