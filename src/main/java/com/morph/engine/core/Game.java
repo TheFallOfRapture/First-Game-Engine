@@ -51,6 +51,12 @@ public abstract class Game implements Runnable {
 	public static final int VERSION_MINOR = 6;
 	public static final int VERSION_PATCH = 0;
 
+	public static final String VERSION_STRING;
+
+	static {
+		VERSION_STRING = VERSION_MAJOR + "." + VERSION_MINOR + "." + VERSION_PATCH;
+	}
+
 	private long delta;
 
 	private Feed<GameAction> gameActionFeed = new Feed<>();

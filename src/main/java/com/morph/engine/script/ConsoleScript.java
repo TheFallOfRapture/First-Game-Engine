@@ -23,7 +23,7 @@ public abstract class ConsoleScript implements Runnable {
     }
 
     protected void getVersion() {
-        echo("Morph " + Game.VERSION_MAJOR + "." + Game.VERSION_MINOR + "." + Game.VERSION_PATCH);
+        echo("Morph " + Game.VERSION_STRING);
     }
 
     protected void addEntity(String name, Component... components) {

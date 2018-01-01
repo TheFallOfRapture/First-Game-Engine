@@ -60,7 +60,7 @@ public class ScriptUtils {
     private static boolean load(Game game) {
         ScriptUtils.game = game;
 
-        Console.out.println("Morph Script Engine 0.5.15 initializing... Please wait...");
+        Console.out.println("Morph Script Engine " + Game.VERSION_STRING + " initializing... Please wait...");
         KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory kotlinEngine = new KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory();
         PyScriptEngineFactory pythonEngine = new PyScriptEngineFactory();
 
@@ -76,7 +76,7 @@ public class ScriptUtils {
 
         initialized = true;
 
-        Console.out.println("[Morph Script Engine 0.5.15] Engine initialized.");
+        Console.out.println("[Morph Script Engine " + Game.VERSION_STRING + "] Engine initialized.");
 
         return true;
     }
