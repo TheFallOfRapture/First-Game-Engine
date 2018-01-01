@@ -14,13 +14,19 @@ import com.morph.engine.math.MathUtils;
 import com.morph.engine.math.Vector2f;
 import com.morph.engine.math.Vector3f;
 import com.morph.engine.physics.components.Velocity2D;
+import com.morph.engine.util.Feed;
+import io.reactivex.Observable;
 import org.jetbrains.annotations.NotNull;
 
 // Reference: noonat.github.io/intersect/
 
 public class CollisionEngine extends GameSystem {
+	private Feed<Collision> collisionFeed = new Feed<>();
+	private Observable<Collision> collisionEvents = Observable.create(collisionFeed::emit);
+
 	public CollisionEngine(Game game) {
 		super(game);
+		game.getEvents().filter(e -> e == Game.GameAction.CLOSE).subscribe(e -> collisionFeed.onComplete());
 	}
 	
 	protected void fixedUpdate(Entity e, float dt) {
@@ -28,7 +34,7 @@ public class CollisionEngine extends GameSystem {
 	}
 	
 	protected void systemFixedUpdate(float dt) {
-		List<Entity> collidables = new ArrayList<Entity>();
+		List<Entity> collidables = new ArrayList<>();
 		for (int i = game.getWorld().getEntities().size() - 1; i >= 0; i--) {
 			Entity e = game.getWorld().getEntities().get(i);
 			if (e != null && acceptEntity(e)) {
@@ -41,9 +47,7 @@ public class CollisionEngine extends GameSystem {
 	
 	public static List<Collision> checkAgainstWorldStatic(BoundingBox2D boxA, List<Entity> entities) {
 		List<Collision> result = new ArrayList<Collision>();
-		for (int i = 0; i < entities.size(); i++) {
-			Entity other = entities.get(i);
-			
+		for (Entity other : entities) {
 			BoundingBox2D boxB = other.getComponent(BoundingBox2D.class);
 			Collision coll = checkDoubleStatic(boxA, boxB);
 			if (coll != null)
@@ -55,17 +59,14 @@ public class CollisionEngine extends GameSystem {
 	
 	public static List<Collision> checkAgainstWorld(BoundingBox2D boxA, Vector2f velA, List<Entity> entities, float dt) {
 		List<Collision> result = new ArrayList<Collision>();
-		
-		for (int i = 0; i < entities.size(); i++) {
-			Entity a = boxA.getParent();
-			Entity b = entities.get(i);
-			
-			BoundingBox2D boxB = b.getComponent(BoundingBox2D.class);
-			Velocity2D vel2D = b.getComponent(Velocity2D.class);
+
+		for (Entity entity : entities) {
+			BoundingBox2D boxB = entity.getComponent(BoundingBox2D.class);
+			Velocity2D vel2D = entity.getComponent(Velocity2D.class);
 			Vector2f velB = vel2D == null ? new Vector2f(0, 0) : vel2D.getVelocity();
-			
+
 			Collision coll;
-			
+
 			if (velA.equals(new Vector2f(0, 0)) && velB.equals(new Vector2f(0, 0)))
 				coll = checkDoubleStatic(boxA, boxB);
 			else if (velA.equals(new Vector2f(0, 0)) && !velB.equals(new Vector2f(0, 0)))
@@ -74,12 +75,12 @@ public class CollisionEngine extends GameSystem {
 				coll = checkStaticDynamic(boxB, boxA, velA.scale(dt), boxA.getHalfSize());
 			else
 				coll = checkDoubleDynamic(boxA, boxB, velA, velB, boxB.getHalfSize(), dt);
-			
+
 			if (coll != null) {
 				if (coll.getHit() == null) {
 					coll = new Collision(coll.getHit(), coll.getEntity(), coll.getPosition(), coll.getIntersection(), coll.getNormal(), coll.getTime());
 				}
-				
+
 				result.add(coll);
 			}
 		}
@@ -115,6 +116,8 @@ public class CollisionEngine extends GameSystem {
 						a.addComponent(new TriggerComponent(b, normal));
 					else
 						a.addComponent(new CollisionComponent(b, normal, distance, coll.getTime()));
+
+					collisionFeed.onNext(coll.getCollision());
 				}
 			}
 		}
@@ -149,7 +152,7 @@ public class CollisionEngine extends GameSystem {
 		}
 	}
 
-	public static SweepCollision checkCollision(Entity a, Entity b, float dt) {
+	private static SweepCollision checkCollision(Entity a, Entity b, float dt) {
 		Velocity2D velA = a.getComponent(Velocity2D.class);
 		Velocity2D velB = b.getComponent(Velocity2D.class);
 		
@@ -200,7 +203,7 @@ public class CollisionEngine extends GameSystem {
 		}
 	}
 
-	public static Collision checkDoubleStatic(BoundingBox2D a, BoundingBox2D b) {
+	private static Collision checkDoubleStatic(BoundingBox2D a, BoundingBox2D b) {
 		Vector2f delta = b.getCenter().sub(a.getCenter());
 		Vector2f proj = b.getHalfSize().add(a.getHalfSize()).sub(delta.abs());
 		
@@ -226,7 +229,7 @@ public class CollisionEngine extends GameSystem {
 		return new Collision(a.getParent(), b.getParent(), pos, inter, n, 0);
 	}
 	
-	public static Collision checkDoubleDynamic(BoundingBox2D boxA, BoundingBox2D boxB, Vector2f velA, Vector2f velB, Vector2f padding, float dt) {
+	private static Collision checkDoubleDynamic(BoundingBox2D boxA, BoundingBox2D boxB, Vector2f velA, Vector2f velB, Vector2f padding, float dt) {
 		Vector2f delta = velB.sub(velA).scale(dt);
 		
 		Vector2f position = boxB.getCenter();
@@ -271,7 +274,7 @@ public class CollisionEngine extends GameSystem {
 		return new Collision(boxA.getParent(), boxB.getParent(), pos, inter, n, time);
 	}
 	
-	public static Collision checkStaticDynamic(BoundingBox2D boxStill, BoundingBox2D boxMoving, Vector2f delta, Vector2f padding) {
+	private static Collision checkStaticDynamic(BoundingBox2D boxStill, BoundingBox2D boxMoving, Vector2f delta, Vector2f padding) {
 		Vector2f position = boxMoving.getCenter();
 		
 		float scaleX = 1.0f / delta.getX();
@@ -327,22 +330,22 @@ public class CollisionEngine extends GameSystem {
 		updateAPriori(entities, dt);
 	} 
 	
-	public void updateAPriori(List<Entity> entities, float dt) {
+	private void updateAPriori(List<Entity> entities, float dt) {
 		List<BoundingBox2D> boundingBoxes = new ArrayList<BoundingBox2D>();
 		for (Entity e: entities)
 			if (e.hasComponent(BoundingBox2D.class))
 				boundingBoxes.add(e.getComponent(BoundingBox2D.class));
 		
 		List<BoundingBox2DSweep> boundingBoxSweeps = new ArrayList<BoundingBox2DSweep>();
-		
+
 		for (Entity e : entities) {
 			if (e.hasComponent(BoundingBox2D.class)) {
 				BoundingBox2D start = e.getComponent(BoundingBox2D.class);
 				Velocity2D vel2D = e.getComponent(Velocity2D.class);
 				Vector2f velocity = vel2D == null ? new Vector2f(0, 0) : vel2D.getVelocity().scale(dt);
-				
-				boolean moving = !velocity.equals(new Vector2f(0, 0)); 
-				
+
+				boolean moving = !velocity.equals(new Vector2f(0, 0));
+
 				boundingBoxSweeps.add(new BoundingBox2DSweep(e, velocity, moving));
 			}
 		}
@@ -352,7 +355,7 @@ public class CollisionEngine extends GameSystem {
 				BoundingBox2DSweep a = boundingBoxSweeps.get(i); // use as moving object
 				BoundingBox2DSweep b = boundingBoxSweeps.get(j); // use as static object
 				float collisionTime = 1;
-				
+
 				if (!a.isMoving() && b.isMoving()) {
 					// Inflate A by B's size
 //					System.out.println("A STILL");
@@ -367,27 +370,27 @@ public class CollisionEngine extends GameSystem {
 //					System.out.println("BOTH STILL");
 					boolean colliding = a.getBoundingBox().intersects(b.getBoundingBox());
 //					System.out.println(a.getBoundingBox().getCenter() + " : " + b.getBoundingBox().getCenter() + " : " + (colliding ? "YES" : "NO"));
-					
+
 					if (colliding) {
 						Entity e1 = boundingBoxes.get(i).getParent();
 						Entity e2 = boundingBoxes.get(j).getParent();
-						
+
 						Vector2f e1Center = boundingBoxes.get(i).getCenter();
 						Vector2f e2Center = boundingBoxes.get(j).getCenter();
-						
+
 						Vector2f e1Min = e1Center.sub(boundingBoxes.get(i).getHalfSize());
 						Vector2f e1Max = e1Center.add(boundingBoxes.get(i).getHalfSize());
 						Vector2f e2Min = e2Center.sub(boundingBoxes.get(j).getHalfSize());
 						Vector2f e2Max = e2Center.add(boundingBoxes.get(j).getHalfSize());
-						
+
 						float dX = Math.min(e1Max.getX() - e2Min.getX(), e2Max.getX() - e1Min.getX());
 						float dY = Math.min(e1Max.getY() - e2Min.getY(), e2Max.getY() - e1Min.getY());
-						
+
 						Vector3f normal;
 						float distance;
-						
+
 //						System.out.println(boundingBoxes.get(i).getCenter() + " : " + boundingBoxes.get(j).getCenter());
-						
+
 						if (dX < dY) {
 							normal = new Vector3f(Math.signum(e1Center.getX() - e2Center.getX()), 0, 0);
 							distance = dX;
@@ -395,19 +398,19 @@ public class CollisionEngine extends GameSystem {
 							normal = new Vector3f(0, Math.signum(e1Center.getY() - e2Center.getY()), 0);
 							distance = dY;
 						}
-						
+
 //						System.out.println("X: " + dX + ", Y: " + dY);
-						
+
 						if (boundingBoxes.get(i).isTrigger())
 							e2.addComponent(new TriggerComponent(e1, normal.negate()));
 						else
 							e2.addComponent(new CollisionComponent(e1, normal.negate(), distance, collisionTime));
-						
+
 						if (boundingBoxes.get(j).isTrigger())
 							e1.addComponent(new TriggerComponent(e2, normal));
 						else
 							e1.addComponent(new CollisionComponent(e2, normal, distance, collisionTime));
-						
+
 						continue;
 					}
 				} else {
@@ -416,37 +419,37 @@ public class CollisionEngine extends GameSystem {
 					Vector2f aVel = a.getVelocity();
 					Vector2f bVel = b.getVelocity();
 					BoundingBox2D bStart = b.getBoundingBox();
-					
+
 					Vector2f newVel = aVel.sub(bVel);
-					
+
 					Vector2f newHalfSize = bStart.getHalfSize().add(a.getBoundingBox().getHalfSize());
 					BoundingBox2D still = new BoundingBox2D(bStart.getCenter(), newHalfSize);
-					
+
 					BoundingBox2DSweep moving = new BoundingBox2DSweep(a.getEntity(), newVel, true);
-					
+
 					collisionTime = getAABBSweepCollision(moving, still);
 				}
-				
+
 				if (collisionTime <= 0.0f)
 					continue;
-				
+
 				Entity e1 = boundingBoxSweeps.get(i).getBoundingBox().getParent();
 				Entity e2 = boundingBoxSweeps.get(j).getBoundingBox().getParent();
-				
+
 				Vector2f e1Center = boundingBoxes.get(i).getCenter();
 				Vector2f e2Center = boundingBoxes.get(j).getCenter();
-				
+
 				Vector2f e1Min = e1Center.sub(boundingBoxes.get(i).getHalfSize());
 				Vector2f e1Max = e1Center.add(boundingBoxes.get(i).getHalfSize());
 				Vector2f e2Min = e2Center.sub(boundingBoxes.get(j).getHalfSize());
 				Vector2f e2Max = e2Center.add(boundingBoxes.get(j).getHalfSize());
-				
+
 				float dX = Math.min(e1Max.getX() - e2Min.getX(), e2Max.getX() - e1Min.getX());
 				float dY = Math.min(e1Max.getY() - e2Min.getY(), e2Max.getY() - e1Min.getY());
-				
+
 				Vector3f normal;
 				float distance;
-				
+
 				if (dX < dY) {
 					normal = new Vector3f(Math.signum(e1Center.getX() - e2Center.getX()), 0, 0);
 					distance = dX;
@@ -454,12 +457,12 @@ public class CollisionEngine extends GameSystem {
 					normal = new Vector3f(0, Math.signum(e1Center.getY() - e2Center.getY()), 0);
 					distance = dY;
 				}
-				
+
 				if (boundingBoxes.get(i).isTrigger())
 					e2.addComponent(new TriggerComponent(e1, normal.negate()));
 				else
 					e2.addComponent(new CollisionComponent(e1, normal.negate(), distance, 0));
-				
+
 				if (boundingBoxes.get(j).isTrigger())
 					e1.addComponent(new TriggerComponent(e2, normal));
 				else
@@ -468,7 +471,7 @@ public class CollisionEngine extends GameSystem {
 		}
 	}
 	
-	public float getAABBSweepCollision(BoundingBox2DSweep a, BoundingBox2D b) {
+	private float getAABBSweepCollision(BoundingBox2DSweep a, BoundingBox2D b) {
 		Vector2f position = a.getBoundingBox().getCenter();
 		Vector2f velocity = a.getVelocity();
 		
@@ -507,52 +510,6 @@ public class CollisionEngine extends GameSystem {
 		}
 		
 		return false;
-	}
-	
-	public void updateCollision(List<BoundingBox2D> boundingBoxes) {
-		for (BoundingBox2D b: boundingBoxes)
-			b.update();
-		
-		for (int i = 0; i < boundingBoxes.size(); i++) {
-			for (int j = i + 1; j < boundingBoxes.size(); j++) {
-				if (boundingBoxes.get(i).intersects(boundingBoxes.get(j))) {
-					Entity e1 = boundingBoxes.get(i).getParent();
-					Entity e2 = boundingBoxes.get(j).getParent();
-					
-					Vector2f e1Center = boundingBoxes.get(i).getCenter();
-					Vector2f e2Center = boundingBoxes.get(j).getCenter();
-					
-					Vector2f e1Min = e1Center.sub(boundingBoxes.get(i).getHalfSize());
-					Vector2f e1Max = e1Center.add(boundingBoxes.get(i).getHalfSize());
-					Vector2f e2Min = e2Center.sub(boundingBoxes.get(j).getHalfSize());
-					Vector2f e2Max = e2Center.add(boundingBoxes.get(j).getHalfSize());
-					
-					float dX = Math.min(e1Max.getX() - e2Min.getX(), e2Max.getX() - e1Min.getX());
-					float dY = Math.min(e1Max.getY() - e2Min.getY(), e2Max.getY() - e1Min.getY());
-					
-					Vector3f normal;
-					float distance;
-					
-					if (dX < dY) {
-						normal = new Vector3f(Math.signum(e1Center.getX() - e2Center.getX()), 0, 0);
-						distance = dX;
-					} else {
-						normal = new Vector3f(0, Math.signum(e1Center.getY() - e2Center.getY()), 0);
-						distance = dY;
-					}
-					
-					if (boundingBoxes.get(i).isTrigger())
-						e2.addComponent(new TriggerComponent(e1, normal.negate()));
-					else
-						e2.addComponent(new CollisionComponent(e1, normal.negate(), distance, 0));
-					
-					if (boundingBoxes.get(j).isTrigger())
-						e1.addComponent(new TriggerComponent(e2, normal));
-					else
-						e1.addComponent(new CollisionComponent(e2, normal, distance, 0));
-				}
-			}
-		}
 	}
 
 	@Override
