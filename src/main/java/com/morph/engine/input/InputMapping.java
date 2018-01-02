@@ -3,10 +3,8 @@ package com.morph.engine.input;
 import com.morph.engine.core.Game;
 import com.morph.engine.util.Pair;
 import io.reactivex.Observable;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.HashMap;
-import java.util.stream.IntStream;
 
 public class InputMapping {
     private HashMap<Integer, Runnable> keyPressed = new HashMap<>();
