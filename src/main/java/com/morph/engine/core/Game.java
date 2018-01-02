@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.morph.engine.core.gui.ConsoleGUI;
+import com.morph.engine.input.InputMapping;
 import com.morph.engine.script.debug.Console;
 import com.morph.engine.graphics.GLDisplay;
 import com.morph.engine.graphics.GLRenderingEngine;
@@ -21,6 +22,8 @@ import com.morph.engine.util.Feed;
 import com.morph.engine.util.Pair;
 import com.morph.engine.util.ScriptUtils;
 import io.reactivex.Observable;
+import io.reactivex.observables.ConnectableObservable;
+import kotlin.Triple;
 
 public abstract class Game implements Runnable {
 	protected int width, height;
@@ -185,45 +188,52 @@ public abstract class Game implements Runnable {
 		display.getEvents().filter(e -> e == GLDisplay.GLDisplayAction.CLOSE).subscribe(e -> handleExitEvent());
 
 		// TODO: Oh my god please move this somewhere else
-		Observable.zip(events.filter(e -> e == GameAction.UPDATE), Mouse.getStandardMouseEvents(), Pair::new).subscribe(pair -> {
-			GameAction g = pair.getFirst();
-			Mouse.StdMouseEvent m = pair.getSecond();
+		Observable.combineLatest(
+		        events.filter(e -> e == GameAction.UPDATE),
+                Observable.concat(Observable.just(new Mouse.StdMouseEvent(Mouse.StdMouseAction.RELEASE, 0, 0)), Mouse.getStandardMouseEvents()),
+                Mouse.getScreenMousePosition(),
+                Triple::new).subscribe(vals -> {
+                    GameAction g = vals.getFirst();
+                    Mouse.StdMouseEvent m = vals.getSecond();
+                    Vector2f mousePos = vals.getThird();
 
-			Vector2f mousePos = Mouse.getScreenMousePosition();
+                    if (m.getButton() == 0 && m.getAction() == Mouse.StdMouseAction.PRESS)
+                        System.out.println("pressed");
 
-			if (m.getButton() == 0 && m.getAction() == Mouse.StdMouseAction.PRESS)
-				System.out.println("pressed");
-
-			for (GUI gui : guis) {
-				for (Element e : gui.getElements()) {
-					switch (e.getState()) {
-						case "IDLE":
-							if (mousePos != null && e.contains(mousePos)) {
-								if (m.getButton() == 0 && m.getAction() == Mouse.StdMouseAction.PRESS) {
-									e.setState("CLICK");
-								} else {
-									e.setState("HOVER");
-								}
-							}
-							break;
-						case "HOVER":
-							if (mousePos != null && e.contains(mousePos)) {
-								if (m.getButton() == 0 && m.getAction() == Mouse.StdMouseAction.PRESS) {
-									e.setState("CLICK");
-								}
-							} else {
-								e.setState("IDLE");
-							}
-							break;
-						case "CLICK":
-							if (m.getButton() == 0 && m.getAction() == Mouse.StdMouseAction.RELEASE) {
-								e.setState("IDLE");
-							}
-							break;
-					}
-				}
-			}
-		});
+                    for (GUI gui : guis) {
+                        for (Element e : gui.getElements()) {
+                            switch (e.getState()) {
+                                case "IDLE":
+                                    if (mousePos != null && e.contains(mousePos)) {
+                                        if (m.getButton() == 0 && m.getAction() == Mouse.StdMouseAction.PRESS) {
+                                            e.setState("CLICK");
+                                        } else {
+                                            e.setState("HOVER");
+                                        }
+                                    }
+                                    break;
+                                case "HOVER":
+                                    if (mousePos != null && e.contains(mousePos)) {
+                                        if (m.getButton() == 0 && m.getAction() == Mouse.StdMouseAction.PRESS) {
+                                            e.setState("CLICK");
+                                        }
+                                    } else {
+                                        e.setState("IDLE");
+                                    }
+                                    break;
+                                case "CLICK":
+                                    if (m.getButton() == 0 && m.getAction() == Mouse.StdMouseAction.RELEASE) {
+                                        if (mousePos != null && e.contains(mousePos))
+                                            e.setState("HOVER");
+                                        else
+                                            e.setState("IDLE");
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+                }
+        );
 	}
 
 	private void update() {
@@ -233,40 +243,7 @@ public abstract class Game implements Runnable {
 			gs.update();
 		}
 
-//		if (Mouse.isMouseButtonPressed(0))
-//			System.out.println("pressed");
-
 		behaviors.values().forEach(GameBehavior::update);
-
-//		for (GUI gui : guis) {
-//			for (Element e : gui.getElements()) {
-//				switch (e.getState()) {
-//					case "IDLE":
-//						if (mousePos != null && e.contains(mousePos)) {
-//							if (Mouse.isMouseButtonPressed(0)) {
-//								e.setState("CLICK");
-//							} else {
-//								e.setState("HOVER");
-//							}
-//						}
-//						break;
-//					case "HOVER":
-//						if (mousePos != null && e.contains(mousePos)) {
-//							if (Mouse.isMouseButtonPressed(0)) {
-//								e.setState("CLICK");
-//							}
-//						} else {
-//							e.setState("IDLE");
-//						}
-//						break;
-//					case "CLICK":
-//						if (!Mouse.isMouseButtonDown(0)) {
-//							e.setState("IDLE");
-//						}
-//						break;
-//				}
-//			}
-//		}
 	}
 
 	public void addSystem(GameSystem gs) {
@@ -279,9 +256,6 @@ public abstract class Game implements Runnable {
 
 	protected void pollEvents() {
 		display.pollEvents();
-
-//		if (display.isCloseRequested())
-//			stop();
 	}
 
 	public void stop() {

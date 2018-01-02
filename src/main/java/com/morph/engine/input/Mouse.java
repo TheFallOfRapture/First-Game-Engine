@@ -8,6 +8,7 @@ import com.morph.engine.util.Feed;
 import com.morph.engine.util.Listener;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
 import org.lwjgl.BufferUtils;
 
 import com.morph.engine.graphics.GLRenderingEngine;
@@ -19,7 +20,6 @@ public class Mouse {
 	private static Feed<StdMouseEvent> mouseEventFeed = new Feed<>();
 
 	private static Observable<StdMouseEvent> standardMouseEvents = Observable.create(mouseEventFeed::emit);
-
 	private static Observable<BinMouseEvent> binaryMouseEvents = Observable.create(emitter -> {
 		Listener<StdMouseEvent> listener = new Listener<StdMouseEvent>() {
 			@Override
@@ -48,8 +48,8 @@ public class Mouse {
 	});
 
 	// TODO: Convert mouse position into Observable/Flowable.
-	private static Vector2f screenMousePosition;
-	private static Vector2f worldMousePosition;
+	private static PublishSubject<Vector2f> screenMousePosition = PublishSubject.create();
+	private static PublishSubject<Vector2f> worldMousePosition = PublishSubject.create();
 	
 	private static Matrix4f screenToWorld;
 
@@ -132,30 +132,35 @@ public class Mouse {
 		int width = widthBuffer.get();
 		int height = heightBuffer.get();
 
-		screenMousePosition = new Vector2f(v.getX(), height - v.getY());
+		Vector2f currentScreenPos = new Vector2f(v.getX(), height - v.getY());
+		screenMousePosition.onNext(currentScreenPos);
 
 		if (screenToWorld == null) {
 			screenToWorld = GLRenderingEngine.getProjectionMatrix().getInverse();
 		}
 
-		Vector2f normalizedMousePos = screenMousePosition.div(new Vector2f(width / 2f, height / 2f)).sub(new Vector2f(1, 1)).mul(new Vector2f(1, -1));
-		worldMousePosition = screenToWorld.mul(new Vector4f(normalizedMousePos, 0, 1)).getXY();
+		Vector2f normalizedMousePos = currentScreenPos.div(new Vector2f(width / 2f, height / 2f)).sub(new Vector2f(1, 1)).mul(new Vector2f(1, -1));
+		worldMousePosition.onNext(screenToWorld.mul(new Vector4f(normalizedMousePos, 0, 1)).getXY());
 	}
 
-	public static Vector2f getScreenMousePosition() {
+	public static Observable<Vector2f> getScreenMousePosition() {
 		return screenMousePosition;
 	}
 	
-	public static Vector2f getWorldMousePosition() {
+	public static Observable<Vector2f> getWorldMousePosition() {
 		return worldMousePosition;
 	}
 
 	public static boolean queryUpDown(int button, BinMouseAction action) {
 		Maybe<BinMouseEvent> e = binaryMouseEvents.filter(event -> event.getButton() == button).lastElement();
-		return !e.isEmpty().blockingGet() && e.blockingGet().action == action;
+		return e.map(event -> event.action == action).blockingGet();
 	}
 
 	public static Observable<StdMouseEvent> getStandardMouseEvents() {
 		return standardMouseEvents;
+	}
+
+	public static Observable<BinMouseEvent> getBinaryMouseEvents() {
+		return binaryMouseEvents;
 	}
 }

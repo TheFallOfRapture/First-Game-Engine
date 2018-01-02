@@ -6,7 +6,9 @@ import com.morph.engine.entities.EntityFactory;
 import com.morph.engine.graphics.Color;
 import com.morph.engine.graphics.GLRenderingEngine;
 import com.morph.engine.graphics.shaders.TintShader;
+import com.morph.engine.input.InputMapping;
 import com.morph.engine.input.Keyboard;
+import com.morph.engine.input.Mouse;
 import com.morph.engine.math.MatrixUtils;
 
 import com.morph.engine.math.Vector2f;
@@ -14,6 +16,8 @@ import com.morph.engine.physics.components.Transform2D;
 import com.morph.engine.script.ScriptContainer;
 import com.morph.engine.util.KotlinTestKt;
 import org.lwjgl.glfw.GLFW;
+
+import static org.lwjgl.glfw.GLFW.*;
 
 public class Engine extends OpenGame {
 	private EngineGUI testGUI;
@@ -49,6 +53,21 @@ public class Engine extends OpenGame {
 
 		attachBehaviorAsync("TestBehavior.kts");
 		attachBehaviorAsync("TestBehavior2.kts");
+
+		InputMapping input = new InputMapping();
+
+		input.mapKeyStd(GLFW_KEY_W, Keyboard.StdKeyAction.PRESS, () -> System.out.println("W"));
+		input.mapKeyStd(GLFW_KEY_A, Keyboard.StdKeyAction.PRESS, () -> System.out.println("A"));
+		input.mapKeyStd(GLFW_KEY_S, Keyboard.StdKeyAction.PRESS, () -> System.out.println("S"));
+		input.mapKeyStd(GLFW_KEY_D, Keyboard.StdKeyAction.PRESS, () -> System.out.println("D"));
+
+		input.mapButtonStd(GLFW_MOUSE_BUTTON_1, Mouse.StdMouseAction.PRESS, () -> System.out.println("PRESS LEFT"));
+		input.mapButtonStd(GLFW_MOUSE_BUTTON_1, Mouse.StdMouseAction.RELEASE, () -> System.out.println("RELEASE LEFT"));
+
+		input.mapButtonStd(GLFW_MOUSE_BUTTON_2, Mouse.StdMouseAction.PRESS, () -> System.out.println("PRESS RIGHT"));
+		input.mapButtonStd(GLFW_MOUSE_BUTTON_2, Mouse.StdMouseAction.RELEASE, () -> System.out.println("RELEASE RIGHT"));
+
+		input.link(this);
 	}
 
 	@Override

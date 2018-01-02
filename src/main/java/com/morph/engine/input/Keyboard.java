@@ -133,4 +133,7 @@ public class Keyboard {
 	public static Observable<StdKeyEvent> getStandardKeyEvents() {
 		return standardKeyEvents;
 	}
+	public static Observable<BinKeyEvent> getBinaryKeyEvents() {
+		return binaryKeyEvents;
+	}
 }
