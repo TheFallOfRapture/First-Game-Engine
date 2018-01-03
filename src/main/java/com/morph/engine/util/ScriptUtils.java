@@ -109,6 +109,7 @@ public class ScriptUtils {
                     key.reset();
                 }
             }
+            subscriber.onComplete();
         } catch (IOException e) {
             subscriber.onError(e);
         }
