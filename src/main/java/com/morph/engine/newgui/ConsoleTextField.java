@@ -1,5 +1,8 @@
 package com.morph.engine.newgui;
 
+import com.morph.engine.input.KeyPress;
+import com.morph.engine.input.KeyRepeat;
+import com.morph.engine.input.StdKeyEvent;
 import com.morph.engine.script.debug.Console;
 import com.morph.engine.graphics.Color;
 import com.morph.engine.input.Keyboard;
@@ -28,15 +31,14 @@ public class ConsoleTextField extends TextField {
         this.console = console;
     }
 
-    public void handleGUIKeyEvent(Keyboard.StdKeyEvent e) {
-        switch (e.getAction()) {
-            case PRESS:
-                if (e.getKey() == GLFW_KEY_BACKSPACE) removeCharacter();
-                else if (e.getKey() == GLFW_KEY_ESCAPE) clearText();
-                else if (e.getKey() == GLFW_KEY_ENTER) processLine();
-                else if (!isIllegalCharacter(e.getKey())) addCharacter(getCharFromKeyData(e.getKey(), e.hasMod(GLFW_MOD_SHIFT)));
-                break;
-            case REPEAT:
+    public void handleGUIKeyEvent(StdKeyEvent e) {
+        if (e.getAction() instanceof KeyPress) {
+            if (e.getKey() == GLFW_KEY_BACKSPACE) removeCharacter();
+            else if (e.getKey() == GLFW_KEY_ESCAPE) clearText();
+            else if (e.getKey() == GLFW_KEY_ENTER) processLine();
+            else if (!isIllegalCharacter(e.getKey()))
+                addCharacter(getCharFromKeyData(e.getKey(), e.hasMod(GLFW_MOD_SHIFT)));
+        } else if (e.getAction() instanceof KeyRepeat) {
                 if (e.getKey() == GLFW_KEY_BACKSPACE) removeCharacter();
                 else if (!isIllegalCharacter(e.getKey())) addCharacter(getCharFromKeyData(e.getKey(), e.hasMod(GLFW_MOD_SHIFT)));
         }

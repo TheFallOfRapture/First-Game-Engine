@@ -1,7 +1,10 @@
 package com.morph.engine.newgui;
 
 import com.morph.engine.graphics.Color;
+import com.morph.engine.input.KeyPress;
+import com.morph.engine.input.KeyRepeat;
 import com.morph.engine.input.Keyboard;
+import com.morph.engine.input.StdKeyEvent;
 import com.morph.engine.math.Vector2f;
 
 import java.util.HashMap;
@@ -67,16 +70,15 @@ public class TextField extends TextElement {
         getRenderData().addString(s);
     }
 
-    public void handleGUIKeyEvent(Keyboard.StdKeyEvent e) {
-        switch (e.getAction()) {
-            case PRESS:
-                if (e.getKey() == GLFW_KEY_BACKSPACE) removeCharacter();
-                else if (e.getKey() == GLFW_KEY_ESCAPE) clearText();
-                else if (!isIllegalCharacter(e.getKey())) addCharacter(getCharFromKeyData(e.getKey(), e.hasMod(GLFW_MOD_SHIFT)));
-                break;
-            case REPEAT:
-                if (e.getKey() == GLFW_KEY_BACKSPACE) removeCharacter();
-                else if (!isIllegalCharacter(e.getKey())) addCharacter(getCharFromKeyData(e.getKey(), e.hasMod(GLFW_MOD_SHIFT)));
+    public void handleGUIKeyEvent(StdKeyEvent e) {
+        if (e.getAction() instanceof KeyPress) {
+            if (e.getKey() == GLFW_KEY_BACKSPACE) removeCharacter();
+            else if (e.getKey() == GLFW_KEY_ESCAPE) clearText();
+            else if (!isIllegalCharacter(e.getKey()))
+                addCharacter(getCharFromKeyData(e.getKey(), e.hasMod(GLFW_MOD_SHIFT)));
+        } else if (e.getAction() instanceof KeyRepeat) {
+            if (e.getKey() == GLFW_KEY_BACKSPACE) removeCharacter();
+            else if (!isIllegalCharacter(e.getKey())) addCharacter(getCharFromKeyData(e.getKey(), e.hasMod(GLFW_MOD_SHIFT)));
         }
     }
 

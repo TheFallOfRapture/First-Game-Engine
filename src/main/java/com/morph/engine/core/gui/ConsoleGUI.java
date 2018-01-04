@@ -2,6 +2,7 @@ package com.morph.engine.core.gui;
 
 import com.morph.engine.core.Game;
 import com.morph.engine.input.Keyboard;
+import com.morph.engine.input.StdKeyEvent;
 import com.morph.engine.script.debug.Console;
 import com.morph.engine.graphics.Color;
 import com.morph.engine.graphics.Texture;
@@ -64,7 +65,7 @@ public class ConsoleGUI extends GUI {
         consoleOutput.setText(console.getText());
     }
 
-    private void onKeyEvent(Keyboard.StdKeyEvent e) {
+    private void onKeyEvent(StdKeyEvent e) {
         if (isOpen()) {
             consoleInput.handleGUIKeyEvent(e);
         }

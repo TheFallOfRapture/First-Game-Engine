@@ -19,8 +19,8 @@ import com.morph.engine.math.Vector4f
 object Mouse {
     private val mouseEventFeed = Feed<StdMouseEvent>()
 
-    val standardMouseEvents: Observable<StdMouseEvent> = Observable.create { mouseEventFeed.emit(it) }
-    val binaryMouseEvents: Observable<BinMouseEvent> = Observable.create {
+    @JvmStatic val standardMouseEvents: Observable<StdMouseEvent> = Observable.create { mouseEventFeed.emit(it) }
+    @JvmStatic val binaryMouseEvents: Observable<BinMouseEvent> = Observable.create {
         mouseEventFeed.emit(it) { e ->
             when (e.action) {
                 MousePress -> onNext(BinMouseEvent(MouseDown, e.button, e.mods))

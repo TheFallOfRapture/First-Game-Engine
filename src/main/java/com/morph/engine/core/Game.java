@@ -5,11 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.morph.engine.core.gui.ConsoleGUI;
-import com.morph.engine.input.InputMapping;
+import com.morph.engine.input.*;
 import com.morph.engine.script.debug.Console;
 import com.morph.engine.graphics.GLDisplay;
 import com.morph.engine.graphics.GLRenderingEngine;
-import com.morph.engine.input.Mouse;
 import com.morph.engine.math.Matrix4f;
 import com.morph.engine.math.MatrixUtils;
 import com.morph.engine.math.Vector2f;
@@ -190,14 +189,14 @@ public abstract class Game implements Runnable {
 		// TODO: Oh my god please move this somewhere else
 		Observable.combineLatest(
 		        events.filter(e -> e == GameAction.UPDATE),
-                Observable.concat(Observable.just(new Mouse.StdMouseEvent(Mouse.INSTANCE.StdMouseAction.RELEASE, 0, 0)), Mouse.getStandardMouseEvents()),
+                Observable.concat(Observable.just(new StdMouseEvent(MouseRelease.INSTANCE, 0, 0)), Mouse.getStandardMouseEvents()),
                 Mouse.INSTANCE.getScreenMousePosition(),
                 Triple::new).subscribe(vals -> {
                     GameAction g = vals.getFirst();
-                    Mouse.StdMouseEvent m = vals.getSecond();
+                    StdMouseEvent m = vals.getSecond();
                     Vector2f mousePos = vals.getThird();
 
-                    if (m.getButton() == 0 && m.getAction() == Mouse.INSTANCE.StdMouseAction.PRESS)
+                    if (m.getButton() == 0 && m.getAction() == MousePress.INSTANCE)
                         System.out.println("pressed");
 
                     for (GUI gui : guis) {
@@ -205,7 +204,7 @@ public abstract class Game implements Runnable {
                             switch (e.getState()) {
                                 case "IDLE":
                                     if (mousePos != null && e.contains(mousePos)) {
-                                        if (m.getButton() == 0 && m.getAction() == Mouse.INSTANCE.StdMouseAction.PRESS) {
+                                        if (m.getButton() == 0 && m.getAction() == MousePress.INSTANCE) {
                                             e.setState("CLICK");
                                         } else {
                                             e.setState("HOVER");
@@ -214,7 +213,7 @@ public abstract class Game implements Runnable {
                                     break;
                                 case "HOVER":
                                     if (mousePos != null && e.contains(mousePos)) {
-                                        if (m.getButton() == 0 && m.getAction() == Mouse.INSTANCE.StdMouseAction.PRESS) {
+                                        if (m.getButton() == 0 && m.getAction() == MousePress.INSTANCE) {
                                             e.setState("CLICK");
                                         }
                                     } else {
@@ -222,7 +221,7 @@ public abstract class Game implements Runnable {
                                     }
                                     break;
                                 case "CLICK":
-                                    if (m.getButton() == 0 && m.getAction() == Mouse.INSTANCE.StdMouseAction.RELEASE) {
+                                    if (m.getButton() == 0 && m.getAction() == MouseRelease.INSTANCE) {
                                         if (mousePos != null && e.contains(mousePos))
                                             e.setState("HOVER");
                                         else
