@@ -1,0 +1,97 @@
+package com.morph.engine.input
+
+import org.lwjgl.glfw.GLFW.*
+
+import java.nio.IntBuffer
+
+import com.morph.engine.util.Feed
+import com.morph.engine.util.Listener
+import io.reactivex.Maybe
+import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
+import org.lwjgl.BufferUtils
+
+import com.morph.engine.graphics.GLRenderingEngine
+import com.morph.engine.math.Matrix4f
+import com.morph.engine.math.Vector2f
+import com.morph.engine.math.Vector4f
+
+object Mouse {
+    private val mouseEventFeed = Feed<StdMouseEvent>()
+
+    val standardMouseEvents: Observable<StdMouseEvent> = Observable.create { mouseEventFeed.emit(it) }
+    val binaryMouseEvents: Observable<BinMouseEvent> = Observable.create {
+        mouseEventFeed.emit(it) { e ->
+            when (e.action) {
+                MousePress -> onNext(BinMouseEvent(MouseDown, e.button, e.mods))
+                MouseRelease -> onNext(BinMouseEvent(MouseUp, e.button, e.mods))
+            }
+        }
+    }
+
+    private val screenMousePosition = PublishSubject.create<Vector2f>()
+    private val worldMousePosition = PublishSubject.create<Vector2f>()
+
+    private var screenToWorld: Matrix4f = Matrix4f.empty()
+
+    fun handleMouseEvent(window: Long, button: Int, action: Int, mods: Int) {
+        mouseEventFeed.onNext(StdMouseEvent(getAction(action), button, mods))
+    }
+
+    private fun getAction(action: Int): StdMouseAction {
+        return when (action) {
+            GLFW_PRESS -> MousePress
+            GLFW_RELEASE -> MouseRelease
+            else -> throw IllegalArgumentException("Argument is not a valid mouse action")
+        }
+    }
+
+    fun setMousePosition(window: Long, v: Vector2f) {
+        val widthBuffer = BufferUtils.createIntBuffer(1)
+        val heightBuffer = BufferUtils.createIntBuffer(1)
+        glfwGetWindowSize(window, widthBuffer, heightBuffer)
+
+        val width = widthBuffer.get()
+        val height = heightBuffer.get()
+
+        val currentScreenPos = Vector2f(v.x, height - v.y)
+        screenMousePosition.onNext(currentScreenPos)
+
+        if (screenToWorld == Matrix4f.empty()) {
+            screenToWorld = GLRenderingEngine.getProjectionMatrix().inverse
+        }
+
+        val normalizedMousePos = currentScreenPos.div(Vector2f(width / 2f, height / 2f)).sub(Vector2f(1f, 1f)).mul(Vector2f(1f, -1f))
+        worldMousePosition.onNext(screenToWorld.mul(Vector4f(normalizedMousePos, 0, 1)).xy)
+    }
+
+    fun getScreenMousePosition(): Observable<Vector2f> {
+        return screenMousePosition
+    }
+
+    fun getWorldMousePosition(): Observable<Vector2f> {
+        return worldMousePosition
+    }
+
+    fun queryUpDown(button: Int, action: BinMouseAction): Boolean {
+        val e = binaryMouseEvents.filter { event -> event.button == button }.lastElement()
+        return e.map { event -> event.action == action }.blockingGet()
+    }
+}
+
+sealed class MouseAction
+sealed class StdMouseAction : MouseAction()
+object MousePress : StdMouseAction()
+object MouseRelease : StdMouseAction()
+
+sealed class BinMouseAction : MouseAction()
+object MouseUp : BinMouseAction()
+object MouseDown : BinMouseAction()
+
+sealed class GenericMouseEvent(val button: Int, val mods: Int) {
+    fun hasMod(modCheck: Int): Boolean {
+        return mods and modCheck != 0
+    }
+}
+class StdMouseEvent(val action: StdMouseAction, button: Int, mods: Int) : GenericMouseEvent(button, mods)
+class BinMouseEvent(val action: BinMouseAction, button: Int, mods: Int) : GenericMouseEvent(button, mods)

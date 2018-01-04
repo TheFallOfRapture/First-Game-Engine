@@ -190,14 +190,14 @@ public abstract class Game implements Runnable {
 		// TODO: Oh my god please move this somewhere else
 		Observable.combineLatest(
 		        events.filter(e -> e == GameAction.UPDATE),
-                Observable.concat(Observable.just(new Mouse.StdMouseEvent(Mouse.StdMouseAction.RELEASE, 0, 0)), Mouse.getStandardMouseEvents()),
-                Mouse.getScreenMousePosition(),
+                Observable.concat(Observable.just(new Mouse.StdMouseEvent(Mouse.INSTANCE.StdMouseAction.RELEASE, 0, 0)), Mouse.getStandardMouseEvents()),
+                Mouse.INSTANCE.getScreenMousePosition(),
                 Triple::new).subscribe(vals -> {
                     GameAction g = vals.getFirst();
                     Mouse.StdMouseEvent m = vals.getSecond();
                     Vector2f mousePos = vals.getThird();
 
-                    if (m.getButton() == 0 && m.getAction() == Mouse.StdMouseAction.PRESS)
+                    if (m.getButton() == 0 && m.getAction() == Mouse.INSTANCE.StdMouseAction.PRESS)
                         System.out.println("pressed");
 
                     for (GUI gui : guis) {
@@ -205,7 +205,7 @@ public abstract class Game implements Runnable {
                             switch (e.getState()) {
                                 case "IDLE":
                                     if (mousePos != null && e.contains(mousePos)) {
-                                        if (m.getButton() == 0 && m.getAction() == Mouse.StdMouseAction.PRESS) {
+                                        if (m.getButton() == 0 && m.getAction() == Mouse.INSTANCE.StdMouseAction.PRESS) {
                                             e.setState("CLICK");
                                         } else {
                                             e.setState("HOVER");
@@ -214,7 +214,7 @@ public abstract class Game implements Runnable {
                                     break;
                                 case "HOVER":
                                     if (mousePos != null && e.contains(mousePos)) {
-                                        if (m.getButton() == 0 && m.getAction() == Mouse.StdMouseAction.PRESS) {
+                                        if (m.getButton() == 0 && m.getAction() == Mouse.INSTANCE.StdMouseAction.PRESS) {
                                             e.setState("CLICK");
                                         }
                                     } else {
@@ -222,7 +222,7 @@ public abstract class Game implements Runnable {
                                     }
                                     break;
                                 case "CLICK":
-                                    if (m.getButton() == 0 && m.getAction() == Mouse.StdMouseAction.RELEASE) {
+                                    if (m.getButton() == 0 && m.getAction() == Mouse.INSTANCE.StdMouseAction.RELEASE) {
                                         if (mousePos != null && e.contains(mousePos))
                                             e.setState("HOVER");
                                         else

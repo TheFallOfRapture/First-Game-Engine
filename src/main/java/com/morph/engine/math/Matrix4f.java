@@ -18,6 +18,19 @@ public class Matrix4f {
 		else
 			throw new RuntimeException("Illegal matrix array length");
 	}
+
+	public static Matrix4f identity() {
+		return new Matrix4f(
+				1, 0, 0, 0,
+				0, 1, 0, 0,
+				0, 0, 1, 0,
+				0, 0, 0, 1
+		);
+	}
+
+	public static Matrix4f empty() {
+		return new Matrix4f(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+	}
 	
 	public String toString() {
 		String result = "Matrix4f(";

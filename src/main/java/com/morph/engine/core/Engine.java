@@ -7,8 +7,7 @@ import com.morph.engine.graphics.Color;
 import com.morph.engine.graphics.GLRenderingEngine;
 import com.morph.engine.graphics.shaders.TintShader;
 import com.morph.engine.input.InputMapping;
-import com.morph.engine.input.Keyboard;
-import com.morph.engine.input.Mouse;
+import com.morph.engine.input.*;
 import com.morph.engine.math.MatrixUtils;
 
 import com.morph.engine.math.Vector2f;
@@ -26,7 +25,7 @@ public class Engine extends OpenGame {
 		super(width, height, "Game Engine", fps, fullscreen);
 
 		Keyboard.getStandardKeyEvents()
-				.filter(e -> e.getAction() == Keyboard.StdKeyAction.PRESS && e.getKey() == GLFW.GLFW_KEY_GRAVE_ACCENT)
+				.filter(e -> e.getAction() == KeyPress.INSTANCE && e.getKey() == GLFW.GLFW_KEY_GRAVE_ACCENT)
 				.subscribe(e -> toggleConsole());
 	}
 
@@ -56,16 +55,16 @@ public class Engine extends OpenGame {
 
 		InputMapping input = new InputMapping();
 
-		input.mapKeyStd(GLFW_KEY_W, Keyboard.StdKeyAction.PRESS, () -> System.out.println("W"));
-		input.mapKeyStd(GLFW_KEY_A, Keyboard.StdKeyAction.PRESS, () -> System.out.println("A"));
-		input.mapKeyStd(GLFW_KEY_S, Keyboard.StdKeyAction.PRESS, () -> System.out.println("S"));
-		input.mapKeyStd(GLFW_KEY_D, Keyboard.StdKeyAction.PRESS, () -> System.out.println("D"));
+		input.mapKey(GLFW_KEY_W, KeyPress.INSTANCE, () -> System.out.println("W"));
+		input.mapKey(GLFW_KEY_A, KeyPress.INSTANCE, () -> System.out.println("A"));
+		input.mapKey(GLFW_KEY_S, KeyPress.INSTANCE, () -> System.out.println("S"));
+		input.mapKey(GLFW_KEY_D, KeyPress.INSTANCE, () -> System.out.println("D"));
 
-		input.mapButtonStd(GLFW_MOUSE_BUTTON_1, Mouse.StdMouseAction.PRESS, () -> System.out.println("PRESS LEFT"));
-		input.mapButtonStd(GLFW_MOUSE_BUTTON_1, Mouse.StdMouseAction.RELEASE, () -> System.out.println("RELEASE LEFT"));
+		input.mapButton(GLFW_MOUSE_BUTTON_1, MousePress.INSTANCE, () -> System.out.println("PRESS LEFT"));
+		input.mapButton(GLFW_MOUSE_BUTTON_1, MouseRelease.INSTANCE, () -> System.out.println("RELEASE LEFT"));
 
-		input.mapButtonStd(GLFW_MOUSE_BUTTON_2, Mouse.StdMouseAction.PRESS, () -> System.out.println("PRESS RIGHT"));
-		input.mapButtonStd(GLFW_MOUSE_BUTTON_2, Mouse.StdMouseAction.RELEASE, () -> System.out.println("RELEASE RIGHT"));
+		input.mapButton(GLFW_MOUSE_BUTTON_2, MousePress.INSTANCE, () -> System.out.println("PRESS RIGHT"));
+		input.mapButton(GLFW_MOUSE_BUTTON_2, MouseRelease.INSTANCE, () -> System.out.println("RELEASE RIGHT"));
 
 		input.link(this);
 	}
