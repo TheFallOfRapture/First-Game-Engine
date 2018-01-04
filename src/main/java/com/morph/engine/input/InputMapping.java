@@ -28,22 +28,22 @@ public class InputMapping {
         Observable.combineLatest(game.getEvents().filter(e -> e == Game.GameAction.UPDATE), Keyboard.getBinaryKeyEvents(), Pair::new).subscribe(pair -> acceptLong(pair.getSecond()));
     }
 
-    public void mapButtonStd(int button, Mouse.StdMouseAction mouseAction, Runnable action) {
+    public void mapButton(int button, Mouse.StdMouseAction mouseAction, Runnable action) {
         getMapByAction(mouseAction).put(button, action);
     }
 
-    public void mapKeyStd(int key, Keyboard.StdKeyAction keyAction, Runnable action) {
+    public void mapKey(int key, Keyboard.StdKeyAction keyAction, Runnable action) {
         getMapByAction(keyAction).put(key, action);
 
         if (keyAction == Keyboard.StdKeyAction.REPEAT) keyPressed.put(key, action);
     }
 
-    public void mapButtonLong(int button, Mouse.BinMouseAction mouseAction, Runnable action) {
+    public void mapButton(int button, Mouse.BinMouseAction mouseAction, Runnable action) {
         if (mouseAction == Mouse.BinMouseAction.UP) mouseUp.put(button, action);
         else mouseDown.put(button, action);
     }
 
-    public void mapKeyLong(int key, Keyboard.BinKeyAction keyAction, Runnable action) {
+    public void mapKey(int key, Keyboard.BinKeyAction keyAction, Runnable action) {
         if (keyAction == Keyboard.BinKeyAction.UP) keyUp.put(key, action);
         else keyDown.put(key, action);
     }
