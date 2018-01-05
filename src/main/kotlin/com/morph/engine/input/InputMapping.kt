@@ -1,7 +1,10 @@
 package com.morph.engine.input
 
 import com.morph.engine.core.Game
+import io.reactivex.Observable
 import io.reactivex.rxkotlin.Observables
+import io.reactivex.rxkotlin.zipWith
+import org.lwjgl.glfw.GLFW.*
 
 typealias Action = () -> Unit
 
@@ -25,8 +28,13 @@ class InputMapping {
         Keyboard.standardKeyEvents.subscribe { this.acceptStd(it) }
         Mouse.standardMouseEvents.subscribe { this.acceptStd(it) }
 
-        Observables.combineLatest(game.events.filter { e -> e == Game.GameAction.UPDATE }, Keyboard.binaryKeyEvents) { t, u -> Pair(t, u) }.subscribe { acceptLong(it.second) }
-        Observables.combineLatest(game.events.filter { e -> e == Game.GameAction.UPDATE }, Mouse.binaryMouseEvents) { t, u -> Pair(t, u) }.subscribe { acceptLong(it.second) }
+        (GLFW_KEY_0..GLFW_KEY_LAST)
+                .map { Keyboard.binaryKeyEvents.filter { e -> e.key == it } }
+                .forEach { Observables.combineLatest(it, game.events.filter { it == Game.GameAction.UPDATE }).subscribe { acceptLong(it.first) } }
+
+        (GLFW_MOUSE_BUTTON_1..GLFW_MOUSE_BUTTON_LAST)
+                .map { Mouse.binaryMouseEvents.filter { e -> e.button == it } }
+                .forEach { Observables.combineLatest(it, game.events.filter {it == Game.GameAction.UPDATE }).subscribe { acceptLong(it.first) } }
     }
 
     // JVM Compatibility Methods

@@ -55,10 +55,10 @@ public class Engine extends OpenGame {
 
 		InputMapping input = new InputMapping();
 
-		input.mapKey(GLFW_KEY_W, KeyActions.PRESS, () -> System.out.println("W"));
-		input.mapKey(GLFW_KEY_A, KeyActions.PRESS, () -> System.out.println("A"));
-		input.mapKey(GLFW_KEY_S, KeyActions.PRESS, () -> System.out.println("S"));
-		input.mapKey(GLFW_KEY_D, KeyActions.PRESS, () -> System.out.println("D"));
+		input.mapKey(GLFW_KEY_W, KeyActions.DOWN, () -> System.out.println("W"));
+		input.mapKey(GLFW_KEY_A, KeyActions.DOWN, () -> System.out.println("A"));
+		input.mapKey(GLFW_KEY_S, KeyActions.DOWN, () -> System.out.println("S"));
+		input.mapKey(GLFW_KEY_D, KeyActions.DOWN, () -> System.out.println("D"));
 
 		input.mapButton(GLFW_MOUSE_BUTTON_1, MouseActions.PRESS, () -> System.out.println("PRESS LEFT"));
 		input.mapButton(GLFW_MOUSE_BUTTON_1, MouseActions.RELEASE, () -> System.out.println("RELEASE LEFT"));
