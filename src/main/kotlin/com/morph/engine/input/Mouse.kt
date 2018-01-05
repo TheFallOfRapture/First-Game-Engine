@@ -2,11 +2,7 @@ package com.morph.engine.input
 
 import org.lwjgl.glfw.GLFW.*
 
-import java.nio.IntBuffer
-
 import com.morph.engine.util.Feed
-import com.morph.engine.util.Listener
-import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import org.lwjgl.BufferUtils
@@ -87,6 +83,11 @@ object MouseRelease : StdMouseAction()
 sealed class BinMouseAction : MouseAction()
 object MouseUp : BinMouseAction()
 object MouseDown : BinMouseAction()
+
+enum class MouseActions(val action: MouseAction) {
+    PRESS(MousePress), RELEASE(MouseRelease),
+    UP(MouseUp), DOWN(MouseDown)
+}
 
 sealed class GenericMouseEvent(val button: Int, val mods: Int) {
     fun hasMod(modCheck: Int): Boolean {

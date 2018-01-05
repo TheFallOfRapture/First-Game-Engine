@@ -19,6 +19,8 @@ class InputMapping {
     private val mouseUp = HashMap<Int, Action>()
     private val mouseDown = HashMap<Int, Action>()
 
+    private val mouseDownCombo = HashMap<IntArray, Action>()
+
     fun link(game: Game) {
         Keyboard.standardKeyEvents.subscribe { this.acceptStd(it) }
         Mouse.standardMouseEvents.subscribe { this.acceptStd(it) }
@@ -27,8 +29,9 @@ class InputMapping {
         Observables.combineLatest(game.events.filter { e -> e == Game.GameAction.UPDATE }, Mouse.binaryMouseEvents) { t, u -> Pair(t, u) }.subscribe { acceptLong(it.second) }
     }
 
-    fun mapButton(button: Int, mouseAction: MouseAction, action: Runnable) = mapButton(button, mouseAction) { action.run() }
-    fun mapKey(key: Int, keyAction: KeyAction, action: Runnable) = mapKey(key, keyAction) { action.run() }
+    // JVM Compatibility Methods
+    fun mapButton(button: Int, mouseAction: MouseActions, action: Runnable) = mapButton(button, mouseAction.action) { action.run() }
+    fun mapKey(key: Int, keyAction: KeyActions, action: Runnable) = mapKey(key, keyAction.action) { action.run() }
 
     fun mapButton(button: Int, mouseAction: MouseAction, action: Action) = when (mouseAction) {
         is StdMouseAction -> when (mouseAction) {
@@ -53,41 +56,24 @@ class InputMapping {
         }
     }
 
-    private fun getMapByAction(action: StdMouseAction): HashMap<Int, Action> {
-        return when (action) {
-            MousePress -> mousePressed
-            MouseRelease -> mouseReleased
+    private fun getMapByAction(action: StdMouseAction): HashMap<Int, Action> = when (action) {
+        MousePress -> mousePressed
+        MouseRelease -> mouseReleased
+    }
+
+    private fun getMapByLongAction(action: BinMouseAction): HashMap<Int, Action> = if (action == MouseUp) mouseUp else mouseDown
+    private fun getMapByLongAction(action: BinKeyAction): HashMap<Int, Action> = if (action == KeyUp) keyUp else keyDown
+
+    private fun acceptStd(mouseEvent: StdMouseEvent) = getMapByAction(mouseEvent.action).getOrDefault(mouseEvent.button, { })()
+    private fun acceptStd(keyEvent: StdKeyEvent) = when (keyEvent.action) {
+        KeyPress -> {
+            (keyPressed).getOrDefault(keyEvent.key, { })()
+            (keyTyped).getOrDefault(keyEvent.key, { })()
         }
+        KeyRepeat -> (keyTyped).getOrDefault(keyEvent.key, { })()
+        KeyRelease -> (keyReleased).getOrDefault(keyEvent.key, { })()
     }
 
-    private fun getMapByLongAction(action: BinMouseAction): HashMap<Int, Action> {
-        return if (action == MouseUp) mouseUp else mouseDown
-    }
-
-    private fun getMapByLongAction(action: BinKeyAction): HashMap<Int, Action> {
-        return if (action == KeyUp) keyUp else keyDown
-    }
-
-    private fun acceptStd(mouseEvent: StdMouseEvent) {
-        (getMapByAction(mouseEvent.action)).getOrDefault(mouseEvent.button, { })()
-    }
-
-    private fun acceptStd(keyEvent: StdKeyEvent) {
-        when (keyEvent.action) {
-            KeyPress -> {
-                (keyPressed).getOrDefault(keyEvent.key, { })()
-                (keyTyped).getOrDefault(keyEvent.key, { })()
-            }
-            KeyRepeat -> (keyTyped).getOrDefault(keyEvent.key, { })()
-            KeyRelease -> (keyReleased).getOrDefault(keyEvent.key, { })()
-        }
-    }
-
-    private fun acceptLong(mouseEvent: BinMouseEvent) {
-        (getMapByLongAction(mouseEvent.action)).getOrDefault(mouseEvent.button, { })()
-    }
-
-    private fun acceptLong(keyEvent: BinKeyEvent) {
-        (getMapByLongAction(keyEvent.action)).getOrDefault(keyEvent.key, { })()
-    }
+    private fun acceptLong(mouseEvent: BinMouseEvent) = getMapByLongAction(mouseEvent.action).getOrDefault(mouseEvent.button, { })()
+    private fun acceptLong(keyEvent: BinKeyEvent) = getMapByLongAction(keyEvent.action).getOrDefault(keyEvent.key, { })()
 }

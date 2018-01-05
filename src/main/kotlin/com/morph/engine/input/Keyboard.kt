@@ -54,6 +54,11 @@ sealed class BinKeyAction : KeyAction()
 object KeyUp : BinKeyAction()
 object KeyDown : BinKeyAction()
 
+enum class KeyActions(val action: KeyAction) {
+    PRESS(KeyPress), REPEAT(KeyRepeat), RELEASE(KeyRelease),
+    UP(KeyUp), DOWN(KeyDown)
+}
+
 sealed class GenericKeyEvent(val key: Int, val mods: Int) {
     fun hasMod(modCheck: Int): Boolean {
         return mods and modCheck != 0

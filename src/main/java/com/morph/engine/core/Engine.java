@@ -55,16 +55,16 @@ public class Engine extends OpenGame {
 
 		InputMapping input = new InputMapping();
 
-		input.mapKey(GLFW_KEY_W, KeyPress.INSTANCE, () -> System.out.println("W"));
-		input.mapKey(GLFW_KEY_A, KeyPress.INSTANCE, () -> System.out.println("A"));
-		input.mapKey(GLFW_KEY_S, KeyPress.INSTANCE, () -> System.out.println("S"));
-		input.mapKey(GLFW_KEY_D, KeyPress.INSTANCE, () -> System.out.println("D"));
+		input.mapKey(GLFW_KEY_W, KeyActions.PRESS, () -> System.out.println("W"));
+		input.mapKey(GLFW_KEY_A, KeyActions.PRESS, () -> System.out.println("A"));
+		input.mapKey(GLFW_KEY_S, KeyActions.PRESS, () -> System.out.println("S"));
+		input.mapKey(GLFW_KEY_D, KeyActions.PRESS, () -> System.out.println("D"));
 
-		input.mapButton(GLFW_MOUSE_BUTTON_1, MousePress.INSTANCE, () -> System.out.println("PRESS LEFT"));
-		input.mapButton(GLFW_MOUSE_BUTTON_1, MouseRelease.INSTANCE, () -> System.out.println("RELEASE LEFT"));
+		input.mapButton(GLFW_MOUSE_BUTTON_1, MouseActions.PRESS, () -> System.out.println("PRESS LEFT"));
+		input.mapButton(GLFW_MOUSE_BUTTON_1, MouseActions.RELEASE, () -> System.out.println("RELEASE LEFT"));
 
-		input.mapButton(GLFW_MOUSE_BUTTON_2, MousePress.INSTANCE, () -> System.out.println("PRESS RIGHT"));
-		input.mapButton(GLFW_MOUSE_BUTTON_2, MouseRelease.INSTANCE, () -> System.out.println("RELEASE RIGHT"));
+		input.mapButton(GLFW_MOUSE_BUTTON_2, MouseActions.PRESS, () -> System.out.println("PRESS RIGHT"));
+		input.mapButton(GLFW_MOUSE_BUTTON_2, MouseActions.RELEASE, () -> System.out.println("RELEASE RIGHT"));
 
 		input.link(this);
 	}
