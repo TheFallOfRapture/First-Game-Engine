@@ -1,7 +1,6 @@
 package com.morph.engine.graphics.components;
 
 import static org.lwjgl.opengl.GL11.GL_DOUBLE;
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
@@ -49,7 +48,7 @@ public class RenderData extends Component {
 		this.shader = shader;
 
 		this.textures.add(texture);
-		
+
 		shader.init();
 	}
 	
