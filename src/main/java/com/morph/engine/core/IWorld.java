@@ -3,7 +3,7 @@ package com.morph.engine.core;
 import com.morph.engine.entities.Entity;
 import com.morph.engine.util.Pair;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,24 +15,13 @@ public interface IWorld {
     List<Entity> getEntities();
 
     default Entity getEntityByName(String name) {
-        return getEntities()
-                .parallelStream()
-                .map(e -> new Pair<>(e, e.getName()))
-                .filter(pair -> pair.getSecond().equals(name))
-                .collect(Collectors.toList())
-                .get(0)
-                .getFirst();
+        return getEntities().stream().collect(Collectors.toMap(Entity::getName, e -> e)).get(name);
     }
 
     default Entity getEntityByID(int id) {
-        return getEntities()
-                .parallelStream()
-                .map(e -> new Pair<>(e, e.getID()))
-                .filter(pair -> pair.getSecond().equals(id))
-                .collect(Collectors.toList())
-                .get(0)
-                .getFirst();
+        return getEntities().stream().collect(Collectors.toMap(Entity::getID, e -> e)).get(id);
     }
 
     boolean addEntity(Entity e); // TODO: Should this really be required?
+    boolean removeEntity(Entity e);
 }

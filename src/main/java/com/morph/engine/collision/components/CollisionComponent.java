@@ -5,10 +5,10 @@ import com.morph.engine.entities.Entity;
 import com.morph.engine.math.Vector3f;
 
 public class CollisionComponent extends Component {
-	private Entity other;
-	private Vector3f normal;
-	private float distance;
-	private float time;
+	private final Entity other;
+	private final Vector3f normal;
+	private final float distance;
+	private final float time;
 	private boolean handled;
 	
 	public CollisionComponent(Entity other, Vector3f normal, float distance, float time) {

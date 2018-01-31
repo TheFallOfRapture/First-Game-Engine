@@ -4,30 +4,32 @@ import com.morph.engine.entities.Entity;
 import com.morph.engine.entities.EntityGrid;
 import com.morph.engine.math.Vector2f;
 import com.morph.engine.physics.components.Transform2D;
+import com.morph.engine.util.Pair;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Created by Fernando on 1/19/2017.
  */
-public class TileWorld implements IWorld {
+public class TileWorld extends EntityGrid implements IWorld {
     private Game game;
-    private int width;
-    private int height;
     private float xOffset;
     private float yOffset;
     private float tileSize;
     private Entity[] entities;
 
     public TileWorld(Game game, int width, int height, float tileSize) {
+        super(width, height);
         this.game = game;
-        this.width = width;
-        this.height = height;
         this.xOffset = 0;
         this.yOffset = 0;
         this.tileSize = tileSize;
-        this.entities = new Entity[width*height];
+        this.entities = new Entity[getWidth()*getHeight()];
     }
 
     @Override
@@ -35,29 +37,11 @@ public class TileWorld implements IWorld {
         return game;
     }
 
-    @Override
-    public List<Entity> getEntities() {
-        return Arrays.asList(entities);
-    }
-
-    @Override
-    public Entity getEntityByID(int id) {
-        return null;
-    }
-
     // TODO: Strict implementation = return false
     @Override
     public boolean addEntity(Entity e) {
         Vector2f tilePos = e.getComponent(Transform2D.class).getPosition().invScale(tileSize).map(x -> (float) Math.floor(x));
         return addEntity(e, (int) tilePos.getX(), (int) tilePos.getY());
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
     }
 
     public float getTileSize() {
@@ -72,18 +56,19 @@ public class TileWorld implements IWorld {
         this.yOffset = yOffset;
     }
 
+    @Override
     public boolean addEntity(Entity e, int tileX, int tileY) {
-        if (tileX < 0 || tileX >= width || tileY < 0 || tileY >= height)
+        if (tileX < 0 || tileX >= getWidth() || tileY < 0 || tileY >= getHeight())
             return false;
 
         game.renderingEngine.register(e);
 
-        Entity tmp = entities[tileX + tileY * width];
+        Entity tmp = entities[tileX + tileY * getWidth()];
         if (tmp != null)
             game.renderingEngine.unregister(tmp);
 
-        entities[tileX + tileY * width] = e;
-        e.getComponent(Transform2D.class).setPosition(new Vector2f(xOffset + (tileX + 0.5f) * tileSize, yOffset + (height * tileSize) - (tileY + 0.5f) * tileSize));
+        entities[tileX + tileY * getWidth()] = e;
+        e.getComponent(Transform2D.class).setPosition(new Vector2f(xOffset + (tileX + 0.5f) * tileSize, yOffset + (getHeight() * tileSize) - (tileY + 0.5f) * tileSize));
         e.getComponent(Transform2D.class).setScale(new Vector2f(tileSize, tileSize));
 
         return true;
@@ -116,85 +101,41 @@ public class TileWorld implements IWorld {
         return addEntityGrid(entities, x, y);
     }
 
+    @Override
     public boolean moveEntity(int startX, int startY, int endX, int endY) {
-        if (startX < 0 || startX >= width || startY < 0 || startY >= height
-                || endX < 0 || endX >= width || endY < 0 || endY >= height)
+        if (startX < 0 || startX >= getWidth() || startY < 0 || startY >= getHeight()
+                || endX < 0 || endX >= getWidth() || endY < 0 || endY >= getHeight())
             return false;
 
-        if (entities[endX + endY * width] != null)
-            game.renderingEngine.unregister(entities[endX + endY * width]);
+        if (entities[endX + endY * getWidth()] != null)
+            game.renderingEngine.unregister(entities[endX + endY * getWidth()]);
 
-        entities[endX + endY * width] = entities[startX + startY * width];
-        entities[startX + startY * width] = null;
+        entities[endX + endY * getWidth()] = entities[startX + startY * getWidth()];
+        entities[startX + startY * getWidth()] = null;
 
-        entities[endX + endY * width].getComponent(Transform2D.class).setPosition(new Vector2f(xOffset + (endX + 0.5f) * tileSize, yOffset + (height * tileSize) - (endY + 0.5f) * tileSize));
+        entities[endX + endY * getWidth()].getComponent(Transform2D.class).setPosition(new Vector2f(xOffset + (endX + 0.5f) * tileSize, yOffset + (getHeight() * tileSize) - (endY + 0.5f) * tileSize));
 
         return true;
     }
 
-    public boolean moveEntity(Entity e, int x, int y) {
-        if (x < 0 || x >= width || y < 0 || y >= height)
-            return false;
-
-        int[] location = findMatch(e);
-
-        if (location[0] == -1)
-            return false;
-
-        System.out.println(new Vector2f(x, y));
-
-        return moveEntity(location[0], location[1], x, y);
-    }
-
-    public boolean translateEntity(Entity e, int dx, int dy) {
-        int[] location = findMatch(e);
-
-        if (location[0] == -1)
-            return false;
-
-        int x = location[0] + dx;
-        int y = location[1] + dy;
-
-        if (x < 0 || x >= width || y < 0 || y >= height)
-            return false;
-
-        return moveEntity(location[0], location[1], x, y);
-    }
-
-    public boolean translateEntity(int tileX, int tileY, int dx, int dy) {
-        int x = tileX + dx;
-        int y = tileY + dy;
-
-        if (x < 0 || x >= width || y < 0 || y >= height)
-            return false;
-
-        return moveEntity(tileX, tileY, x, y);
-    }
-
     private int[] findMatch(Entity e) {
-        for (int y = 0; y < height; y++)
-            for (int x = 0; x < width; x++)
-                if (entities[x + y * width] != null && e != null && e.equals(entities[x + y * width]))
+        for (int y = 0; y < getHeight(); y++)
+            for (int x = 0; x < getWidth(); x++)
+                if (entities[x + y * getWidth()] != null && e != null && e.equals(entities[x + y * getWidth()]))
                     return new int[]{x, y};
 
         return new int[]{-1, -1};
     }
 
-    public Entity getEntity(int tileX, int tileY) {
-        if (tileX >= width || tileY >= height)
-            return null;
-
-        return entities[tileX + tileY * width];
-    }
-
+    @Override
     public boolean removeEntity(int tileX, int tileY) {
-        if (tileX + tileY * width >= entities.length || entities[tileX + tileY * width] == null)
+        if (tileX + tileY * getWidth() >= entities.length || entities[tileX + tileY * getWidth()] == null)
             return false;
 
-        Entity temp = entities[tileX + tileY * width];
+        Entity temp = entities[tileX + tileY * getWidth()];
         game.renderingEngine.unregister(temp);
 
-        entities[tileX + tileY * width] = null;
+        entities[tileX + tileY * getWidth()] = null;
 
         return true;
     }
@@ -208,10 +149,10 @@ public class TileWorld implements IWorld {
     }
 
     public boolean isEmpty(int x, int y) {
-        if (x < 0 || x >= width || y < 0 || y >= height)
+        if (x < 0 || x >= getWidth() || y < 0 || y >= getHeight())
             return false;
 
-        return entities[x + y * width] == null;
+        return entities[x + y * getWidth()] == null;
     }
 
     public boolean areEmpty(int[]... positions) {

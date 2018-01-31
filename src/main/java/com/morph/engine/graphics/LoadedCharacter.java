@@ -2,8 +2,6 @@ package com.morph.engine.graphics;
 
 import com.morph.engine.math.Vector2f;
 
-import java.util.HashMap;
-
 /**
  * Created on 7/30/2017.
  */

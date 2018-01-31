@@ -14,6 +14,7 @@ public abstract class Element {
     private boolean enabled;
     private String ID;
     private String guiClass;
+    private String name;
     private Transform2D transform;
     private RenderData data;
     private int depth;
@@ -24,7 +25,8 @@ public abstract class Element {
 
     public StateMachine state;
 
-    public Element(Transform2D transform, RenderData data, int depth) {
+    public Element(String name, Transform2D transform, RenderData data, int depth) {
+        this.name = name;
         this.transform = transform;
         this.data = data;
         this.depth = depth;
@@ -43,7 +45,8 @@ public abstract class Element {
         data.init();
     }
 
-    public Element(Transform2D transform, RenderData data) {
+    public Element(String name, Transform2D transform, RenderData data) {
+        this.name = name;
         this.transform = transform;
         this.data = data;
 
@@ -61,7 +64,8 @@ public abstract class Element {
         data.init();
     }
 
-    public Element(Transform2D transform) {
+    public Element(String name, Transform2D transform) {
+        this.name = name;
         this.transform = transform;
 
         this.onIdle = () -> Console.out.println("Idle : " + this);
@@ -119,5 +123,9 @@ public abstract class Element {
 
     public String getState() {
         return state.getCurrentStateName();
+    }
+
+    public String getName() {
+        return name;
     }
 }

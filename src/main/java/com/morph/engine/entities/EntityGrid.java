@@ -1,9 +1,5 @@
 package com.morph.engine.entities;
 
-import com.morph.engine.core.Game;
-import com.morph.engine.math.Vector2f;
-import com.morph.engine.physics.components.Transform2D;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -36,8 +32,6 @@ public class EntityGrid {
     public boolean addEntity(Entity e, int tileX, int tileY) {
         if (tileX < 0 || tileX >= width || tileY < 0 || tileY >= height)
             return false;
-
-        Entity tmp = entities[tileX + tileY * width];
 
         entities[tileX + tileY * width] = e;
         return true;
@@ -81,6 +75,16 @@ public class EntityGrid {
         return moveEntity(location[0], location[1], x, y);
     }
 
+    public boolean translateEntity(int tileX, int tileY, int dx, int dy) {
+        int x = tileX + dx;
+        int y = tileY + dy;
+
+        if (x < 0 || x >= getWidth() || y < 0 || y >= getHeight())
+            return false;
+
+        return moveEntity(tileX, tileY, x, y);
+    }
+
     private int[] findMatch(Entity e) {
         for (int y = 0; y < height; y++)
             for (int x = 0; x < width; x++)
@@ -100,8 +104,6 @@ public class EntityGrid {
     public boolean removeEntity(int tileX, int tileY) {
         if (tileX + tileY * width >= entities.length || entities[tileX + tileY * width] == null)
             return false;
-
-        Entity temp = entities[tileX + tileY * width];
 
         entities[tileX + tileY * width] = null;
 

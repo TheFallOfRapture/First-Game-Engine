@@ -8,7 +8,6 @@ import com.morph.engine.collision.components.CollisionComponent;
 import com.morph.engine.collision.components.TriggerComponent;
 import com.morph.engine.core.Game;
 import com.morph.engine.core.GameSystem;
-import com.morph.engine.entities.Component;
 import com.morph.engine.entities.Entity;
 import com.morph.engine.math.MathUtils;
 import com.morph.engine.math.Vector2f;
@@ -21,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 // Reference: noonat.github.io/intersect/
 
 public class CollisionEngine extends GameSystem {
-	private Feed<Collision> collisionFeed = new Feed<>();
+	private final Feed<Collision> collisionFeed = new Feed<>();
 	private Observable<Collision> collisionEvents = Observable.create(collisionFeed::emit);
 
 	public CollisionEngine(Game game) {
@@ -46,7 +45,7 @@ public class CollisionEngine extends GameSystem {
 	}
 	
 	public static List<Collision> checkAgainstWorldStatic(BoundingBox2D boxA, List<Entity> entities) {
-		List<Collision> result = new ArrayList<Collision>();
+		List<Collision> result = new ArrayList<>();
 		for (Entity other : entities) {
 			BoundingBox2D boxB = other.getComponent(BoundingBox2D.class);
 			Collision coll = checkDoubleStatic(boxA, boxB);
@@ -58,7 +57,7 @@ public class CollisionEngine extends GameSystem {
 	}
 	
 	public static List<Collision> checkAgainstWorld(BoundingBox2D boxA, Vector2f velA, List<Entity> entities, float dt) {
-		List<Collision> result = new ArrayList<Collision>();
+		List<Collision> result = new ArrayList<>();
 
 		for (Entity entity : entities) {
 			BoundingBox2D boxB = entity.getComponent(BoundingBox2D.class);
@@ -199,7 +198,7 @@ public class CollisionEngine extends GameSystem {
 		} else {
 			Vector2f pos = boxB.getCenter().add(delta);
 			float time = 1;
-			return new SweepCollision(c, pos, time);
+			return new SweepCollision(null, pos, time);
 		}
 	}
 
@@ -322,21 +321,16 @@ public class CollisionEngine extends GameSystem {
 			if (e.hasComponent(CollisionComponent.class))
 				e.clearComponents(CollisionComponent.class);
 		
-		List<BoundingBox2D> boundingBoxes = new ArrayList<BoundingBox2D>();
-		for (Entity e: entities)
-			if (e.hasComponent(BoundingBox2D.class))
-				boundingBoxes.add(e.getComponent(BoundingBox2D.class));
-				
 		updateAPriori(entities, dt);
 	} 
 	
 	private void updateAPriori(List<Entity> entities, float dt) {
-		List<BoundingBox2D> boundingBoxes = new ArrayList<BoundingBox2D>();
+		List<BoundingBox2D> boundingBoxes = new ArrayList<>();
 		for (Entity e: entities)
 			if (e.hasComponent(BoundingBox2D.class))
 				boundingBoxes.add(e.getComponent(BoundingBox2D.class));
 		
-		List<BoundingBox2DSweep> boundingBoxSweeps = new ArrayList<BoundingBox2DSweep>();
+		List<BoundingBox2DSweep> boundingBoxSweeps = new ArrayList<>();
 
 		for (Entity e : entities) {
 			if (e.hasComponent(BoundingBox2D.class)) {
@@ -475,7 +469,7 @@ public class CollisionEngine extends GameSystem {
 		Vector2f position = a.getBoundingBox().getCenter();
 		Vector2f velocity = a.getVelocity();
 		
-		float nearTimeX = 0, nearTimeY = 0, farTimeX = 0, farTimeY = 0;
+		float nearTimeX, nearTimeY, farTimeX, farTimeY;
 		
 		float scaleX = 1f / velocity.getX();
 		float scaleY = 1f / velocity.getY();

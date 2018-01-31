@@ -2,27 +2,24 @@ package com.morph.engine.entities;
 
 import com.morph.engine.collision.components.BoundingBox2D;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Queue;
 import java.util.stream.Collectors;
 
 public class Entity implements Cloneable {
 	private List<Component> components;
-	private List<String> tags;
+//	private List<String> tags;
 
 	private String name;
 	private int id;
 	private boolean destroyed;
 
 	public Entity() {
-		this.components = new ArrayList<Component>();
+		this.components = new ArrayList<>();
 	}
 
 	public Entity(String name, int id) {
-		this.tags = new ArrayList<>();
+//		this.tags = new ArrayList<>();
 		this.name = name;
 		this.id = id;
 		this.components = new ArrayList<>();
@@ -44,7 +41,7 @@ public class Entity implements Cloneable {
 	
 	public void removeComponent(Component c) {
 		if (c instanceof BoundingBox2D && !((BoundingBox2D) c).isTrigger())
-			System.out.println("!!!");
+			System.out.println("?!");
 
 		c.setParent(null);
 		components.remove(c);
@@ -92,16 +89,6 @@ public class Entity implements Cloneable {
 
 	public List<? extends Component> getAllComponents() {
 		return components;
-	}
-	
-	@Override
-	public Entity clone() {
-		Entity e = new Entity();
-		for (Component c : components) {
-			e.addComponent(c.clone());
-		}
-		
-		return e;
 	}
 	
 	public boolean isDestroyed() {

@@ -1,11 +1,13 @@
 package com.morph.engine.graphics.components;
 
 import com.morph.engine.graphics.*;
+import com.morph.engine.graphics.shaders.Shader;
 import com.morph.engine.math.MathUtils;
 import com.morph.engine.math.Vector2f;
 
 import java.nio.CharBuffer;
-import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.IntStream;
 
 /**
  * Created on 7/30/2017.
@@ -24,7 +26,7 @@ public class TextRenderData extends RenderData {
         this.cursorPosition = new Vector2f(0, 0);
         this.font = font;
         setTint(color);
-        if (text != "") addString(text);
+        if (!Objects.equals(text, "")) addString(text);
     }
 
     public void addCharacter(char c) {
@@ -53,12 +55,7 @@ public class TextRenderData extends RenderData {
             data.addVertex(cursorPosition.add(offsetMax), texCoords[1]);
             data.addVertex(cursorPosition.add(new Vector2f(offsetMax.getX(), offsetMin.getY())), texCoords[2]);
 
-            data.addIndex(0 + (previousPointLength));
-            data.addIndex(1 + (previousPointLength));
-            data.addIndex(3 + (previousPointLength));
-            data.addIndex(1 + (previousPointLength));
-            data.addIndex(2 + (previousPointLength));
-            data.addIndex(3 + (previousPointLength));
+            data.addIndices(IntStream.of(0, 1, 3, 1, 2, 3).map(i -> i + previousPointLength).toArray());
         });
 
         previousPointLength += 4;

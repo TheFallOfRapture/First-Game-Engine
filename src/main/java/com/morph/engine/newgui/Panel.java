@@ -8,13 +8,13 @@ import com.morph.engine.physics.components.Transform2D;
 import com.morph.engine.util.RenderDataUtils;
 
 public class Panel extends Container {
-	public Panel(Vector2f position, Vector2f size, Color color, Texture texture) {
-		super(new Transform2D(position.add(size.scale(0.5f)), size),
+	public Panel(String name, Vector2f position, Vector2f size, Color color, Texture texture) {
+		super(name, new Transform2D(position.add(size.scale(0.5f)), size),
 				RenderDataUtils.createTintedSquare(color, new GUITintShader(), texture));
 	}
 	
-	public Panel(Vector2f position, Vector2f size, Texture texture) {
-		super(new Transform2D(position.add(size.scale(0.5f)), size),
+	public Panel(String name, Vector2f position, Vector2f size, Texture texture) {
+		super(name, new Transform2D(position.add(size.scale(0.5f)), size),
 				RenderDataUtils.createTintedSquare(new GUITintShader(), texture));
 	}
 }

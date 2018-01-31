@@ -30,23 +30,23 @@ public class EngineGUI extends GUI {
 
         String font = "fonts/RobotoCondensed-Regular.ttf";
 
-        addElement(new TextElement("File", font, 16, new Vector2f(5, height - menuBarHeight + 10)));
-        addElement(new TextElement("Edit", font, 16, new Vector2f(45, height - menuBarHeight + 10)));
-        addElement(new TextElement("Source", font, 16, new Vector2f(85, height - menuBarHeight + 10)));
-        addElement(new TextElement("Refactor", font, 16, new Vector2f(145, height - menuBarHeight + 10)));
-        addElement(new TextElement("Navigate", font, 16, new Vector2f(215, height - menuBarHeight + 10)));
-        addElement(new TextElement("Search", font, 16, new Vector2f(285, height - menuBarHeight + 10)));
-        addElement(new TextElement("Project", font, 16, new Vector2f(345, height - menuBarHeight + 10)));
-        addElement(new TextElement("Run", font, 16, new Vector2f(405, height - menuBarHeight + 10)));
-        addElement(new TextElement("Window", font, 16, new Vector2f(445, height - menuBarHeight + 10)));
-        addElement(new TextElement("Help", font, 16, new Vector2f(510, height - menuBarHeight + 10)));
-        addElement(new Panel(new Vector2f(0, 0), new Vector2f(toolbarWidth, height - menuBarHeight), new Color(0x9E9E9E, 1), new Texture("textures/solid.png")));
-        addElement(new Panel(new Vector2f(width - toolbarWidth, 0), new Vector2f(toolbarWidth, height - menuBarHeight), new Color(0x9E9E9E, 1), new Texture("textures/solid.png")));
-        addElement(new Panel(new Vector2f(toolbarWidth, 0), new Vector2f(width - (toolbarWidth * 2), bottomBarHeight), new Color(0x757575, 1), new Texture("textures/solid.png")));
-        addElement(new Panel(new Vector2f(0, height - menuBarHeight), new Vector2f(width, menuBarHeight), new Color(0x616161, 1), new Texture("textures/solid.png")));
+        addElement(new TextElement("fileMenu", "File", font, 16, new Vector2f(5, height - menuBarHeight + 10)));
+        addElement(new TextElement("editMenu", "Edit", font, 16, new Vector2f(45, height - menuBarHeight + 10)));
+        addElement(new TextElement("srcMenu", "Source", font, 16, new Vector2f(85, height - menuBarHeight + 10)));
+        addElement(new TextElement("refMenu", "Refactor", font, 16, new Vector2f(145, height - menuBarHeight + 10)));
+        addElement(new TextElement("navMenu", "Navigate", font, 16, new Vector2f(215, height - menuBarHeight + 10)));
+        addElement(new TextElement("searchMenu", "Search", font, 16, new Vector2f(285, height - menuBarHeight + 10)));
+        addElement(new TextElement("projMenu", "Project", font, 16, new Vector2f(345, height - menuBarHeight + 10)));
+        addElement(new TextElement("runMenu", "Run", font, 16, new Vector2f(405, height - menuBarHeight + 10)));
+        addElement(new TextElement("windowMenu", "Window", font, 16, new Vector2f(445, height - menuBarHeight + 10)));
+        addElement(new TextElement("helpMenu", "Help", font, 16, new Vector2f(510, height - menuBarHeight + 10)));
+        addElement(new Panel("panel1", new Vector2f(0, 0), new Vector2f(toolbarWidth, height - menuBarHeight), new Color(0x9E9E9E, 1), new Texture("textures/solid.png")));
+        addElement(new Panel("panel2", new Vector2f(width - toolbarWidth, 0), new Vector2f(toolbarWidth, height - menuBarHeight), new Color(0x9E9E9E, 1), new Texture("textures/solid.png")));
+        addElement(new Panel("panel3", new Vector2f(toolbarWidth, 0), new Vector2f(width - (toolbarWidth * 2), bottomBarHeight), new Color(0x757575, 1), new Texture("textures/solid.png")));
+        addElement(new Panel("panel4", new Vector2f(0, height - menuBarHeight), new Vector2f(width, menuBarHeight), new Color(0x616161, 1), new Texture("textures/solid.png")));
 
-        testBtn1 = new Button("Test Button", font, 16, new Color(1, 1, 1), new Color(0.5f, 0.5f, 0.5f), new Texture("textures/friendlyBlueMan.png"), new Texture("textures/4Head.png"), new Transform2D(new Vector2f(500, 400), 0, new Vector2f(100, 50)), 0);
-        testBtn2 = new Button("Test Button 2", font, 16, new Color(1, 1, 1), new Color(0.5f, 0.5f, 0.5f), new Texture("textures/friendlyBlueMan.png"), new Texture("textures/4Head.png"), new Transform2D(new Vector2f(500, 600), 0, new Vector2f(100, 50)), 0);
+        testBtn1 = new Button("testBtn1", "Test Button", font, 16, new Color(1, 1, 1), new Color(0.5f, 0.5f, 0.5f), new Texture("textures/friendlyBlueMan.png"), new Texture("textures/4Head.png"), new Transform2D(new Vector2f(500, 400), 0, new Vector2f(100, 50)), 0);
+        testBtn2 = new Button("testBtn2", "Test Button 2", font, 16, new Color(1, 1, 1), new Color(0.5f, 0.5f, 0.5f), new Texture("textures/friendlyBlueMan.png"), new Texture("textures/4Head.png"), new Transform2D(new Vector2f(500, 600), 0, new Vector2f(100, 50)), 0);
 
         testBtn1.setOnHover(() -> System.out.println("Button 1 hovered over!"));
         testBtn2.setOnHover(() -> System.out.println("Button 2 hovered over!"));

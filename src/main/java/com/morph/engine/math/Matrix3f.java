@@ -8,15 +8,15 @@ public class Matrix3f {
 	}
 	
 	public String toString() {
-		String result = "Matrix3f(";
+		StringBuilder result = new StringBuilder("Matrix3f(");
 		
 		for (int i = 0; i < 8; i++) {
-			result += m[i] + ", ";
+			result.append(m[i]).append(", ");
 			if (i % 3 == 2)
-				result += "\n";
+				result.append("\n");
 		}
 		
-		return result + m[8] + ")";
+		return result.toString() + m[8] + ")";
 	}
 	
 	// TODO: BROKEN!

@@ -16,9 +16,9 @@ import java.util.stream.DoubleStream;
 
 import com.morph.engine.entities.Component;
 import com.morph.engine.graphics.Color;
-import com.morph.engine.graphics.Shader;
+import com.morph.engine.graphics.shaders.Shader;
 import com.morph.engine.graphics.Texture;
-import com.morph.engine.graphics.Uniforms;
+import com.morph.engine.graphics.shaders.Uniforms;
 import com.morph.engine.graphics.Vertex;
 import com.morph.engine.math.Vector2f;
 import com.morph.engine.math.Vector3f;

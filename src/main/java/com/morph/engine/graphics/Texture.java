@@ -18,8 +18,9 @@ import static org.lwjgl.opengl.GL13.*;
 
 public class Texture {
 	private TextureResource resource;
-	private static HashMap<String, TextureResource> loadedTextures = new HashMap<String, TextureResource>();
 	private String filename;
+
+	private static HashMap<String, TextureResource> loadedTextures = new HashMap<>();
 	
 	public Texture(String filename) {
 		this.filename = filename != null ? filename : "textures/solid.png";
@@ -139,28 +140,7 @@ public class Texture {
 		
 		return new TextureResource(texture);
 	}
-	
-	public static STBTTBakedChar.Buffer loadChars(String font, int size, int bitmapWidth, int bitmapHeight) {
-		int texture = glGenTextures();
-		STBTTBakedChar.Buffer chars = STBTTBakedChar.malloc(96);
-		
-		try {
-			ByteBuffer fontBuffer = IOUtils.getFileAsByteBuffer(font, 160 * 1024);
-			ByteBuffer bitmap = BufferUtils.createByteBuffer(bitmapWidth * bitmapHeight);
-			
-			STBTruetype.stbtt_BakeFontBitmap(fontBuffer, size, bitmap, bitmapWidth, bitmapHeight, 32, chars);
-			
-			glBindTexture(GL_TEXTURE_2D, texture);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, bitmapWidth, bitmapHeight, 0, GL_ALPHA, GL_UNSIGNED_BYTE, bitmap);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		
-		return chars;
-	}
-	
+
 	public void destroy() {
 		resource.removeReference();
 	}

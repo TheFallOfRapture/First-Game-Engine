@@ -1,5 +1,3 @@
-package scripts
-
 import com.morph.engine.script.EntityBehavior
 
 class EScript : EntityBehavior() {

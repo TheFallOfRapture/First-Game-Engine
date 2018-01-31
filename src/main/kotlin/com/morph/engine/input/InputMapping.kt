@@ -1,9 +1,7 @@
 package com.morph.engine.input
 
 import com.morph.engine.core.Game
-import io.reactivex.Observable
 import io.reactivex.rxkotlin.Observables
-import io.reactivex.rxkotlin.zipWith
 import org.lwjgl.glfw.GLFW.*
 
 typealias Action = () -> Unit
@@ -43,24 +41,25 @@ class InputMapping {
 
     fun mapButton(button: Int, mouseAction: MouseAction, action: Action) = when (mouseAction) {
         is StdMouseAction -> when (mouseAction) {
-            is MousePress -> mousePressed.put(button, action)
-            is MouseRelease -> mouseReleased.put(button, action)
+            MousePress -> mousePressed.put(button, action)
+            MouseRelease -> mouseReleased.put(button, action)
         }
         is BinMouseAction -> when (mouseAction) {
-            is MouseUp -> mouseUp.put(button, action)
-            is MouseDown -> mouseDown.put(button, action)
+            MouseUp -> mouseUp.put(button, action)
+            MouseDown -> mouseDown.put(button, action)
         }
     }
 
     fun mapKey(key: Int, keyAction: KeyAction, action: Action) = when (keyAction) {
         is StdKeyAction -> when (keyAction) {
-            is KeyPress -> keyPressed.put(key, action)
-            is KeyRepeat -> { keyPressed.put(key, action); keyTyped.put(key, action) }
-            is KeyRelease -> keyReleased.put(key, action)
+            KeyPress -> keyPressed.put(key, action)
+            KeyRepeat -> {
+                keyPressed[key] = action; keyTyped.put(key, action) }
+            KeyRelease -> keyReleased.put(key, action)
         }
         is BinKeyAction -> when (keyAction) {
-            is KeyUp -> keyUp.put(key, action)
-            is KeyDown -> keyDown.put(key, action)
+            KeyUp -> keyUp.put(key, action)
+            KeyDown -> keyDown.put(key, action)
         }
     }
 

@@ -5,7 +5,6 @@ import com.morph.engine.physics.components.Transform2D;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -14,19 +13,19 @@ import java.util.List;
 public class Container extends Element {
     private List<Element> children;
 
-    public Container(Transform2D transform, RenderData data, int depth) {
-        super(transform, data, depth);
+    public Container(String name, Transform2D transform, RenderData data, int depth) {
+        super(name, transform, data, depth);
         children = new ArrayList<>();
     }
 
-    public Container(Transform2D transform, RenderData data) {
-        super(transform, data);
-        children = new ArrayList<Element>();
+    public Container(String name, Transform2D transform, RenderData data) {
+        super(name, transform, data);
+        children = new ArrayList<>();
     }
 
-    public Container(Transform2D transform) {
-        super(transform);
-        children = new ArrayList<Element>();
+    public Container(String name, Transform2D transform) {
+        super(name, transform);
+        children = new ArrayList<>();
     }
 
     public List<Element> getChildren(boolean deep) {
@@ -36,7 +35,7 @@ public class Container extends Element {
                 result.add(c);
                 if (c instanceof Container) {
                     Container container = (Container) c;
-                    container.getChildren(true).forEach(result::add);
+                    result.addAll(container.getChildren(true));
                 }
             });
 

@@ -1,9 +1,10 @@
 package com.morph.engine.core;
 
-import javax.swing.*;
-
 import com.morph.engine.graphics.CustomDisplay;
 
+import javax.swing.*;
+
+@Deprecated
 public class GameApplet extends JApplet {
 	/**
 	 * 

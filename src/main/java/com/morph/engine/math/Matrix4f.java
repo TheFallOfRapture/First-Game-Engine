@@ -33,15 +33,15 @@ public class Matrix4f {
 	}
 	
 	public String toString() {
-		String result = "Matrix4f(";
+		StringBuilder result = new StringBuilder("Matrix4f(");
 		for (int i = 0; i < 15; i++) {
-			result += m[i] + ", ";
-			if (i % 4 == 3 && i != 0)
-				result += "\n         ";
+			result.append(m[i]).append(", ");
+			if (i % 4 == 3)
+				result.append("\n         ");
 		}
-		result += m[15] + ")";
+		result.append(m[15]).append(")");
 		
-		return result;
+		return result.toString();
 	}
 	
 	public float get(int i, int j) {
@@ -136,8 +136,7 @@ public class Matrix4f {
 	}
 	
 	private float minorDet(int i, int j) {
-		float minorDet = minor(i, j).getDeterminant();
-		return minorDet;
+        return minor(i, j).getDeterminant();
 	}
 	
 	public Matrix4f getInverse() {

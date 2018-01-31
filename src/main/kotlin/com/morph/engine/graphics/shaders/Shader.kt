@@ -1,17 +1,16 @@
-package com.morph.engine.graphics
+package com.morph.engine.graphics.shaders
 
-import org.lwjgl.opengl.GL11.*
-import org.lwjgl.opengl.GL20.*
-
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStreamReader
-import java.util.HashMap
-
+import com.morph.engine.graphics.Color
+import com.morph.engine.graphics.ShaderResource
 import com.morph.engine.math.Matrix4f
 import com.morph.engine.math.Vector3f
 import com.morph.engine.math.Vector4f
-import javax.inject.Inject
+import org.lwjgl.opengl.GL11.GL_FALSE
+import org.lwjgl.opengl.GL20.*
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStreamReader
+import java.util.*
 
 open class Shader<out T : Uniforms>(shaderURL: String, val uniforms: T) {
     private var resource: ShaderResource
@@ -22,8 +21,8 @@ open class Shader<out T : Uniforms>(shaderURL: String, val uniforms: T) {
             this.resource = oldResource
             oldResource.addReference()
         } else {
-            this.resource = Shader.loadShaderProgram(shaderURL)
-            loadedShaders.put(shaderURL, resource)
+            this.resource = loadShaderProgram(shaderURL)
+            loadedShaders[shaderURL] = resource
         }
     }
 

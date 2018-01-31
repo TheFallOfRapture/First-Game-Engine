@@ -1,20 +1,16 @@
 package com.morph.engine.graphics;
 
-import java.awt.Canvas;
-import java.awt.DisplayMode;
-import java.awt.Graphics;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
+import com.morph.engine.graphics.gui.GUI;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JFrame;
-
-import com.morph.engine.graphics.gui.GUI;
-
+@Deprecated
 public class CustomDisplay extends Canvas {
 	private static final long serialVersionUID = 1L;
 	private int[] pixels;
@@ -24,7 +20,7 @@ public class CustomDisplay extends Canvas {
 	private JFrame windowReference;
 	
 	public CustomDisplay(int width, int height) {
-		this.guis = new ArrayList<GUI>();
+		this.guis = new ArrayList<>();
 		setSize(width, height);
 		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
@@ -41,7 +37,7 @@ public class CustomDisplay extends Canvas {
 		if (x >= 0 && x < getWidth() && y >= 0 && y < getHeight()) {
 			Color dst = new Color(pixels[x + y * getWidth()]);
 			Color result = color.alphaBlend(dst);
-			pixels[x + y * getWidth()] = result.getRGBInteger();
+			pixels[x + y * getWidth()] = Colors.toRGBHex(result);
 		}
 	}
 	
@@ -51,7 +47,7 @@ public class CustomDisplay extends Canvas {
 	
 	public void clearScreen() {
 		for (int i = 0; i < pixels.length; i++) {
-			pixels[i] = clearColor.getARGBInteger();
+			pixels[i] = Colors.toARGBHex(clearColor);
 		}
 	}
 	

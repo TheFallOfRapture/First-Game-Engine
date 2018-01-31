@@ -3,7 +3,6 @@ package com.morph.engine.newgui;
 import com.morph.engine.graphics.Color;
 import com.morph.engine.input.KeyPress;
 import com.morph.engine.input.KeyRepeat;
-import com.morph.engine.input.Keyboard;
 import com.morph.engine.input.StdKeyEvent;
 import com.morph.engine.math.Vector2f;
 
@@ -30,16 +29,16 @@ public class TextField extends TextElement {
         IntStream.range(0, keyList.size()).forEach(i -> shiftMap.put(keyList.get(i), shiftKeyList.get(i)));
     }
 
-    public TextField(String text, String font, int size, Color color, Vector2f position, int depth) {
-        super(text, font, size, color, position, depth);
+    public TextField(String name, String text, String font, int size, Color color, Vector2f position, int depth) {
+        super(name, text, font, size, color, position, depth);
     }
 
-    public TextField(String text, String font, int size, Color color, Vector2f position) {
-        this(text, font, size, color, position, 0);
+    public TextField(String name, String text, String font, int size, Color color, Vector2f position) {
+        this(name, text, font, size, color, position, 0);
     }
 
-    public TextField(String text, String font, int size, Vector2f position) {
-        this(text, font, size, new Color(0, 0, 0), position, 0);
+    public TextField(String name, String text, String font, int size, Vector2f position) {
+        this(name, text, font, size, new Color(0, 0, 0), position, 0);
     }
 
     public void setText(String text) {
@@ -74,17 +73,17 @@ public class TextField extends TextElement {
         if (e.getAction() instanceof KeyPress) {
             if (e.getKey() == GLFW_KEY_BACKSPACE) removeCharacter();
             else if (e.getKey() == GLFW_KEY_ESCAPE) clearText();
-            else if (!isIllegalCharacter(e.getKey()))
+            else if (isLegalCharacter(e.getKey()))
                 addCharacter(getCharFromKeyData(e.getKey(), e.hasMod(GLFW_MOD_SHIFT)));
         } else if (e.getAction() instanceof KeyRepeat) {
             if (e.getKey() == GLFW_KEY_BACKSPACE) removeCharacter();
-            else if (!isIllegalCharacter(e.getKey())) addCharacter(getCharFromKeyData(e.getKey(), e.hasMod(GLFW_MOD_SHIFT)));
+            else if (isLegalCharacter(e.getKey())) addCharacter(getCharFromKeyData(e.getKey(), e.hasMod(GLFW_MOD_SHIFT)));
         }
     }
 
-    private boolean isIllegalCharacter(int c) {
-        return c == GLFW_KEY_LEFT_SHIFT
-                || c == GLFW_KEY_RIGHT_SHIFT;
+    private boolean isLegalCharacter(int c) {
+        return c != GLFW_KEY_LEFT_SHIFT
+                && c != GLFW_KEY_RIGHT_SHIFT;
     }
 
     /*
@@ -117,8 +116,6 @@ public class TextField extends TextElement {
         boolean isAlphabetical = keycode >= 65 && keycode <= 90;
 
         if (isAlphabetical) key += 32;
-
-//        System.out.println(keycode + " | " + key + ", " + shiftMap.get(key));
 
         if (shift) {
             if (shiftMap.get(key) != null) return (char) shiftMap.get(key).intValue();

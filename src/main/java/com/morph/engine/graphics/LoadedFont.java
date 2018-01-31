@@ -1,6 +1,5 @@
 package com.morph.engine.graphics;
 
-import com.morph.engine.graphics.components.TextRenderData;
 import com.morph.engine.math.Vector2f;
 import com.morph.engine.util.IOUtils;
 import org.lwjgl.BufferUtils;
@@ -12,6 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.FloatBuffer;
 import java.util.HashMap;
+import java.util.stream.IntStream;
 
 /**
  * Created on 7/30/2017.
@@ -20,7 +20,6 @@ public class LoadedFont {
     private Texture textureAtlas;
     public static final int BITMAP_WIDTH = 1024, BITMAP_HEIGHT = 1024;
     public static final int SIZE = 64;
-    private STBTTBakedChar.Buffer chars;
     private STBTTPackedchar.Buffer packedChars;
     private String fontName;
     private HashMap<Character, Integer[]> charIndices;
@@ -72,40 +71,7 @@ public class LoadedFont {
         preloadPackedChars();
     }
 
-    public void preloadChars(TextRenderData data) {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            FloatBuffer x = stack.floats(0.0f);
-            FloatBuffer y = stack.floats(0.0f);
-            STBTTAlignedQuad q = STBTTAlignedQuad.mallocStack(stack);
-
-            for (int i = 0; i < CHARSET.length(); i++) {
-                char c = CHARSET.charAt(i);
-                if (c == '\n') {
-                    y.put(0, y.get(0) - LoadedFont.SIZE);
-                    x.put(0, 0);
-                } else if (c < 32 || c >= 128)
-                    continue;
-
-                STBTruetype.stbtt_GetBakedQuad(chars, LoadedFont.BITMAP_WIDTH, LoadedFont.BITMAP_HEIGHT, c - 32, x, y, q, true);
-
-                data.addVertex(new Vertex(new Vector2f(q.x0(), -q.y0()), new Vector2f(q.s0(), q.t0())));
-                data.addVertex(new Vertex(new Vector2f(q.x1(), -q.y0()), new Vector2f(q.s1(), q.t0())));
-                data.addVertex(new Vertex(new Vector2f(q.x1(), -q.y1()), new Vector2f(q.s1(), q.t1())));
-                data.addVertex(new Vertex(new Vector2f(q.x0(), -q.y1()), new Vector2f(q.s0(), q.t1())));
-
-                charIndices.put(c, new Integer[]{
-                        0 + (i * 4),
-                        1 + (i * 4),
-                        3 + (i * 4),
-                        1 + (i * 4),
-                        2 + (i * 4),
-                        3 + (i * 4)
-                });
-            }
-        }
-    }
-
-    public void preloadPackedChars() {
+    private void preloadPackedChars() {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             FloatBuffer x = stack.floats(0.0f);
             FloatBuffer y = stack.floats(0.0f);
@@ -139,14 +105,7 @@ public class LoadedFont {
                         new Vector2f(q.s0(), q.t1())
                 };
 
-                int[] indices = new int[]{
-                        0 + (i * 4),
-                        1 + (i * 4),
-                        3 + (i * 4),
-                        1 + (i * 4),
-                        2 + (i * 4),
-                        3 + (i * 4)
-                };
+                int[] indices = IntStream.of(0, 1, 3, 1, 2, 3).map(j -> j * 4).toArray();
 
                 STBTTPackedchar pc = packedChars.get(i);
                 float[] offsetData = new float[] {
@@ -183,10 +142,6 @@ public class LoadedFont {
 
     public String getFontName() {
         return fontName;
-    }
-
-    public STBTTBakedChar.Buffer getChars() {
-        return chars;
     }
 
     public float getYAdvance() {

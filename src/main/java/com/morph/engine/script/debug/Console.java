@@ -98,9 +98,9 @@ public class Console {
         }
     }
 
-    private static Feed<EventType> eventFeed = new Feed<>();
+    private static final Feed<EventType> eventFeed = new Feed<>();
 
-    private static Observable<EventType> events = Observable.create(emitter -> {
+    private static final Observable<EventType> events = Observable.create(emitter -> {
         Listener<EventType> eventListener = new Listener<EventType>() {
             @Override
             public void onNext(EventType eventType) {
@@ -129,11 +129,11 @@ public class Console {
     private static String currentLine = "";
     private static Game game;
 
-    private static ConsoleOutputStream outBytes = new ConsoleOutputStream();
-    private static ConsoleOutputStream errBytes = new ConsoleOutputStream();
+    private static final ConsoleOutputStream outBytes = new ConsoleOutputStream();
+    private static final ConsoleOutputStream errBytes = new ConsoleOutputStream();
 
-    public static PrintStream out = new PrintStream(outBytes);
-    public static PrintStream err = new PrintStream(errBytes);
+    public static final PrintStream out = new PrintStream(outBytes);
+    public static final PrintStream err = new PrintStream(errBytes);
 
     public Console(Console.ScriptType type, Game game) {
         this.type = type;

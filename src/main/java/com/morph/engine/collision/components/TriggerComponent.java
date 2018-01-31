@@ -14,12 +14,6 @@ public class TriggerComponent extends Component {
 		this.handled = false;
 		this.normal = normal;
 	}
-
-//	public TriggerComponent(Entity other) {
-//		this.other = other;
-//		this.handled = false;
-//		this.normal = new Vector2f();
-//	}
 	
 	public Entity getCollidedEntity() {
 		return other;

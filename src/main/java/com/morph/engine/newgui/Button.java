@@ -13,15 +13,15 @@ public class Button extends Container {
 	private String font;
 	protected int size;
 
-    public Button(String text, String font, int size, Color color, Color buttonColor, Texture texture, Texture altTexture, Transform2D transform, int depth) {
-        super(transform,
+    public Button(String name, String text, String font, int size, Color color, Color buttonColor, Texture texture, Texture altTexture, Transform2D transform, int depth) {
+        super(name, transform,
 				RenderDataUtils.createTintedSquare(buttonColor, new GUITintTransitionShader(), texture, altTexture, 0),
 				depth);
 		this.text = text;
 		this.font = font;
 		this.size = size;
 
-		TextElement textObj = new TextElement(text, font, size, color,
+		TextElement textObj = new TextElement(name + "-innerText", text, font, size, color,
 				transform.getPosition().sub(transform.getScale().mul(new Vector2f(0.5f, 0.5f))), depth - 1);
 
 		float scaleRatio = (float) size / (float) LoadedFont.SIZE;

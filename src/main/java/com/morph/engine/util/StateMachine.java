@@ -9,8 +9,8 @@ public class StateMachine {
 
     public StateMachine(State currentState) {
         this.currentState = currentState;
-        transitions = new HashMap<String, Runnable>();
-        possibleStates = new HashMap<String, State>();
+        transitions = new HashMap<>();
+        possibleStates = new HashMap<>();
     }
 
     public void addPossibility(String stateName) {

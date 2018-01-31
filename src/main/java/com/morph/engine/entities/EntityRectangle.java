@@ -2,7 +2,7 @@ package com.morph.engine.entities;
 
 import com.morph.engine.collision.components.BoundingBox2D;
 import com.morph.engine.graphics.Color;
-import com.morph.engine.graphics.Shader;
+import com.morph.engine.graphics.shaders.Shader;
 import com.morph.engine.graphics.Texture;
 import com.morph.engine.math.Vector2f;
 import com.morph.engine.physics.components.Transform2D;

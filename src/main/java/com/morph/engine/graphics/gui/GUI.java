@@ -14,7 +14,7 @@ public abstract class GUI extends GUIElement {
 	public GUI(Game game, int layer) {
 		super();
 		this.game = game;
-		elements = new ArrayList<GUIElement>();
+		elements = new ArrayList<>();
 	}
 	
 	public GUI(Game game) {

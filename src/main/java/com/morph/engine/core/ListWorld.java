@@ -37,10 +37,10 @@ public class ListWorld implements IWorld {
         e.forEach(game.renderingEngine::register);
     }
 
-    public void removeEntity(Entity e) {
-        entities.remove(e);
+    public boolean removeEntity(Entity e) {
         game.renderingEngine.unregister(e);
         e.destroy();
+        return entities.remove(e);
     }
 
     public void removeEntities(List<Entity> e) {

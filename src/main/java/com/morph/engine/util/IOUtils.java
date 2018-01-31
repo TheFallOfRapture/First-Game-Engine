@@ -8,7 +8,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.SeekableByteChannel;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,7 +32,7 @@ public class IOUtils {
 		} else {
 			try (
 					InputStream source = IOUtils.class.getClassLoader().getResourceAsStream(filename); 
-					ReadableByteChannel channel = Channels.newChannel(source);
+					ReadableByteChannel channel = Channels.newChannel(source)
 				) {
 				buffer = BufferUtils.createByteBuffer(size);
 				while (true) {

@@ -2,7 +2,7 @@ package com.morph.engine.entities;
 
 import com.morph.engine.collision.components.BoundingBox2D;
 import com.morph.engine.graphics.Color;
-import com.morph.engine.graphics.Shader;
+import com.morph.engine.graphics.shaders.Shader;
 import com.morph.engine.graphics.Texture;
 import com.morph.engine.graphics.components.RenderData;
 import com.morph.engine.graphics.shaders.BasicTexturedShader;
@@ -14,11 +14,7 @@ import com.morph.engine.util.RenderDataUtils;
  * Created by Fernando on 1/15/2017.
  */
 public class EntityFactory {
-    private static int count;
-
-    public EntityFactory() {
-        this.count = 0;
-    }
+    private static int count = 0;
 
     public static Entity getEntity(String name) {
         count++;

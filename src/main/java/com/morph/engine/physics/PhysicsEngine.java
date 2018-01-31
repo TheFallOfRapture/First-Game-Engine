@@ -17,7 +17,7 @@ public class PhysicsEngine {
 	}
 	
 	public void update(Game g, List<Entity> entities, float dt) {
-		List<RigidBody> rigidBodies = new ArrayList<RigidBody>();
+		List<RigidBody> rigidBodies = new ArrayList<>();
 		for (Entity e: entities)
 			if (e.hasComponent(RigidBody.class))
 				rigidBodies.add(e.getComponent(RigidBody.class));

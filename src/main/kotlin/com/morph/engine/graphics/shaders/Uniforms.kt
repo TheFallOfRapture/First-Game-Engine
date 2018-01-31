@@ -1,14 +1,13 @@
-package com.morph.engine.graphics
+package com.morph.engine.graphics.shaders
 
-import org.lwjgl.opengl.GL20.*
-
-import java.util.HashMap
-
+import com.morph.engine.graphics.Color
 import com.morph.engine.graphics.components.RenderData
 import com.morph.engine.math.Matrix4f
 import com.morph.engine.math.Vector3f
 import com.morph.engine.math.Vector4f
 import com.morph.engine.physics.components.Transform
+import org.lwjgl.opengl.GL20.*
+import java.util.*
 
 abstract class Uniforms {
     private var uniforms: HashMap<String, Int> = HashMap()
@@ -24,7 +23,7 @@ abstract class Uniforms {
 
     protected fun addUniform(name: String, shader: Int) {
         val location = glGetUniformLocation(shader, name)
-        uniforms.put(name, location)
+        uniforms[name] = location
     }
 
     fun setUniform1i(name: String, value: Int) {

@@ -7,7 +7,6 @@ import com.morph.engine.graphics.components.RenderData;
 import com.morph.engine.math.Matrix4f;
 import com.morph.engine.newgui.Element;
 import com.morph.engine.physics.components.Transform;
-import com.morph.engine.physics.components.Transform2D;
 
 import static org.lwjgl.system.MemoryUtil.*;
 
@@ -29,7 +28,7 @@ public class GLRenderingEngine extends GameSystem {
 		this.guiRenderables = new ArrayList<>();
 	}
 
-	public void render(RenderData data, Transform transform) {
+	private void render(RenderData data, Transform transform) {
 		if (data == null || transform == null)
 			return;
 

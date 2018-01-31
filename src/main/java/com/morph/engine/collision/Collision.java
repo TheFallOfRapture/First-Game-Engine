@@ -4,12 +4,12 @@ import com.morph.engine.entities.Entity;
 import com.morph.engine.math.Vector2f;
 
 public class Collision {
-	private Entity entity;
-	private Entity hit;
-	private Vector2f position;
-	private Vector2f intersection;
-	private Vector2f normal;
-	private float time;
+	private final Entity entity;
+	private final Entity hit;
+	private final Vector2f position;
+	private final Vector2f intersection;
+	private final Vector2f normal;
+	private final float time;
 	
 	public Collision(Entity entity, Entity hit, Vector2f position, Vector2f intersection, Vector2f normal, float time) {
 		this.entity = entity;

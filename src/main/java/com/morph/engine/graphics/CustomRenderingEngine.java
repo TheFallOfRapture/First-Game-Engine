@@ -8,13 +8,11 @@ import java.util.stream.Collectors;
 
 import com.morph.engine.core.Game;
 import com.morph.engine.core.GameSystem;
-import com.morph.engine.entities.Component;
 import com.morph.engine.entities.Entity;
 import com.morph.engine.graphics.components.RenderData;
 import com.morph.engine.math.Matrix4f;
 import com.morph.engine.math.Vector2f;
 import com.morph.engine.math.Vector3f;
-import com.morph.engine.math.Vector4f;
 import com.morph.engine.physics.components.Transform;
 
 @Deprecated
@@ -29,9 +27,9 @@ public class CustomRenderingEngine extends GameSystem {
 	
 	public CustomRenderingEngine(Game game) {
 		super(game);
-		vertices = new HashMap<Integer, Vertex>();
-		fragments = new ArrayList<Fragment>();
-		triangles = new ArrayList<Triangle>();
+		vertices = new HashMap<>();
+		fragments = new ArrayList<>();
+		triangles = new ArrayList<>();
 		vertexIDGenerator = new AtomicInteger(0);
 	}
 	
@@ -61,7 +59,7 @@ public class CustomRenderingEngine extends GameSystem {
 		List<Entity> renderEntities = entities.stream().filter(e -> e.hasComponent(RenderData.class) && e.hasComponent(Transform.class))
 				.collect(Collectors.toCollection(ArrayList::new));
 		
-		List<Vertex> verts = new ArrayList<Vertex>();
+		List<Vertex> verts = new ArrayList<>();
 		for (Entity e : renderEntities) {
 			RenderData data = e.getComponent(RenderData.class);
 			Transform transform = e.getComponent(Transform.class);

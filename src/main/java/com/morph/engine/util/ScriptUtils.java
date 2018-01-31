@@ -21,9 +21,6 @@ import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.*;
 
 import static java.nio.file.StandardWatchEventKinds.*;
@@ -43,7 +40,7 @@ public class ScriptUtils {
     private static Game game;
     private static PublishSubject<Boolean> closeRequests = PublishSubject.create();
 
-    private static final List<String> SCRIPT_ENGINE_EXTENSIONS = Arrays.asList("kts");
+    private static final List<String> SCRIPT_ENGINE_EXTENSIONS = Collections.singletonList("kts");
 
     public static void init(Game game) {
         initTask = Single.just(game).observeOn(Schedulers.io()).flatMapCompletable(g -> Completable.fromCallable(() -> ScriptUtils.load(g))).cache();
@@ -259,9 +256,7 @@ public class ScriptUtils {
         String extension = getFileExtension(filename);
         ScriptEngine engine = getScriptEngine(extension).blockingGet();
 
-        T behavior = getScriptBehaviorDI(filename, engine);
-
-        return behavior;
+        return getScriptBehaviorDI(filename, engine);
     }
 
     public static boolean isInitialized() {

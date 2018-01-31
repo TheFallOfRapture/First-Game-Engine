@@ -4,6 +4,7 @@ import com.morph.engine.core.Game;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Fernando on 3/6/2017.
@@ -34,6 +35,10 @@ public abstract class GUI {
         if (e instanceof Container) {
             ((Container)e).getChildren(true).forEach(this::removeElement);
         }
+    }
+
+    public Element getElementByName(String name) {
+        return elements.stream().collect(Collectors.toMap(Element::getName, e -> e)).get(name);
     }
 
     public void fixedUpdate(float dt) {}

@@ -1,5 +1,7 @@
 package com.morph.engine.graphics.gui;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.awt.Graphics;
 
 @Deprecated
@@ -46,7 +48,7 @@ public abstract class GUIElement implements Comparable<GUIElement> {
 	}
 	
 	@Override
-	public int compareTo(GUIElement other) {
+	public int compareTo(@NotNull GUIElement other) {
 		return layer - other.getLayer();
 	}
 }

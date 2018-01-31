@@ -4,7 +4,6 @@ import com.morph.engine.core.Game;
 import com.morph.engine.script.debug.Console;
 import com.morph.engine.entities.Component;
 import com.morph.engine.entities.Entity;
-import com.morph.engine.math.*;
 import com.morph.engine.util.EntityGenUtils;
 
 public abstract class ConsoleScript implements Runnable {
