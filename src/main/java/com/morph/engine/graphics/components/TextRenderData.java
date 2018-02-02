@@ -29,7 +29,7 @@ public class TextRenderData extends RenderData {
         if (!Objects.equals(text, "")) addString(text);
     }
 
-    public void addCharacter(char c) {
+    public void loadCharacter(char c) {
         if (c == '\n') {
             newLine();
             return;
@@ -49,14 +49,12 @@ public class TextRenderData extends RenderData {
         Vector2f offsetMin = new Vector2f(offsetData[0], -offsetData[3]);
         Vector2f offsetMax = new Vector2f(offsetData[2], -offsetData[1]);
 
-        updateAll(data -> {
-            data.addVertex(cursorPosition.add(offsetMin), texCoords[3]);
-            data.addVertex(cursorPosition.add(new Vector2f(offsetMin.getX(), offsetMax.getY())), texCoords[0]);
-            data.addVertex(cursorPosition.add(offsetMax), texCoords[1]);
-            data.addVertex(cursorPosition.add(new Vector2f(offsetMax.getX(), offsetMin.getY())), texCoords[2]);
+        addVertex(cursorPosition.add(offsetMin), texCoords[3]);
+        addVertex(cursorPosition.add(new Vector2f(offsetMin.getX(), offsetMax.getY())), texCoords[0]);
+        addVertex(cursorPosition.add(offsetMax), texCoords[1]);
+        addVertex(cursorPosition.add(new Vector2f(offsetMax.getX(), offsetMin.getY())), texCoords[2]);
 
-            data.addIndices(IntStream.of(0, 1, 3, 1, 2, 3).map(i -> i + previousPointLength).toArray());
-        });
+        addIndices(IntStream.of(0, 1, 3, 1, 2, 3).map(i -> i + previousPointLength).toArray());
 
         previousPointLength += 4;
         text += c;
@@ -67,14 +65,22 @@ public class TextRenderData extends RenderData {
         height = numLines <= 1 ? font.getScale() : font.getScale() + font.getYAdvance() * numLines;
     }
 
+    public void addCharacter(char c) {
+        updateAll(data -> loadCharacter(c));
+    }
+
     public void newLine() {
         cursorPosition.setX(0);
         cursorPosition.setY(cursorPosition.getY() - (font.getYAdvance() * font.getScale()));
         text += "\n";
     }
 
+    public void loadString(String text) {
+        CharBuffer.wrap(text.toCharArray()).chars().mapToObj(c -> (char) c).forEach(this::loadCharacter);
+    }
+
     public void addString(String text) {
-        CharBuffer.wrap(text.toCharArray()).chars().mapToObj(c -> (char) c).forEachOrdered(this::addCharacter);
+        updateAll(data -> loadString(text));
     }
 
     public void setText(String text) {

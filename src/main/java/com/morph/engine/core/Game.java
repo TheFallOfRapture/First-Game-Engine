@@ -1,14 +1,12 @@
 package com.morph.engine.core;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import com.morph.engine.core.gui.ConsoleGUI;
-import com.morph.engine.input.*;
-import com.morph.engine.script.debug.Console;
 import com.morph.engine.graphics.GLDisplay;
 import com.morph.engine.graphics.GLRenderingEngine;
+import com.morph.engine.input.Mouse;
+import com.morph.engine.input.MousePress;
+import com.morph.engine.input.MouseRelease;
+import com.morph.engine.input.StdMouseEvent;
 import com.morph.engine.math.Matrix4f;
 import com.morph.engine.math.MatrixUtils;
 import com.morph.engine.math.Vector2f;
@@ -17,10 +15,15 @@ import com.morph.engine.newgui.Element;
 import com.morph.engine.newgui.GUI;
 import com.morph.engine.script.GameBehavior;
 import com.morph.engine.script.ScriptSystem;
+import com.morph.engine.script.debug.Console;
 import com.morph.engine.util.Feed;
 import com.morph.engine.util.ScriptUtils;
 import io.reactivex.Observable;
 import kotlin.Triple;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public abstract class Game implements Runnable {
 	protected int width, height;
@@ -51,11 +54,7 @@ public abstract class Game implements Runnable {
 	public static final int VERSION_MINOR = 6;
 	public static final int VERSION_PATCH = 0;
 
-	public static final String VERSION_STRING;
-
-	static {
-		VERSION_STRING = VERSION_MAJOR + "." + VERSION_MINOR + "." + VERSION_PATCH;
-	}
+	public static final String VERSION_STRING = VERSION_MAJOR + "." + VERSION_MINOR + "." + VERSION_PATCH;
 
 	private long delta;
 

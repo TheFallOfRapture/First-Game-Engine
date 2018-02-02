@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.FloatBuffer;
-import java.util.HashMap;
 import java.util.stream.IntStream;
 
 /**
@@ -18,12 +17,12 @@ import java.util.stream.IntStream;
  */
 public class LoadedFont {
     private Texture textureAtlas;
-    public static final int BITMAP_WIDTH = 1024, BITMAP_HEIGHT = 1024;
+    private static final int BITMAP_WIDTH = 1024, BITMAP_HEIGHT = 1024;
     public static final int SIZE = 64;
-    private STBTTPackedchar.Buffer packedChars;
+    public static final int CHAR_FIRST = 32, CHAR_LAST = 128;
     private String fontName;
-    private HashMap<Character, Integer[]> charIndices;
-    private HashMap<Character, LoadedCharacter> characters;
+    private Integer[][] charIndices;
+    private LoadedCharacter[] characters;
     private float scale;
     private float ascent;
     private int yAdvance;
@@ -35,21 +34,20 @@ public class LoadedFont {
 
     static {
         StringBuilder temp = new StringBuilder();
-        for (int i = 0; i < 96; i++) {
-            temp.append((char) (i + 32));
+        for (int i = 0; i < CHAR_LAST; i++) {
+            temp.append((char) (i + CHAR_FIRST));
         }
         CHARSET = temp.toString();
     }
 
     public LoadedFont(String font) {
         this.fontName = font;
-        this.packedChars = STBTTPackedchar.malloc(96);
-        this.charIndices = new HashMap<>();
-        this.characters = new HashMap<>();
+        this.charIndices = new Integer[CHAR_LAST - CHAR_FIRST][6];
+        this.characters = new LoadedCharacter[CHAR_LAST - CHAR_FIRST];
 
         ByteBuffer pixels;
 
-        try (STBTTPackContext context = STBTTPackContext.malloc()) {
+        try (STBTTPackContext context = STBTTPackContext.malloc(); STBTTPackedchar.Buffer packedChars = STBTTPackedchar.malloc(96)) {
             pixels = BufferUtils.createByteBuffer(LoadedFont.BITMAP_WIDTH * LoadedFont.BITMAP_HEIGHT);
 
             ByteBuffer fontBuffer = IOUtils.getFileAsByteBuffer(font, 160 * 1024);
@@ -62,16 +60,16 @@ public class LoadedFont {
             STBTruetype.stbtt_PackEnd(context);
 
             this.textureAtlas = new Texture(font, LoadedFont.BITMAP_WIDTH, LoadedFont.BITMAP_HEIGHT, pixels);
+            this.kerningTable = new float[CHARSET.length()][CHARSET.length()];
+
+            preloadPackedChars(packedChars);
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        kerningTable = new float[CHARSET.length()][CHARSET.length()];
-
-        preloadPackedChars();
     }
 
-    private void preloadPackedChars() {
+    private void preloadPackedChars(STBTTPackedchar.Buffer packedChars) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             FloatBuffer x = stack.floats(0.0f);
             FloatBuffer y = stack.floats(0.0f);
@@ -113,7 +111,7 @@ public class LoadedFont {
                         pc.xoff2(), pc.yoff2()
                 };
 
-                characters.put(c, new LoadedCharacter(c, texCoords, indices, (float) xAdvance[0], offsetData));
+                characters[c - CHAR_FIRST] = new LoadedCharacter(c, texCoords, indices, (float) xAdvance[0], offsetData);
 
                 CharBuffer.wrap(CHARSET.toCharArray()).chars().forEach(c2 -> kerningTable[c - 32][c2 - 32] = STBTruetype.stbtt_GetCodepointKernAdvance(fontInfo, c, c2) * scale);
             }
@@ -129,11 +127,11 @@ public class LoadedFont {
     }
 
     public Integer[] getCharData(char c) {
-        return charIndices.get(c);
+        return charIndices[c - CHAR_FIRST];
     }
 
     public LoadedCharacter getCharacter(char c) {
-        return characters.get(c);
+        return characters[c - CHAR_FIRST];
     }
 
     public Texture getTextureAtlas() {
@@ -150,7 +148,6 @@ public class LoadedFont {
 
     public void destroy() {
         textureAtlas.destroy();
-        packedChars.free();
     }
 
     public float getScale() {
@@ -159,5 +156,9 @@ public class LoadedFont {
 
     public float getAscent() {
         return ascent;
+    }
+
+    public static boolean isValidChar(char c) {
+        return CHARSET.contains(Character.toString(c));
     }
 }
