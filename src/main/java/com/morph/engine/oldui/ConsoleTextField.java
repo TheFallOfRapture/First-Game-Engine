@@ -1,4 +1,4 @@
-package com.morph.engine.newgui;
+package com.morph.engine.oldui;
 
 import com.morph.engine.input.KeyPress;
 import com.morph.engine.input.StdKeyEvent;

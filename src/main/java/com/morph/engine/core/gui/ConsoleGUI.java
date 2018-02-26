@@ -7,10 +7,10 @@ import com.morph.engine.script.debug.Console;
 import com.morph.engine.graphics.Color;
 import com.morph.engine.graphics.Texture;
 import com.morph.engine.math.Vector2f;
-import com.morph.engine.newgui.ConsoleTextField;
-import com.morph.engine.newgui.GUI;
-import com.morph.engine.newgui.Panel;
-import com.morph.engine.newgui.TextField;
+import com.morph.engine.oldui.ConsoleTextField;
+import com.morph.engine.oldui.GUI;
+import com.morph.engine.oldui.Panel;
+import com.morph.engine.oldui.TextField;
 
 import java.util.Objects;
 

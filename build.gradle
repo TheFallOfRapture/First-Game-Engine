@@ -41,6 +41,7 @@ repositories {
 	mavenCentral()
 	jcenter()
 	maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+	maven { url "https://dl.bintray.com/facebook/maven" }
 	maven { url "https://jitpack.io" }
 }
 
@@ -68,7 +69,6 @@ dependencies {
 	compile "org.jetbrains.kotlin:kotlin-script-util:1.2.10"
 	compile "org.python:jython-standalone:2.7.1b3"
 }
-
 jar {
 	manifest {
 		attributes 'Main-Class': 'com.morph.engine.core.EngineLauncher'

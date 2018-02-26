@@ -5,10 +5,10 @@ import com.morph.engine.graphics.Color;
 import com.morph.engine.graphics.Colors;
 import com.morph.engine.graphics.Texture;
 import com.morph.engine.math.Vector2f;
-import com.morph.engine.newgui.Button;
-import com.morph.engine.newgui.GUI;
-import com.morph.engine.newgui.Panel;
-import com.morph.engine.newgui.TextElement;
+import com.morph.engine.oldui.Button;
+import com.morph.engine.oldui.GUI;
+import com.morph.engine.oldui.Panel;
+import com.morph.engine.oldui.TextElement;
 import com.morph.engine.physics.components.Transform2D;
 
 /**
