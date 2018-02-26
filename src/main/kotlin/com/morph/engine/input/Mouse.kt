@@ -1,16 +1,13 @@
 package com.morph.engine.input
 
-import org.lwjgl.glfw.GLFW.*
-
+import com.morph.engine.math.Matrix4f
+import com.morph.engine.math.Vector2f
+import com.morph.engine.math.Vector4f
 import com.morph.engine.util.Feed
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import org.lwjgl.BufferUtils
-
-import com.morph.engine.graphics.GLRenderingEngine
-import com.morph.engine.math.Matrix4f
-import com.morph.engine.math.Vector2f
-import com.morph.engine.math.Vector4f
+import org.lwjgl.glfw.GLFW.*
 
 object Mouse {
     private val mouseEventFeed = Feed<StdMouseEvent>()
@@ -42,7 +39,7 @@ object Mouse {
         }
     }
 
-    fun setMousePosition(window: Long, v: Vector2f) {
+    fun setMousePosition(window: Long, v: Vector2f, projection: Matrix4f) {
         val widthBuffer = BufferUtils.createIntBuffer(1)
         val heightBuffer = BufferUtils.createIntBuffer(1)
         glfwGetWindowSize(window, widthBuffer, heightBuffer)
@@ -54,11 +51,11 @@ object Mouse {
         screenMousePosition.onNext(currentScreenPos)
 
         if (screenToWorld == Matrix4f.empty()) {
-            screenToWorld = GLRenderingEngine.getProjectionMatrix().inverse
+            screenToWorld = projection.inverse
         }
 
         val normalizedMousePos = currentScreenPos.div(Vector2f(width / 2f, height / 2f)).sub(Vector2f(1f, 1f)).mul(Vector2f(1f, -1f))
-        worldMousePosition.onNext(screenToWorld.mul(Vector4f(normalizedMousePos, 0, 1)).xy)
+        worldMousePosition.onNext(screenToWorld.times(Vector4f(normalizedMousePos, 0, 1)).xy)
     }
 
     fun getScreenMousePosition(): Observable<Vector2f> {

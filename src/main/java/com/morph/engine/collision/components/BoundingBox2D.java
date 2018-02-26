@@ -101,8 +101,4 @@ public class BoundingBox2D extends Component {
 	public void setTrigger(boolean isTrigger) {
 		this.isTrigger = isTrigger;
 	}
-	
-	public BoundingBox2D clone() {
-		return new BoundingBox2D(center, halfSize, isTrigger);
-	}
 }

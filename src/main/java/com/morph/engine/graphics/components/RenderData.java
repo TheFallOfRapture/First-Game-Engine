@@ -1,11 +1,15 @@
 package com.morph.engine.graphics.components;
 
-import static org.lwjgl.opengl.GL11.GL_DOUBLE;
-import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
-import static org.lwjgl.opengl.GL30.glGenVertexArrays;
+import com.morph.engine.entities.Component;
+import com.morph.engine.graphics.Color;
+import com.morph.engine.graphics.Texture;
+import com.morph.engine.graphics.Vertex;
+import com.morph.engine.graphics.shaders.Shader;
+import com.morph.engine.graphics.shaders.Uniforms;
+import com.morph.engine.math.Vector2f;
+import com.morph.engine.math.Vector3f;
+import com.morph.engine.util.RenderDataUtilsKt;
+import kotlin.Unit;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,16 +18,12 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 
-import com.morph.engine.entities.Component;
-import com.morph.engine.graphics.Color;
-import com.morph.engine.graphics.shaders.Shader;
-import com.morph.engine.graphics.Texture;
-import com.morph.engine.graphics.shaders.Uniforms;
-import com.morph.engine.graphics.Vertex;
-import com.morph.engine.math.Vector2f;
-import com.morph.engine.math.Vector3f;
-import com.morph.engine.util.RenderDataUtilsKt;
-import kotlin.Unit;
+import static org.lwjgl.opengl.GL11.GL_DOUBLE;
+import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
+import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public class RenderData extends Component {
 	protected List<Vertex> vertices;
@@ -375,10 +375,5 @@ public class RenderData extends Component {
 			body.accept(data);
 			return Unit.INSTANCE;
 		});
-	}
-
-	@Override
-	public Component clone() {
-		return new RenderData(vertices, indices, shader, textures, vao);
 	}
 }

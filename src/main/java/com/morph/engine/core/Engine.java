@@ -4,11 +4,10 @@ import com.morph.engine.core.gui.EngineGUI;
 import com.morph.engine.entities.Entity;
 import com.morph.engine.entities.EntityFactory;
 import com.morph.engine.graphics.Color;
-import com.morph.engine.graphics.GLRenderingEngine;
 import com.morph.engine.graphics.shaders.TintShader;
 import com.morph.engine.input.*;
+import com.morph.engine.math.Matrix4f;
 import com.morph.engine.math.MatrixUtils;
-
 import com.morph.engine.math.Vector2f;
 import com.morph.engine.physics.components.Transform2D;
 import com.morph.engine.script.ScriptContainer;
@@ -31,7 +30,6 @@ public class Engine extends OpenGame {
 	@Override
 	public void initGame() {
 		renderingEngine.setClearColor(0, 0, 0, 0);
-		GLRenderingEngine.setProjectionMatrix(MatrixUtils.getOrthographicProjectionMatrix(height, 0, 0, width, -5, 5));
 
 		testGUI = new EngineGUI(this, width, height);
 		testGUI.init();
@@ -91,5 +89,10 @@ public class Engine extends OpenGame {
 //		if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_GRAVE_ACCENT)) {
 //			toggleConsole();
 //		}
+	}
+
+	@Override
+	public Matrix4f getWorldProjection() {
+		return MatrixUtils.INSTANCE.getOrthographicProjectionMatrix(height, 0, 0, width, -5, 5);
 	}
 }

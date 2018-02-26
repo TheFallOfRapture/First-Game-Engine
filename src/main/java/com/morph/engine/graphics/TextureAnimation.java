@@ -51,9 +51,4 @@ public class TextureAnimation extends Component {
 
         accumulator += dt;
     }
-
-    @Override
-    public TextureAnimation clone() {
-        return new TextureAnimation(delay, frames);
-    }
 }

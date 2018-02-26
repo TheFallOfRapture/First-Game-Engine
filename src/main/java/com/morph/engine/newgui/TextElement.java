@@ -32,8 +32,8 @@ public class TextElement extends Element {
         this.size = size;
 
         if (!Objects.equals(text, "")) {
-            this.bottomLeft = getRenderData().getVertices().get(0).getPosition().getXY();
-            this.topRight = getRenderData().getVertices().get(getRenderData().getVertices().size() - 2).getPosition().getXY();
+            this.bottomLeft = getRenderData().getVertices().get(0).getPosition().getXy();
+            this.topRight = getRenderData().getVertices().get(getRenderData().getVertices().size() - 2).getPosition().getXy();
         }
     }
 

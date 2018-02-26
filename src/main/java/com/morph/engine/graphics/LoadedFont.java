@@ -20,6 +20,7 @@ public class LoadedFont {
     private static final int BITMAP_WIDTH = 1024, BITMAP_HEIGHT = 1024;
     public static final int SIZE = 64;
     public static final int CHAR_FIRST = 32, CHAR_LAST = 128;
+    public static final int CHARSET_RANGE = CHAR_LAST - CHAR_FIRST;
     private String fontName;
     private Integer[][] charIndices;
     private LoadedCharacter[] characters;
@@ -34,20 +35,20 @@ public class LoadedFont {
 
     static {
         StringBuilder temp = new StringBuilder();
-        for (int i = 0; i < CHAR_LAST; i++) {
-            temp.append((char) (i + CHAR_FIRST));
+        for (int i = CHAR_FIRST; i < CHAR_LAST; i++) {
+            temp.append((char)i);
         }
         CHARSET = temp.toString();
     }
 
     public LoadedFont(String font) {
         this.fontName = font;
-        this.charIndices = new Integer[CHAR_LAST - CHAR_FIRST][6];
-        this.characters = new LoadedCharacter[CHAR_LAST - CHAR_FIRST];
+        this.charIndices = new Integer[CHARSET_RANGE][6];
+        this.characters = new LoadedCharacter[CHARSET_RANGE];
 
         ByteBuffer pixels;
 
-        try (STBTTPackContext context = STBTTPackContext.malloc(); STBTTPackedchar.Buffer packedChars = STBTTPackedchar.malloc(96)) {
+        try (STBTTPackContext context = STBTTPackContext.malloc(); STBTTPackedchar.Buffer packedChars = STBTTPackedchar.malloc(CHARSET_RANGE)) {
             pixels = BufferUtils.createByteBuffer(LoadedFont.BITMAP_WIDTH * LoadedFont.BITMAP_HEIGHT);
 
             ByteBuffer fontBuffer = IOUtils.getFileAsByteBuffer(font, 160 * 1024);
@@ -60,7 +61,7 @@ public class LoadedFont {
             STBTruetype.stbtt_PackEnd(context);
 
             this.textureAtlas = new Texture(font, LoadedFont.BITMAP_WIDTH, LoadedFont.BITMAP_HEIGHT, pixels);
-            this.kerningTable = new float[CHARSET.length()][CHARSET.length()];
+            this.kerningTable = new float[CHARSET_RANGE][CHARSET_RANGE];
 
             preloadPackedChars(packedChars);
 
@@ -88,7 +89,7 @@ public class LoadedFont {
 
             this.ascent = ascent[0] * scale;
 
-            for (int i = 0; i < CHARSET.length(); i++) {
+            for (int i = 0; i < CHARSET_RANGE; i++) {
                 char c = CHARSET.charAt(i);
 
                 int[] xAdvance = new int[1], leftSideBearing = new int[1];
@@ -113,7 +114,7 @@ public class LoadedFont {
 
                 characters[c - CHAR_FIRST] = new LoadedCharacter(c, texCoords, indices, (float) xAdvance[0], offsetData);
 
-                CharBuffer.wrap(CHARSET.toCharArray()).chars().forEach(c2 -> kerningTable[c - 32][c2 - 32] = STBTruetype.stbtt_GetCodepointKernAdvance(fontInfo, c, c2) * scale);
+                CharBuffer.wrap(CHARSET.toCharArray()).chars().forEach(c2 -> kerningTable[c - CHAR_FIRST][c2 - CHAR_FIRST] = STBTruetype.stbtt_GetCodepointKernAdvance(fontInfo, c, c2) * scale);
             }
         } catch (IOException e) {
             e.printStackTrace();

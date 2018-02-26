@@ -48,8 +48,6 @@ public abstract class Game implements Runnable {
 	private Console console;
 	private ConsoleGUI consoleGUI;
 
-	public static Matrix4f screenOrtho;
-
 	public static final int VERSION_MAJOR = 0;
 	public static final int VERSION_MINOR = 6;
 	public static final int VERSION_PATCH = 0;
@@ -78,8 +76,6 @@ public abstract class Game implements Runnable {
 		this.fullscreen = fullscreen;
 		this.console = new Console(Console.ScriptType.KOTLIN, this);
 		this.consoleGUI = new ConsoleGUI(this, console, width, height);
-
-		Game.screenOrtho = getScreenOrtho();
 
 //		System.setOut(Console.out);
 	}
@@ -169,12 +165,14 @@ public abstract class Game implements Runnable {
 		addSystem(renderingEngine);
 		addSystem(scriptSystem);
 
-		display.init();
+		display.init(getWorldProjection());
 		display.show();
 
 		if (fullscreen)
 			display.setFullscreen(width, height);
 
+		renderingEngine.setWorldProjection(getWorldProjection());
+		renderingEngine.setScreenProjection(MatrixUtils.INSTANCE.getOrthographicProjectionMatrix(height, 0, 0, width, -1, 1));
 		initGame();
 
 		systems.forEach(GameSystem::initSystem);
@@ -356,6 +354,8 @@ public abstract class Game implements Runnable {
 
 	public abstract IWorld getWorld();
 
+	public abstract Matrix4f getWorldProjection();
+
 	public final void render() {
 		gameActionFeed.onNext(GameAction.RENDER);
 
@@ -364,10 +364,6 @@ public abstract class Game implements Runnable {
 
 	public boolean isRunning() {
 		return isRunning;
-	}
-
-	public Matrix4f getScreenOrtho() {
-		return MatrixUtils.getOrthographicProjectionMatrix(height, 0, 0, width, -1, 1);
 	}
 
 	public Console getConsole() {

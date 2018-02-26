@@ -18,7 +18,7 @@ abstract class Uniforms {
     }
 
     abstract fun defineUniforms(shader: Int)
-    abstract fun setUniforms(t: Transform, data: RenderData)
+    abstract fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f)
     abstract fun unbind(t: Transform, data: RenderData)
 
     protected fun addUniform(name: String, shader: Int) {

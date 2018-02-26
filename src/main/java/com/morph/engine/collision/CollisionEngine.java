@@ -189,7 +189,7 @@ public class CollisionEngine extends GameSystem {
 	@NotNull
 	private static SweepCollision getSweepCollision(Entity a, Entity b, BoundingBox2D boxB, Vector2f delta, Collision c) {
 		if (c != null) {
-			float time = MathUtils.clamp(c.getTime(), 0f, 1f);
+			float time = MathUtils.INSTANCE.clamp(c.getTime(), 0f, 1f);
 			Vector2f pos = boxB.getCenter().add(delta).scale(time);
 			Vector2f dir = delta.normalize();
 			Vector2f hitPos = c.getPosition().add(boxB.getHalfSize().mul(dir));
@@ -259,7 +259,7 @@ public class CollisionEngine extends GameSystem {
 		if (nearTime >= 1 || farTime <= 0)
 			return null;
 		
-		float time = MathUtils.clamp(nearTime, 0f, 1f);
+		float time = MathUtils.INSTANCE.clamp(nearTime, 0f, 1f);
 		Vector2f n;
 		if (nearTimeX > nearTimeY) {
 			n = new Vector2f(-signX, 0);
@@ -302,7 +302,7 @@ public class CollisionEngine extends GameSystem {
 		if (nearTime >= 1 || farTime <= 0)
 			return null;
 		
-		float time = MathUtils.clamp(nearTime, 0f, 1f);
+		float time = MathUtils.INSTANCE.clamp(nearTime, 0f, 1f);
 		Vector2f n;
 		if (nearTimeX > nearTimeY) {
 			n = new Vector2f(-signX, 0);
@@ -491,7 +491,7 @@ public class CollisionEngine extends GameSystem {
 		if (nearTime >= 1 || farTime <= 0)
 			return -1;
 		
-		return MathUtils.clamp(nearTime, 0f, 1f);
+		return MathUtils.INSTANCE.clamp(nearTime, 0f, 1f);
 	}
 	
 	public static boolean checkAgainstWorld(Vector2f point, List<Entity> entities) {

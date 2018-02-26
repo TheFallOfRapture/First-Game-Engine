@@ -22,11 +22,6 @@ public class TriggerComponent extends Component {
 	public Vector3f getNormal() {
 		return normal;
 	}
-
-	@Override
-	public TriggerComponent clone() {
-		return new TriggerComponent(other, normal);
-	}
 	
 	public boolean isHandled() {
 		return handled;

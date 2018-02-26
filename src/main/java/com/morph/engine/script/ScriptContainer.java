@@ -62,9 +62,4 @@ public class ScriptContainer extends Component {
     public List<EntityBehavior> getBehaviors() {
         return new ArrayList<>(behaviors.values());
     }
-
-    @Override
-    public Component clone() {
-        return null;
-    }
 }

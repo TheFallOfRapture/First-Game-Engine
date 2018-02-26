@@ -98,9 +98,4 @@ public class RigidBody extends Component {
 		velocity.set(0, 0);
 		acceleration.set(0, 0);
 	}
-	
-	@Override
-	public RigidBody clone() {
-		return new RigidBody(mass, velocity, acceleration, netForce);
-	}
 }

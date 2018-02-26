@@ -34,11 +34,6 @@ public class CollisionComponent extends Component {
 	public float getTime() {
 		return time;
 	}
-
-	@Override
-	public CollisionComponent clone() {
-		return new CollisionComponent(other, normal, distance, time);
-	}
 	
 	public boolean isHandled() {
 		return handled;

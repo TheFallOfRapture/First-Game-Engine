@@ -60,7 +60,7 @@ public class Transform2D extends Transform {
 
 	@Override
 	public void translate(Matrix4f translation) {
-		position = position.add(translation.asTranslationVector().getXY());
+		position = position.add(translation.asTranslationVector().getXy());
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public class Transform2D extends Transform {
 
 	@Override
 	public void scale(Matrix4f scaling) {
-		scale = scale.add(scaling.asScaleVector().getXY());
+		scale = scale.add(scaling.asScaleVector().getXy());
 	}
 	
 	public void translate(Vector2f translation) {
@@ -103,9 +103,5 @@ public class Transform2D extends Transform {
 
 	public void setScale(Vector2f scale) {
 		this.scale = scale;
-	}
-	
-	public Transform clone() {
-		return new Transform2D(position, orientation, scale);
 	}
 }

@@ -88,8 +88,4 @@ public class Transform3D extends Transform {
 	public void setScale(Vector3f scale) {
 		this.scale = scale;
 	}
-	
-	public Transform3D clone() {
-		return new Transform3D(position, orientation, scale);
-	}
 }

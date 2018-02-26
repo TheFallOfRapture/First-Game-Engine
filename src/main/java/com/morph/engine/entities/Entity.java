@@ -25,14 +25,6 @@ public class Entity implements Cloneable {
 		this.components = new ArrayList<>();
 	}
 
-	public Entity(Entity e, String name, int id) {
-		this.name = name;
-		this.id = id;
-		this.components = new ArrayList<>();
-		e.getAllComponents().forEach(c -> components.add(c.clone()));
-		components.forEach(c -> c.setParent(this));
-	}
-
 	public void addComponent(Component c) {
 		c.setParent(this);
 		components.add(c);

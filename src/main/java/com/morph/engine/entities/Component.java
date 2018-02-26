@@ -1,6 +1,6 @@
 package com.morph.engine.entities;
 
-public abstract class Component implements Cloneable {
+public abstract class Component {
 	protected Entity parent;
 	protected boolean initialized = false;
 	protected boolean requestDestroy = false;
@@ -31,6 +31,4 @@ public abstract class Component implements Cloneable {
 	
 	public void init() {}
 	public void destroy() {}
-	
-	public abstract Component clone();
 }

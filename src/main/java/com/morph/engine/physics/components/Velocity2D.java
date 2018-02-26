@@ -18,10 +18,6 @@ public class Velocity2D extends Component {
 		this(new Vector2f(0, 0));
 	}
 
-	@Override
-	public Component clone() {
-		return new Velocity2D(velocity);
-	}
 	
 	public Vector2f getVelocity() {
 		return velocity;

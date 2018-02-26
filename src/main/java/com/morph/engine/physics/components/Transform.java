@@ -16,8 +16,6 @@ public abstract class Transform extends Component {
 	public abstract Matrix4f getTranslationMatrix();
 	public abstract Matrix4f getRotationMatrix();
 	public abstract Matrix4f getScaleMatrix();
-	
-	public abstract Transform clone();
 
 	public Matrix4f transform(Transform transform) {
 		return transform.getTransformationMatrix().mul(this.getTransformationMatrix());

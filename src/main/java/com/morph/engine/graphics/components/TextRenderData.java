@@ -89,7 +89,7 @@ public class TextRenderData extends RenderData {
     }
 
     public void moveCursor(int pos) {
-        charCursorPosition = MathUtils.clamp(pos, 0, text.length() - 1);
+        charCursorPosition = MathUtils.INSTANCE.clamp(pos, 0, text.length() - 1);
     }
 
     public void removeCharacter(int index) {

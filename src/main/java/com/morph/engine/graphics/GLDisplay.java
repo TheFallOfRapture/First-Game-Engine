@@ -1,16 +1,18 @@
 package com.morph.engine.graphics;
 
-import com.morph.engine.util.Feed;
-import io.reactivex.Observable;
-import org.lwjgl.glfw.*;
-import org.lwjgl.opengl.GL;
-
 import com.morph.engine.input.Keyboard;
 import com.morph.engine.input.Mouse;
+import com.morph.engine.math.Matrix4f;
 import com.morph.engine.math.Vector2f;
+import com.morph.engine.util.Feed;
+import io.reactivex.Observable;
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.opengl.GL;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.system.MemoryUtil.*;
+import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class GLDisplay {
 	private long window;
@@ -30,7 +32,7 @@ public class GLDisplay {
 		this.title = title;
 	}
 	
-	public void init() {
+	public void init(Matrix4f projection) {
 		eventFeed.onNext(GLDisplayAction.OPEN);
 
 		GLFWErrorCallback.createPrint(System.err).set();
@@ -49,7 +51,7 @@ public class GLDisplay {
 		
 //		glfwSetWindowSizeCallback(window, (window, x, y) -> EventDispatcher.INSTANCE.dispatchEvent(new ResizeEvent(this, x, y, false)));
 		
-		glfwSetCursorPosCallback(window, (window, x, y) -> Mouse.INSTANCE.setMousePosition(window, new Vector2f(x, y)));
+		glfwSetCursorPosCallback(window, (window, x, y) -> Mouse.INSTANCE.setMousePosition(window, new Vector2f(x, y), projection));
 		
 		glfwSetMouseButtonCallback(window, Mouse.INSTANCE::handleMouseEvent);
 

@@ -8,17 +8,18 @@ import com.morph.engine.math.Matrix4f;
 import com.morph.engine.newgui.Element;
 import com.morph.engine.physics.components.Transform;
 
-import static org.lwjgl.system.MemoryUtil.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL13.*;
-import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class GLRenderingEngine extends GameSystem {
-	public static Matrix4f projectionMatrix = new Matrix4f();
+	private Matrix4f worldProjection = Matrix4f.empty();
+	private Matrix4f screenProjection = Matrix4f.empty();
 	private List<Entity> gameRenderables;
 	private List<Element> guiRenderables;
 
@@ -33,7 +34,7 @@ public class GLRenderingEngine extends GameSystem {
 			return;
 
 		data.getShader().bind();
-		data.getShader().getUniforms().setUniforms(transform, data);
+		data.getShader().getUniforms().setUniforms(transform, data, worldProjection, screenProjection);
 
 		glBindVertexArray(data.getVertexArrayObject());
 		glDrawElements(GL_TRIANGLES, data.getIndices().size(), GL_UNSIGNED_INT, NULL);
@@ -91,12 +92,11 @@ public class GLRenderingEngine extends GameSystem {
 	}
 
 	// TODO: Replace projection matrix loading with better implementation
-	public static void setProjectionMatrix(Matrix4f m) {
-		GLRenderingEngine.projectionMatrix = m;
+	public void setWorldProjection(Matrix4f m) {
+		worldProjection = m;
 	}
-
-	public static Matrix4f getProjectionMatrix() {
-		return GLRenderingEngine.projectionMatrix;
+	public void setScreenProjection(Matrix4f m) {
+		screenProjection = m;
 	}
 
 	public void setClearColor(float r, float g, float b, float a) {
