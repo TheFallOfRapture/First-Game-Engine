@@ -1,15 +1,14 @@
 package com.morph.engine.util;
 
 import com.morph.engine.core.Game;
-import com.morph.engine.script.debug.Console;
 import com.morph.engine.entities.Entity;
+import com.morph.engine.graphics.LoadedFont;
 import com.morph.engine.script.ConsoleScript;
 import com.morph.engine.script.EntityBehavior;
 import com.morph.engine.script.GameBehavior;
 import com.morph.engine.script.ScriptContainer;
+import com.morph.engine.script.debug.Console;
 import io.reactivex.*;
-import io.reactivex.Observable;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import org.jetbrains.kotlin.script.jsr223.KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory;
@@ -21,9 +20,13 @@ import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
-import static java.nio.file.StandardWatchEventKinds.*;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 /**
  * Created on 7/5/2017.
@@ -35,28 +38,35 @@ public class ScriptUtils {
     private static boolean isRunning;
     private static boolean initialized;
     private static Completable initTask;
-    private static Observable<GameBehavior> scriptUpdateTask;
-    private static Disposable scriptUpdaterHandle;
-    private static Game game;
     private static PublishSubject<Boolean> closeRequests = PublishSubject.create();
 
     private static final List<String> SCRIPT_ENGINE_EXTENSIONS = Collections.singletonList("kts");
 
     public static void init(Game game) {
-        initTask = Single.just(game).observeOn(Schedulers.io()).flatMapCompletable(g -> Completable.fromCallable(() -> ScriptUtils.load(g))).cache();
+        initTask = Single.just(game).flatMapCompletable(g -> Completable.fromCallable(() -> ScriptUtils.load(g))).cache();
 
-        initTask.subscribeOn(Schedulers.io()).subscribe(() -> scriptUpdaterHandle = Observable.create(ScriptUtils::runReactive)
+        Observable<GameBehavior> loadedScripts = initTask.subscribeOn(Schedulers.io())
+                .andThen(Observable.create(ScriptUtils::runReactive))
                 .map(event -> Paths.get("scripts/").resolve(event.context()).getFileName().toString())
-                .flatMapMaybe(ScriptUtils::getScriptBehaviorAsync)
-                .subscribe(behavior -> {
-                    if (behavior instanceof EntityBehavior) scriptedEntities.get(behavior.getName()).forEach(entity -> entity.getComponent(ScriptContainer.class).replaceBehavior(behavior.getName(), (EntityBehavior)behavior));
-                    else game.replaceBehavior(behavior.getName(), behavior);
-                }));
+                .flatMapMaybe(ScriptUtils::getScriptBehaviorAsync);
+
+        loadedScripts
+                .filter(EntityBehavior.class::isInstance)
+                .subscribe(behavior ->
+                        scriptedEntities.get(behavior.getName()).forEach(entity ->
+                                entity.getComponent(ScriptContainer.class).replaceBehavior(behavior.getName(), (EntityBehavior)behavior)));
+
+        loadedScripts
+                .filter(behavior -> !EntityBehavior.class.isInstance(behavior))
+                .subscribe(behavior -> game.replaceBehavior(behavior.getName(), behavior));
+
+//                .subscribe(behavior -> {
+//                    if (behavior instanceof EntityBehavior) scriptedEntities.get(behavior.getName()).forEach(entity -> entity.getComponent(ScriptContainer.class).replaceBehavior(behavior.getName(), (EntityBehavior)behavior));
+//                    else game.replaceBehavior(behavior.getName(), behavior);
+//                });
     }
 
     private static boolean load(Game game) {
-        ScriptUtils.game = game;
-
         Console.out.println("Morph Script Engine " + Game.VERSION_STRING + " initializing... Please wait...");
         KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory kotlinEngine = new KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory();
         PyScriptEngineFactory pythonEngine = new PyScriptEngineFactory();
@@ -76,10 +86,6 @@ public class ScriptUtils {
         Console.out.println("[Morph Script Engine " + Game.VERSION_STRING + "] Engine initialized.");
 
         return true;
-    }
-
-    public static void stopRx() {
-        scriptUpdaterHandle.dispose();
     }
 
     private static void runReactive(Emitter<WatchEvent<Path>> subscriber) {
@@ -112,6 +118,7 @@ public class ScriptUtils {
         }
     }
 
+    @Deprecated
     private static void run(Game game) {
         try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
             WatchKey key = Paths.get(System.getProperty("user.dir") + "/src/main/resources/scripts/").register(watchService, ENTRY_MODIFY);
@@ -123,6 +130,7 @@ public class ScriptUtils {
         }
     }
 
+    @Deprecated
     private static void start(Game game) {
         if (isRunning) return;
 
@@ -136,6 +144,7 @@ public class ScriptUtils {
         closeRequests.onNext(true);
     }
 
+    @Deprecated
     public static void pollEvents(WatchService watchService, Game game) {
         WatchKey key;
         if ((key = watchService.poll()) != null) {
@@ -185,7 +194,8 @@ public class ScriptUtils {
 
     private static void readScriptDI(String script, ScriptEngine engine, Console console) {
         try {
-            ConsoleScript behavior = (ConsoleScript) engine.eval(genScript(script), bindings);
+            String sanitizedScript = script.chars().mapToObj(c -> (char) c).filter(LoadedFont::isValidChar).map(String::valueOf).reduce(new StringBuilder(), StringBuilder::append, StringBuilder::append).toString();
+            ConsoleScript behavior = (ConsoleScript) engine.eval(genScript(sanitizedScript), bindings);
             behavior.setConsole(console);
             behavior.run();
         } catch (ScriptException e) {
@@ -214,7 +224,7 @@ public class ScriptUtils {
     }
 
     public static Maybe<GameBehavior> getScriptBehaviorAsync(String filename) {
-        return getScriptEngine(getFileExtension(filename)).flatMap(scriptEngine -> Maybe.just(getScriptBehaviorDI(filename, scriptEngine)));
+        return getScriptEngine(getFileExtension(filename)).observeOn(Schedulers.single()).flatMap(scriptEngine -> Maybe.just(getScriptBehaviorDI(filename, scriptEngine)));
     }
 
     private static <T extends GameBehavior> T getScriptBehaviorDI(String filename, ScriptEngine engine) {
@@ -252,6 +262,7 @@ public class ScriptUtils {
         return fullFilename.substring(fullFilename.indexOf(".") + 1);
     }
 
+    @Deprecated
     public static <T extends GameBehavior> T getScriptBehavior(String filename) {
         String extension = getFileExtension(filename);
         ScriptEngine engine = getScriptEngine(extension).blockingGet();
@@ -261,10 +272,6 @@ public class ScriptUtils {
 
     public static boolean isInitialized() {
         return initialized;
-    }
-
-    public static Observable<GameBehavior> getScriptUpdateTask() {
-        return scriptUpdateTask;
     }
 
     public static Completable getInitializationTask() {

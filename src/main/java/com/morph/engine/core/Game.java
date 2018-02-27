@@ -158,15 +158,21 @@ public abstract class Game implements Runnable {
 
 		ScriptUtils.init(this);
 
+		System.err.println("Game initialization should progress past this point without blocking.");
+
 		display = new GLDisplay(width, height, title);
 		renderingEngine = new GLRenderingEngine(this);
 		scriptSystem = new ScriptSystem(this);
+
+		System.err.println("Display, rendering engine, and script system have all been initialized.");
 
 		addSystem(renderingEngine);
 		addSystem(scriptSystem);
 
 		display.init(getWorldProjection());
 		display.show();
+
+		System.err.println("Systems added, display shown.");
 
 		if (fullscreen)
 			display.setFullscreen(width, height);
@@ -175,9 +181,15 @@ public abstract class Game implements Runnable {
 		renderingEngine.setScreenProjection(MatrixUtils.INSTANCE.getOrthographicProjectionMatrix(height, 0, 0, width, -1, 1));
 		initGame();
 
+		System.err.println("Initializing all systems...");
+
 		systems.forEach(GameSystem::initSystem);
 
+		System.err.println("All systems initialized. Initializing console...");
+
 		consoleGUI.init();
+
+		System.err.println("Console initialized.");
 
 		display.getEvents().filter(e -> e == GLDisplay.GLDisplayAction.CLOSE).subscribe(e -> handleExitEvent());
 
@@ -316,6 +328,7 @@ public abstract class Game implements Runnable {
 		behaviors.values().forEach(b -> b.fixedUpdate(dt));
 	}
 
+	@Deprecated
 	public void attachBehavior(String filename) {
 		GameBehavior behavior = ScriptUtils.getScriptBehavior(filename);
 

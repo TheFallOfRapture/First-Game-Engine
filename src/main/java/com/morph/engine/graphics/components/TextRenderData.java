@@ -1,6 +1,8 @@
 package com.morph.engine.graphics.components;
 
-import com.morph.engine.graphics.*;
+import com.morph.engine.graphics.Color;
+import com.morph.engine.graphics.LoadedCharacter;
+import com.morph.engine.graphics.LoadedFont;
 import com.morph.engine.graphics.shaders.Shader;
 import com.morph.engine.math.MathUtils;
 import com.morph.engine.math.Vector2f;
@@ -8,6 +10,8 @@ import com.morph.engine.math.Vector2f;
 import java.nio.CharBuffer;
 import java.util.Objects;
 import java.util.stream.IntStream;
+
+import static com.morph.engine.graphics.LoadedFont.CHARSET;
 
 /**
  * Created on 7/30/2017.
@@ -36,6 +40,10 @@ public class TextRenderData extends RenderData {
         }
 
         if (c == '\r') return;
+
+        System.out.println(c + " | " + ((int)c));
+
+        if (!CHARSET.contains(c + "")) return;
 
         LoadedCharacter charData = font.getCharacter(c);
         float[] offsetData = charData.getOffsetData();

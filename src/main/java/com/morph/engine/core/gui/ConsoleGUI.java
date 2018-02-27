@@ -1,16 +1,18 @@
 package com.morph.engine.core.gui;
 
 import com.morph.engine.core.Game;
-import com.morph.engine.input.Keyboard;
-import com.morph.engine.input.StdKeyEvent;
-import com.morph.engine.script.debug.Console;
 import com.morph.engine.graphics.Color;
 import com.morph.engine.graphics.Texture;
+import com.morph.engine.input.KeyPress;
+import com.morph.engine.input.Keyboard;
+import com.morph.engine.input.StdKeyEvent;
 import com.morph.engine.math.Vector2f;
 import com.morph.engine.newgui.ConsoleTextField;
 import com.morph.engine.newgui.GUI;
 import com.morph.engine.newgui.Panel;
 import com.morph.engine.newgui.TextField;
+import com.morph.engine.script.debug.Console;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.Objects;
 
@@ -69,6 +71,8 @@ public class ConsoleGUI extends GUI {
         if (isOpen()) {
             consoleInput.handleGUIKeyEvent(e);
         }
+
+        if (e.getAction() == KeyPress.INSTANCE && e.getKey() == GLFW.GLFW_KEY_GRAVE_ACCENT) getGame().toggleConsole();
     }
 
     private void onConsoleUpdate() {

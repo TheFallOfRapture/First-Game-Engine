@@ -5,14 +5,15 @@ import com.morph.engine.entities.Entity;
 import com.morph.engine.entities.EntityFactory;
 import com.morph.engine.graphics.Color;
 import com.morph.engine.graphics.shaders.TintShader;
-import com.morph.engine.input.*;
+import com.morph.engine.input.InputMapping;
+import com.morph.engine.input.KeyActions;
+import com.morph.engine.input.MouseActions;
 import com.morph.engine.math.Matrix4f;
 import com.morph.engine.math.MatrixUtils;
 import com.morph.engine.math.Vector2f;
 import com.morph.engine.physics.components.Transform2D;
 import com.morph.engine.script.ScriptContainer;
 import com.morph.engine.util.KotlinTestKt;
-import org.lwjgl.glfw.GLFW;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -21,15 +22,13 @@ public class Engine extends OpenGame {
 
 	public Engine(int width, int height, float fps, boolean fullscreen) {
 		super(width, height, "Game Engine", fps, fullscreen);
-
-		Keyboard.getStandardKeyEvents()
-				.filter(e -> e.getAction() == KeyPress.INSTANCE && e.getKey() == GLFW.GLFW_KEY_GRAVE_ACCENT)
-				.subscribe(e -> toggleConsole());
 	}
 
 	@Override
 	public void initGame() {
 		renderingEngine.setClearColor(0, 0, 0, 0);
+
+		System.err.println("Initializing game...");
 
 		testGUI = new EngineGUI(this, width, height);
 		testGUI.init();
@@ -41,6 +40,9 @@ public class Engine extends OpenGame {
 		Entity player = EntityFactory.getCustomTintRectangle("player", 20, 20, new Color(0, 1, 0), new TintShader());
 		player.getComponent(Transform2D.class).translate(new Vector2f(50, 50));
 		ScriptContainer sc = new ScriptContainer(this);
+
+		System.err.println("Most components have been initialized. Initializing scripts...");
+
 		player.addComponent(sc);
 		sc.addBehaviorAsync("EScript.kts");
 		sc.addBehaviorAsync("TestPythonScript.py");
@@ -64,6 +66,8 @@ public class Engine extends OpenGame {
 		input.mapButton(GLFW_MOUSE_BUTTON_2, MouseActions.RELEASE, () -> System.out.println("RELEASE RIGHT"));
 
 		input.link(this);
+
+		System.err.println("Game initialization complete.");
 	}
 
 	@Override
