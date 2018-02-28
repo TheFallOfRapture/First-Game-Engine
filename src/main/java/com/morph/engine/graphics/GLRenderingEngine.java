@@ -1,10 +1,12 @@
 package com.morph.engine.graphics;
 
+import com.morph.engine.core.Camera;
 import com.morph.engine.core.Game;
 import com.morph.engine.core.GameSystem;
 import com.morph.engine.entities.Entity;
 import com.morph.engine.graphics.components.RenderData;
 import com.morph.engine.math.Matrix4f;
+import com.morph.engine.math.MatrixUtils;
 import com.morph.engine.newgui.Element;
 import com.morph.engine.physics.components.Transform;
 
@@ -18,8 +20,8 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class GLRenderingEngine extends GameSystem {
-	private Matrix4f worldProjection = Matrix4f.empty();
-	private Matrix4f screenProjection = Matrix4f.empty();
+	private Matrix4f screenProjection;
+	private Camera camera;
 	private List<Entity> gameRenderables;
 	private List<Element> guiRenderables;
 
@@ -27,6 +29,7 @@ public class GLRenderingEngine extends GameSystem {
 		super(game);
 		this.gameRenderables = new ArrayList<>();
 		this.guiRenderables = new ArrayList<>();
+		this.screenProjection = MatrixUtils.INSTANCE.getOrthographicProjectionMatrix(game.getHeight(), 0, 0, game.getWidth(), -1, 1);
 	}
 
 	private void render(RenderData data, Transform transform) {
@@ -34,7 +37,7 @@ public class GLRenderingEngine extends GameSystem {
 			return;
 
 		data.getShader().bind();
-		data.getShader().getUniforms().setUniforms(transform, data, worldProjection, screenProjection);
+		data.getShader().getUniforms().setUniforms(transform, data, camera.getProjectionMatrix(), screenProjection);
 
 		glBindVertexArray(data.getVertexArrayObject());
 		glDrawElements(GL_TRIANGLES, data.getIndices().size(), GL_UNSIGNED_INT, NULL);
@@ -91,12 +94,8 @@ public class GLRenderingEngine extends GameSystem {
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 
-	// TODO: Replace projection matrix loading with better implementation
-	public void setWorldProjection(Matrix4f m) {
-		worldProjection = m;
-	}
-	public void setScreenProjection(Matrix4f m) {
-		screenProjection = m;
+	public void setCamera(Camera camera) {
+		this.camera = camera;
 	}
 
 	public void setClearColor(float r, float g, float b, float a) {

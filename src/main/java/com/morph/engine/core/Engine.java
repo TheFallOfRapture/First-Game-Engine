@@ -27,8 +27,7 @@ public class Engine extends OpenGame {
 	@Override
 	public void initGame() {
 		renderingEngine.setClearColor(0, 0, 0, 0);
-
-		System.err.println("Initializing game...");
+		setCamera(new OrthoCam2D(new Vector2f(0, 0), 20f, 20f));
 
 		testGUI = new EngineGUI(this, width, height);
 		testGUI.init();
@@ -40,8 +39,6 @@ public class Engine extends OpenGame {
 		Entity player = EntityFactory.getCustomTintRectangle("player", 20, 20, new Color(0, 1, 0), new TintShader());
 		player.getComponent(Transform2D.class).translate(new Vector2f(50, 50));
 		ScriptContainer sc = new ScriptContainer(this);
-
-		System.err.println("Most components have been initialized. Initializing scripts...");
 
 		player.addComponent(sc);
 		sc.addBehaviorAsync("EScript.kts");

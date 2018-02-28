@@ -8,7 +8,6 @@ import com.morph.engine.input.MousePress;
 import com.morph.engine.input.MouseRelease;
 import com.morph.engine.input.StdMouseEvent;
 import com.morph.engine.math.Matrix4f;
-import com.morph.engine.math.MatrixUtils;
 import com.morph.engine.math.Vector2f;
 import com.morph.engine.newgui.Container;
 import com.morph.engine.newgui.Element;
@@ -48,6 +47,8 @@ public abstract class Game implements Runnable {
 	private Console console;
 	private ConsoleGUI consoleGUI;
 
+	private Camera camera;
+
 	public static final int VERSION_MAJOR = 0;
 	public static final int VERSION_MINOR = 6;
 	public static final int VERSION_PATCH = 0;
@@ -76,6 +77,7 @@ public abstract class Game implements Runnable {
 		this.fullscreen = fullscreen;
 		this.console = new Console(Console.ScriptType.KOTLIN, this);
 		this.consoleGUI = new ConsoleGUI(this, console, width, height);
+		this.camera = Camera.Identity.INSTANCE;
 
 //		System.setOut(Console.out);
 	}
@@ -177,19 +179,11 @@ public abstract class Game implements Runnable {
 		if (fullscreen)
 			display.setFullscreen(width, height);
 
-		renderingEngine.setWorldProjection(getWorldProjection());
-		renderingEngine.setScreenProjection(MatrixUtils.INSTANCE.getOrthographicProjectionMatrix(height, 0, 0, width, -1, 1));
 		initGame();
-
-		System.err.println("Initializing all systems...");
 
 		systems.forEach(GameSystem::initSystem);
 
-		System.err.println("All systems initialized. Initializing console...");
-
 		consoleGUI.init();
-
-		System.err.println("Console initialized.");
 
 		display.getEvents().filter(e -> e == GLDisplay.GLDisplayAction.CLOSE).subscribe(e -> handleExitEvent());
 
@@ -407,5 +401,22 @@ public abstract class Game implements Runnable {
 
 	public Observable<GameAction> getEvents() {
 		return events;
+	}
+
+	public void setCamera(Camera camera) {
+		this.camera = camera;
+		renderingEngine.setCamera(camera);
+	}
+
+	public Camera getCamera() {
+		return camera;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public int getHeight() {
+		return height;
 	}
 }

@@ -41,9 +41,7 @@ public class TextRenderData extends RenderData {
 
         if (c == '\r') return;
 
-        System.out.println(c + " | " + ((int)c));
-
-        if (!CHARSET.contains(c + "")) return;
+        if (!CHARSET.contains(String.valueOf(c))) return;
 
         LoadedCharacter charData = font.getCharacter(c);
         float[] offsetData = charData.getOffsetData();
