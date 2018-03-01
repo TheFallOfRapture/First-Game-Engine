@@ -1,12 +1,9 @@
 package com.morph.engine.collision.components;
 
 import com.morph.engine.entities.Component;
-import com.morph.engine.entities.Entity;
-import com.morph.engine.entities.EntityRectangle;
 import com.morph.engine.math.Vector2f;
-import com.morph.engine.physics.components.Transform2D;
 
-public class BoundingBox2D extends Component {
+public class BoundingBox2D implements Component {
 	private Vector2f center;
 	private Vector2f halfSize;
 	private boolean isTrigger;
@@ -82,17 +79,6 @@ public class BoundingBox2D extends Component {
 	public Vector2f getMax() {
 		return center.add(halfSize);
 	}
-
-	public void update() {
-		Entity parent = getParent();
-		if (parent != null && parent.hasComponent(Transform2D.class)) {
-			if (parent instanceof EntityRectangle)
-				center = ((EntityRectangle) parent).getCenter();
-			else
-				center = parent.getComponent(Transform2D.class).getPosition();
-		}
-			
-	}
 	
 	public boolean isTrigger() {
 		return isTrigger;
@@ -100,5 +86,15 @@ public class BoundingBox2D extends Component {
 	
 	public void setTrigger(boolean isTrigger) {
 		this.isTrigger = isTrigger;
+	}
+
+	@Override
+	public void init() {
+
+	}
+
+	@Override
+	public void destroy() {
+
 	}
 }

@@ -3,6 +3,8 @@ package com.morph.engine.graphics.shaders
 import com.morph.engine.graphics.Color
 import com.morph.engine.graphics.Texture
 import com.morph.engine.graphics.components.RenderData
+import com.morph.engine.graphics.components.light.Light
+import com.morph.engine.graphics.components.light.PointLight
 import com.morph.engine.math.Matrix4f
 import com.morph.engine.physics.components.Transform
 
@@ -15,7 +17,7 @@ class BasicTexturedShaderUniforms : Uniforms() {
         addUniform("diffuse", shader)
     }
 
-    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f) {
+    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f, lights: List<Light>) {
         mvp = t.transformationMatrix
         diffuse = data.getTexture(0)
 
@@ -39,7 +41,7 @@ class GUIShaderUniforms : Uniforms() {
         addUniform("diffuse", shader)
     }
 
-    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f) {
+    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f, lights: List<Light>) {
         mvp = t.transformationMatrix
         diffuse = data.getTexture(0)
 
@@ -64,7 +66,7 @@ class GUITextShaderUniforms : Uniforms() {
         addUniform("diffuseColor", shader)
     }
 
-    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f) {
+    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f, lights: List<Light>) {
         mvp = t.transformationMatrix
         diffuse = data.getTexture(0)
 
@@ -90,7 +92,7 @@ class GUITintShaderUniforms : Uniforms() {
         addUniform("diffuseColor", shader)
     }
 
-    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f) {
+    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f, lights: List<Light>) {
         mvp = t.transformationMatrix
         diffuse = data.getTexture(0)
 
@@ -121,7 +123,7 @@ class GUITintTransitionShaderUniforms : Uniforms() {
         addUniform("lerpFactor", shader)
     }
 
-    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f) {
+    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f, lights: List<Light>) {
         this.mvp = t.transformationMatrix
         this.diff1 = data.getTexture(0)
         this.diff2 = data.getTexture(1)
@@ -157,7 +159,7 @@ class GUITransitionShaderUniforms : Uniforms() {
         addUniform("lerpFactor", shader)
     }
 
-    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f) {
+    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f, lights: List<Light>) {
         this.mvp = t.transformationMatrix
         this.diff1 = data.getTexture(0)
         this.diff2 = data.getTexture(1)
@@ -188,7 +190,7 @@ class TextShaderUniforms : Uniforms() {
         addUniform("diffuseColor", shader)
     }
 
-    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f) {
+    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f, lights: List<Light>) {
         mvp = t.transformationMatrix
         diffuse = data.getTexture(0)
 
@@ -214,7 +216,7 @@ class TintShaderUniforms : Uniforms() {
         addUniform("diffuseColor", shader)
     }
 
-    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f) {
+    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f, lights: List<Light>) {
         mvp = t.transformationMatrix
         diffuse = data.getTexture(0)
 
@@ -243,7 +245,7 @@ class TransitionShaderUniforms : Uniforms() {
         addUniform("lerpFactor", shader)
     }
 
-    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f) {
+    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f, lights: List<Light>) {
         this.mvp = t.transformationMatrix
         this.diff1 = data.getTexture(0)
         this.diff2 = data.getTexture(1)
@@ -261,6 +263,34 @@ class TransitionShaderUniforms : Uniforms() {
     override fun unbind(t: Transform, data: RenderData) {
         diff1.unbind()
         diff2.unbind()
+    }
+}
+
+class BasicLightShaderUniforms : Uniforms() {
+    private lateinit var mvp: Matrix4f
+    private lateinit var diffuse: Texture
+
+    override fun defineUniforms(shader: Int) {
+        addUniform("mvp", shader)
+        addUniform("diffuse", shader)
+        addUniform("diffuseColor", shader)
+        addUniform("lightPosition", shader)
+    }
+
+    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f, lights: List<Light>) {
+        mvp = t.transformationMatrix
+        diffuse = data.getTexture(0)
+
+        setUniformMatrix4fv("mvp", (mvp * world).transpose)
+        setUniform1i("diffuse", 0)
+        setUniform4f("diffuseColor", data.tint)
+        setUniform2f("lightPosition", (lights[0] as PointLight).localPosition.xy)
+
+        diffuse.bind()
+    }
+
+    override fun unbind(t: Transform, data: RenderData) {
+        diffuse.unbind()
     }
 }
 

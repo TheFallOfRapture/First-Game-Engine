@@ -1,21 +1,22 @@
 package com.morph.engine.collision;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.morph.engine.collision.components.BoundingBox2D;
 import com.morph.engine.collision.components.CollisionComponent;
 import com.morph.engine.collision.components.TriggerComponent;
 import com.morph.engine.core.Game;
 import com.morph.engine.core.GameSystem;
 import com.morph.engine.entities.Entity;
+import com.morph.engine.entities.EntityRectangle;
 import com.morph.engine.math.MathUtils;
 import com.morph.engine.math.Vector2f;
 import com.morph.engine.math.Vector3f;
+import com.morph.engine.physics.components.Transform2D;
 import com.morph.engine.physics.components.Velocity2D;
 import com.morph.engine.util.Feed;
 import io.reactivex.Observable;
-import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 // Reference: noonat.github.io/intersect/
 
@@ -29,7 +30,7 @@ public class CollisionEngine extends GameSystem {
 	}
 	
 	protected void fixedUpdate(Entity e, float dt) {
-		e.getComponent(BoundingBox2D.class).update();
+		updateCollider(e, e.getComponent(BoundingBox2D.class), e.getComponent(Transform2D.class));
 	}
 	
 	protected void systemFixedUpdate(float dt) {
@@ -43,12 +44,17 @@ public class CollisionEngine extends GameSystem {
 		
 		checkCollision(collidables, dt);
 	}
+
+	private static void updateCollider(Entity e, BoundingBox2D collider, Transform2D transform) {
+		if (e instanceof EntityRectangle) collider.setCenter(((EntityRectangle) e).getCenter());
+		else collider.setCenter(e.getComponent(Transform2D.class).getPosition());
+	}
 	
-	public static List<Collision> checkAgainstWorldStatic(BoundingBox2D boxA, List<Entity> entities) {
-		List<Collision> result = new ArrayList<>();
+	public static List<CollisionData> checkAgainstWorldStatic(BoundingBox2D boxA, List<Entity> entities) {
+		List<CollisionData> result = new ArrayList<>();
 		for (Entity other : entities) {
 			BoundingBox2D boxB = other.getComponent(BoundingBox2D.class);
-			Collision coll = checkDoubleStatic(boxA, boxB);
+			CollisionData coll = checkDoubleStatic(boxA, boxB);
 			if (coll != null)
 				result.add(coll);
 		}
@@ -56,30 +62,26 @@ public class CollisionEngine extends GameSystem {
 		return result;
 	}
 	
-	public static List<Collision> checkAgainstWorld(BoundingBox2D boxA, Vector2f velA, List<Entity> entities, float dt) {
-		List<Collision> result = new ArrayList<>();
+	public static List<CollisionData> checkAgainstWorld(BoundingBox2D boxA, Vector2f velA, List<Entity> entities, float dt) {
+		List<CollisionData> result = new ArrayList<>();
 
 		for (Entity entity : entities) {
 			BoundingBox2D boxB = entity.getComponent(BoundingBox2D.class);
 			Velocity2D vel2D = entity.getComponent(Velocity2D.class);
 			Vector2f velB = vel2D == null ? new Vector2f(0, 0) : vel2D.getVelocity();
 
-			Collision coll;
+			CollisionData coll;
 
 			if (velA.equals(new Vector2f(0, 0)) && velB.equals(new Vector2f(0, 0)))
 				coll = checkDoubleStatic(boxA, boxB);
 			else if (velA.equals(new Vector2f(0, 0)) && !velB.equals(new Vector2f(0, 0)))
-				coll = checkStaticDynamic(boxA, boxB, velB.scale(dt), boxB.getHalfSize());
+				coll = checkStaticDynamic(boxA, boxB, velB.scale(dt));
 			else if (!velA.equals(new Vector2f(0, 0)) && velB.equals(new Vector2f(0, 0)))
-				coll = checkStaticDynamic(boxB, boxA, velA.scale(dt), boxA.getHalfSize());
+				coll = checkStaticDynamic(boxB, boxA, velA.scale(dt));
 			else
-				coll = checkDoubleDynamic(boxA, boxB, velA, velB, boxB.getHalfSize(), dt);
+				coll = checkDoubleDynamic(boxA, boxB, velA, velB, dt);
 
 			if (coll != null) {
-				if (coll.getHit() == null) {
-					coll = new Collision(coll.getHit(), coll.getEntity(), coll.getPosition(), coll.getIntersection(), coll.getNormal(), coll.getTime());
-				}
-
 				result.add(coll);
 			}
 		}
@@ -98,10 +100,10 @@ public class CollisionEngine extends GameSystem {
 				
 				SweepCollision coll = checkCollision(a, b, dt);
 				
-				if (coll.getCollision() != null) { // Collision Solver
-					Vector2f delta = coll.getCollision().getIntersection();
+				if (coll != null) { // Collision Solver
+					Vector2f delta = coll.getCollisionData().getIntersection();
 					float distance = delta.getX() == 0 ? delta.getX() : delta.getY();
-					Vector3f normal = new Vector3f(coll.getCollision().getNormal(), 0);
+					Vector3f normal = new Vector3f(coll.getCollisionData().getNormal(), 0);
 					
 					if (!boxA.isTrigger() && !boxB.isTrigger())
 						solveCollision(coll);
@@ -116,22 +118,23 @@ public class CollisionEngine extends GameSystem {
 					else
 						a.addComponent(new CollisionComponent(b, normal, distance, coll.getTime()));
 
-					collisionFeed.onNext(coll.getCollision());
+					Collision collision = new Collision(a, b, coll.getCollisionData());
+					collisionFeed.onNext(collision);
 				}
 			}
 		}
 	}
 	
 	private void solveCollision(SweepCollision coll) {
-		Entity a = coll.getCollision().getEntity();
-		Entity b = coll.getCollision().getHit();
+		Entity a = coll.getEntity();
+		Entity b = coll.getHit();
 		
 		if (a.hasComponent(Velocity2D.class)) {
 			Velocity2D v2D = a.getComponent(Velocity2D.class);
 			
 			Vector2f vel = v2D.getVelocity();
-			Vector2f blockDir = coll.getCollision().getNormal().negate();
-			Vector2f remove = blockDir.scale(blockDir.dot(vel)).scale(1.0f - coll.getCollision().getTime());
+			Vector2f blockDir = coll.getCollisionData().getNormal().negate();
+			Vector2f remove = blockDir.scale(blockDir.dot(vel)).scale(1.0f - coll.getCollisionData().getTime());
 			
 			Vector2f newVelocity = vel.sub(remove);
 			
@@ -142,8 +145,8 @@ public class CollisionEngine extends GameSystem {
 			Velocity2D v2D = b.getComponent(Velocity2D.class);
 			
 			Vector2f vel = v2D.getVelocity();
-			Vector2f blockDir = coll.getCollision().getNormal();
-			Vector2f remove = blockDir.scale(blockDir.dot(vel)).scale(1.0f - coll.getCollision().getTime());
+			Vector2f blockDir = coll.getCollisionData().getNormal();
+			Vector2f remove = blockDir.scale(blockDir.dot(vel)).scale(1.0f - coll.getCollisionData().getTime());
 			
 			Vector2f newVelocity = vel.sub(remove);
 			
@@ -163,46 +166,43 @@ public class CollisionEngine extends GameSystem {
 		
 		if (vA.getX() == 0 && vA.getY() == 0) { // A STILL
 			if (vB.getX() == 0 && vB.getY() == 0) { // A STILL | B STILL
-				Collision c = checkDoubleStatic(boxA, boxB);
+				CollisionData c = checkDoubleStatic(boxA, boxB);
 				float time = c != null ? 0 : 1;
-				return new SweepCollision(c, boxB.getCenter(), time);
+				return new SweepCollision(a, b, c, boxB.getCenter(), time);
 			}
 			
 			// A STILL | B MOVING
 			Vector2f delta = vB.scale(dt);
-			Collision c = checkStaticDynamic(boxA, boxB, delta, boxB.getHalfSize());
+			CollisionData c = checkStaticDynamic(boxA, boxB, delta);
 			return getSweepCollision(a, b, boxB, delta, c);
 		}
 		
 		if (vB.getX() == 0 && vB.getY() == 0) { // A MOVING | B STILL
 			Vector2f delta = vA.scale(dt);
-			Collision c = checkStaticDynamic(boxB, boxA, delta, boxA.getHalfSize());
+			CollisionData c = checkStaticDynamic(boxB, boxA, delta);
 			return getSweepCollision(b, a, boxA, delta, c);
 		}
 		
 		// A MOVING | B MOVING (CALCULATE AS IF A WAS STILL)
 		Vector2f delta = vB.sub(vA).scale(dt);
-		Collision c = checkDoubleDynamic(boxA, boxB, vA, vB, boxB.getHalfSize(), dt);
+		CollisionData c = checkDoubleDynamic(boxA, boxB, vA, vB, dt);
 		return getSweepCollision(a, b, boxB, delta, c);
 	}
 
-	@NotNull
-	private static SweepCollision getSweepCollision(Entity a, Entity b, BoundingBox2D boxB, Vector2f delta, Collision c) {
+	private static SweepCollision getSweepCollision(Entity a, Entity b, BoundingBox2D boxB, Vector2f delta, CollisionData c) {
 		if (c != null) {
 			float time = MathUtils.INSTANCE.clamp(c.getTime(), 0f, 1f);
 			Vector2f pos = boxB.getCenter().add(delta).scale(time);
 			Vector2f dir = delta.normalize();
 			Vector2f hitPos = c.getPosition().add(boxB.getHalfSize().mul(dir));
-			Collision newC = new Collision(a, b, hitPos, c.getIntersection(), c.getNormal(), time);
-			return new SweepCollision(newC, pos, time);
+			CollisionData newC = new CollisionData(hitPos, c.getIntersection(), c.getNormal(), time);
+			return new SweepCollision(a, b, newC, pos, time);
 		} else {
-			Vector2f pos = boxB.getCenter().add(delta);
-			float time = 1;
-			return new SweepCollision(null, pos, time);
+			return null;
 		}
 	}
 
-	private static Collision checkDoubleStatic(BoundingBox2D a, BoundingBox2D b) {
+	private static CollisionData checkDoubleStatic(BoundingBox2D a, BoundingBox2D b) {
 		Vector2f delta = b.getCenter().sub(a.getCenter());
 		Vector2f proj = b.getHalfSize().add(a.getHalfSize()).sub(delta.abs());
 		
@@ -225,11 +225,12 @@ public class CollisionEngine extends GameSystem {
 			pos = new Vector2f(b.getCenter().getX(), a.getCenter().getY() + (a.getHalfSize().getY() * signY));
 		}
 		
-		return new Collision(a.getParent(), b.getParent(), pos, inter, n, 0);
+		return new CollisionData(pos, inter, n, 0);
 	}
 	
-	private static Collision checkDoubleDynamic(BoundingBox2D boxA, BoundingBox2D boxB, Vector2f velA, Vector2f velB, Vector2f padding, float dt) {
+	private static CollisionData checkDoubleDynamic(BoundingBox2D boxA, BoundingBox2D boxB, Vector2f velA, Vector2f velB, float dt) {
 		Vector2f delta = velB.sub(velA).scale(dt);
+		Vector2f padding = boxB.getHalfSize();
 		
 		Vector2f position = boxB.getCenter();
 		
@@ -270,11 +271,12 @@ public class CollisionEngine extends GameSystem {
 		Vector2f inter = delta.scale(time);
 		Vector2f pos = position.add(delta);
 		
-		return new Collision(boxA.getParent(), boxB.getParent(), pos, inter, n, time);
+		return new CollisionData(pos, inter, n, time);
 	}
 	
-	private static Collision checkStaticDynamic(BoundingBox2D boxStill, BoundingBox2D boxMoving, Vector2f delta, Vector2f padding) {
+	private static CollisionData checkStaticDynamic(BoundingBox2D boxStill, BoundingBox2D boxMoving, Vector2f delta) {
 		Vector2f position = boxMoving.getCenter();
+		Vector2f padding = boxMoving.getHalfSize();
 		
 		float scaleX = 1.0f / delta.getX();
 		float scaleY = 1.0f / delta.getY();
@@ -313,7 +315,7 @@ public class CollisionEngine extends GameSystem {
 		Vector2f inter = delta.scale(time);
 		Vector2f pos = position.add(delta);
 		
-		return new Collision(boxStill.getParent(), boxMoving.getParent(), pos, inter, n, time);
+		return new CollisionData(pos, inter, n, time);
 	}
 	
 	public void update(List<Entity> entities, float dt) {
@@ -366,8 +368,8 @@ public class CollisionEngine extends GameSystem {
 //					System.out.println(a.getBoundingBox().getCenter() + " : " + b.getBoundingBox().getCenter() + " : " + (colliding ? "YES" : "NO"));
 
 					if (colliding) {
-						Entity e1 = boundingBoxes.get(i).getParent();
-						Entity e2 = boundingBoxes.get(j).getParent();
+						Entity e1 = a.getEntity();
+						Entity e2 = b.getEntity();
 
 						Vector2f e1Center = boundingBoxes.get(i).getCenter();
 						Vector2f e2Center = boundingBoxes.get(j).getCenter();
@@ -427,8 +429,8 @@ public class CollisionEngine extends GameSystem {
 				if (collisionTime <= 0.0f)
 					continue;
 
-				Entity e1 = boundingBoxSweeps.get(i).getBoundingBox().getParent();
-				Entity e2 = boundingBoxSweeps.get(j).getBoundingBox().getParent();
+				Entity e1 = boundingBoxSweeps.get(i).getEntity();
+				Entity e2 = boundingBoxSweeps.get(j).getEntity();
 
 				Vector2f e1Center = boundingBoxes.get(i).getCenter();
 				Vector2f e2Center = boundingBoxes.get(j).getCenter();

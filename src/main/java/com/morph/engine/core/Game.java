@@ -160,21 +160,15 @@ public abstract class Game implements Runnable {
 
 		ScriptUtils.init(this);
 
-		System.err.println("Game initialization should progress past this point without blocking.");
-
 		display = new GLDisplay(width, height, title);
 		renderingEngine = new GLRenderingEngine(this);
 		scriptSystem = new ScriptSystem(this);
-
-		System.err.println("Display, rendering engine, and script system have all been initialized.");
 
 		addSystem(renderingEngine);
 		addSystem(scriptSystem);
 
 		display.init(getWorldProjection());
 		display.show();
-
-		System.err.println("Systems added, display shown.");
 
 		if (fullscreen)
 			display.setFullscreen(width, height);

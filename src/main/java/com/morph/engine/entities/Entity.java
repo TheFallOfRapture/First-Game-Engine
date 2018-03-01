@@ -26,7 +26,6 @@ public class Entity implements Cloneable {
 	}
 
 	public void addComponent(Component c) {
-		c.setParent(this);
 		components.add(c);
 		c.init();
 	}
@@ -35,7 +34,6 @@ public class Entity implements Cloneable {
 		if (c instanceof BoundingBox2D && !((BoundingBox2D) c).isTrigger())
 			System.out.println("?!");
 
-		c.setParent(null);
 		components.remove(c);
 		c.destroy();
 	}

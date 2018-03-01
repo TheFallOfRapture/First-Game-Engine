@@ -1,13 +1,13 @@
 package com.morph.engine.physics;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.morph.engine.core.Game;
 import com.morph.engine.entities.Entity;
 import com.morph.engine.math.Vector2f;
 import com.morph.engine.physics.components.RigidBody;
 import com.morph.engine.physics.components.Transform;
+
+import java.util.ArrayList;
+import java.util.List;
 
 // TODO: This class cannot be present in the Engine package with an immutable gravity factor!
 public class PhysicsEngine {
@@ -22,12 +22,13 @@ public class PhysicsEngine {
 			if (e.hasComponent(RigidBody.class))
 				rigidBodies.add(e.getComponent(RigidBody.class));
 				
-		updateRigidBodies(rigidBodies, dt);
+		updateRigidBodies(entities, dt);
 	}
 	
-	public void updateRigidBodies(List<RigidBody> rigidBodies, float dt) {
-		for (RigidBody rb: rigidBodies) {
-			Transform t = rb.getParent().getComponent(Transform.class);
+	public void updateRigidBodies(List<Entity> entities, float dt) {
+		for (Entity e : entities) {
+			RigidBody rb = e.getComponent(RigidBody.class);
+			Transform t = e.getComponent(Transform.class);
 			updateRigidBody(rb, t, dt);
 		}
 	}

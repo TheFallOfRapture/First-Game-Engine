@@ -2,6 +2,7 @@ package com.morph.engine.script;
 
 import com.morph.engine.core.Game;
 import com.morph.engine.entities.Component;
+import com.morph.engine.entities.Entity;
 import com.morph.engine.util.ScriptUtils;
 
 import java.util.ArrayList;
@@ -11,13 +12,15 @@ import java.util.List;
 /**
  * Created on 7/5/2017.
  */
-public class ScriptContainer extends Component {
+public class ScriptContainer implements Component {
     private HashMap<String, EntityBehavior> behaviors;
     private Game game;
+    private Entity parent;
 
-    public ScriptContainer(Game game) {
+    public ScriptContainer(Game game, Entity parent) {
         behaviors = new HashMap<>();
         this.game = game;
+        this.parent = parent;
     }
 
     public void addBehavior(String filename) {
@@ -35,6 +38,7 @@ public class ScriptContainer extends Component {
         });
     }
 
+    @Deprecated
     private void addBehaviorStrict(String filename) {
         EntityBehavior behavior = ScriptUtils.getScriptBehavior(filename);
         behavior.setGame(game);

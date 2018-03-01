@@ -5,6 +5,7 @@ import com.morph.engine.core.Game;
 import com.morph.engine.core.GameSystem;
 import com.morph.engine.entities.Entity;
 import com.morph.engine.graphics.components.RenderData;
+import com.morph.engine.graphics.components.light.Light;
 import com.morph.engine.math.Matrix4f;
 import com.morph.engine.math.MatrixUtils;
 import com.morph.engine.newgui.Element;
@@ -24,12 +25,14 @@ public class GLRenderingEngine extends GameSystem {
 	private Camera camera;
 	private List<Entity> gameRenderables;
 	private List<Element> guiRenderables;
+	private List<Light> lights;
 
 	public GLRenderingEngine(Game game) {
 		super(game);
 		this.gameRenderables = new ArrayList<>();
 		this.guiRenderables = new ArrayList<>();
-		this.screenProjection = MatrixUtils.INSTANCE.getOrthographicProjectionMatrix(game.getHeight(), 0, 0, game.getWidth(), -1, 1);
+		this.lights = new ArrayList<>();
+		this.screenProjection = MatrixUtils.getOrthographicProjectionMatrix(game.getHeight(), 0, 0, game.getWidth(), -1, 1);
 	}
 
 	private void render(RenderData data, Transform transform) {
@@ -37,7 +40,7 @@ public class GLRenderingEngine extends GameSystem {
 			return;
 
 		data.getShader().bind();
-		data.getShader().getUniforms().setUniforms(transform, data, camera.getProjectionMatrix(), screenProjection);
+		data.getShader().getUniforms().setUniforms(transform, data, camera.getProjectionMatrix(), screenProjection, lights);
 
 		glBindVertexArray(data.getVertexArrayObject());
 		glDrawElements(GL_TRIANGLES, data.getIndices().size(), GL_UNSIGNED_INT, NULL);
@@ -50,7 +53,6 @@ public class GLRenderingEngine extends GameSystem {
 	private void render(Entity e) {
 		render(e.getComponent(RenderData.class), e.getComponent(Transform.class));
 	}
-
 	private void render(Element e) {
 		render(e.getRenderData(), e.getTransform());
 	}
@@ -58,24 +60,29 @@ public class GLRenderingEngine extends GameSystem {
 	public void register(Entity e) {
 		gameRenderables.add(0, e);
 	}
-
-	public boolean unregister(Entity e) {
-		return gameRenderables.remove(e);
+	public void unregister(Entity e) {
+		gameRenderables.remove(e);
 	}
 
 	public void register(Element e) {
 		guiRenderables.add(0, e);
 	}
-
 	public void unregister(Element e) {
 		guiRenderables.remove(e);
+	}
+
+	public void addLight(Light l) {
+		lights.add(l);
+	}
+
+	public void removeLight(Light l) {
+		lights.remove(l);
 	}
 
 	public void render(GLDisplay display) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		gameRenderables.forEach(this::render);
-//		System.out.println("There are " + gameRenderables.size() + " entities currently being rendered.");
 		guiRenderables.sort((e1, e2) -> e2.getDepth() - e1.getDepth());
 		guiRenderables.forEach(this::render);
 

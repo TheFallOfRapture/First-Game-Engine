@@ -1,7 +1,7 @@
 package com.morph.engine.math
 
 object MatrixUtils {
-    fun getOrthographicProjectionMatrix(top: Float, bottom: Float, left: Float, right: Float, near: Float, far: Float): Matrix4f {
+    @JvmStatic fun getOrthographicProjectionMatrix(top: Float, bottom: Float, left: Float, right: Float, near: Float, far: Float): Matrix4f {
         return Matrix4f(
                 2f / (right - left), 0f, 0f, -((right + left) / (right - left)),
                 0f, 2f / (top - bottom), 0f, -((top + bottom) / (top - bottom)),

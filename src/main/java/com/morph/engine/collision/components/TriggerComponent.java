@@ -4,7 +4,7 @@ import com.morph.engine.entities.Component;
 import com.morph.engine.entities.Entity;
 import com.morph.engine.math.Vector3f;
 
-public class TriggerComponent extends Component {
+public class TriggerComponent implements Component {
 	private Entity other;
 	private boolean handled;
 	private Vector3f normal;

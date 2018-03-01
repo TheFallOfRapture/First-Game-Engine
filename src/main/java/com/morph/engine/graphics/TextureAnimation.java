@@ -9,16 +9,17 @@ import java.util.stream.Collectors;
 /**
  * Created by Fernando on 1/18/2017.
  */
-public class TextureAnimation extends Component {
+public class TextureAnimation implements Component {
     private Texture[] frames;
     private float delay;
     private float accumulator;
     private int counter;
     private final int numFrames;
-    private RenderData renderDataRef;
+    private RenderData data;
 
-    public TextureAnimation(float delay, String... files) {
+    public TextureAnimation(RenderData data, float delay, String... files) {
         Arrays.stream(files).map(Texture::new).collect(Collectors.toList()).toArray(frames);
+        this.data = data;
         this.delay = delay;
         this.accumulator = delay;
         this.counter = 0;
@@ -34,12 +35,8 @@ public class TextureAnimation extends Component {
     }
 
     public void update(float dt) {
-        if (renderDataRef == null) {
-            renderDataRef = parent.getComponent(RenderData.class);
-        }
-
         if (accumulator >= delay) {
-            renderDataRef.setTexture(frames[counter], 0);
+            data.setTexture(frames[counter], 0);
 
             accumulator = 0;
             counter++;

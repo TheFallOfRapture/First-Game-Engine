@@ -4,13 +4,15 @@ import com.morph.engine.core.gui.EngineGUI;
 import com.morph.engine.entities.Entity;
 import com.morph.engine.entities.EntityFactory;
 import com.morph.engine.graphics.Color;
-import com.morph.engine.graphics.shaders.TintShader;
+import com.morph.engine.graphics.components.light.PointLight;
+import com.morph.engine.graphics.shaders.BasicLightShader;
 import com.morph.engine.input.InputMapping;
 import com.morph.engine.input.KeyActions;
 import com.morph.engine.input.MouseActions;
 import com.morph.engine.math.Matrix4f;
 import com.morph.engine.math.MatrixUtils;
 import com.morph.engine.math.Vector2f;
+import com.morph.engine.math.Vector3f;
 import com.morph.engine.physics.components.Transform2D;
 import com.morph.engine.script.ScriptContainer;
 import com.morph.engine.util.KotlinTestKt;
@@ -29,6 +31,8 @@ public class Engine extends OpenGame {
 		renderingEngine.setClearColor(0, 0, 0, 0);
 		setCamera(new OrthoCam2D(new Vector2f(0, 0), 20f, 20f));
 
+		renderingEngine.addLight(new PointLight(10f, new Color(1f, 1f, 1f), new Vector3f(0f, 0f, 0f)));
+
 		testGUI = new EngineGUI(this, width, height);
 		testGUI.init();
 
@@ -36,9 +40,9 @@ public class Engine extends OpenGame {
 
 		KotlinTestKt.printMsg("Hello, world! Kotlin 1.1.1 is working in Morph 0.5.0!");
 
-		Entity player = EntityFactory.getCustomTintRectangle("player", 20, 20, new Color(0, 1, 0), new TintShader());
+		Entity player = EntityFactory.getCustomTintRectangle("player", 100, 100, new Color(0, 1, 0), new BasicLightShader());
 		player.getComponent(Transform2D.class).translate(new Vector2f(50, 50));
-		ScriptContainer sc = new ScriptContainer(this);
+		ScriptContainer sc = new ScriptContainer(this, player);
 
 		player.addComponent(sc);
 		sc.addBehaviorAsync("EScript.kts");

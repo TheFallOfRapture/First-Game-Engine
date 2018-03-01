@@ -2,7 +2,9 @@ package com.morph.engine.graphics.shaders
 
 import com.morph.engine.graphics.Color
 import com.morph.engine.graphics.components.RenderData
+import com.morph.engine.graphics.components.light.Light
 import com.morph.engine.math.Matrix4f
+import com.morph.engine.math.Vector2f
 import com.morph.engine.math.Vector3f
 import com.morph.engine.math.Vector4f
 import com.morph.engine.physics.components.Transform
@@ -18,7 +20,7 @@ abstract class Uniforms {
     }
 
     abstract fun defineUniforms(shader: Int)
-    abstract fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f)
+    abstract fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f, lights: List<Light>)
     abstract fun unbind(t: Transform, data: RenderData)
 
     protected fun addUniform(name: String, shader: Int) {
@@ -34,6 +36,11 @@ abstract class Uniforms {
     fun setUniform1f(name: String, value: Float) {
         val location = uniforms[name]
         location?.let { glUniform1f(it, value) }
+    }
+
+    fun setUniform2f(name: String, value: Vector2f) {
+        val location = uniforms[name]
+        location?.let { glUniform2f(it, value.x, value.y) }
     }
 
     fun setUniform3f(name: String, value: Vector3f) {

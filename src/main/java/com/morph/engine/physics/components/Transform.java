@@ -4,7 +4,7 @@ import com.morph.engine.entities.Component;
 import com.morph.engine.math.Matrix4f;
 import com.morph.engine.math.Quaternion;
 
-public abstract class Transform extends Component {
+public abstract class Transform implements Component {
 	public Matrix4f getTransformationMatrix() {
 		return getScaleMatrix().mul(getRotationMatrix()).mul(getTranslationMatrix());
 	}
