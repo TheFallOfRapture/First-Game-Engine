@@ -4,8 +4,25 @@ import com.morph.engine.entities.Component
 import com.morph.engine.graphics.Color
 import com.morph.engine.math.Quaternion
 import com.morph.engine.math.Vector3f
+import com.morph.engine.physics.components.Transform
 
 sealed class Light(var brightness: Float, var color: Color)
 class DirectionalLight(brightness: Float, color: Color) : Light(brightness, color)
-class PointLight(brightness: Float, color: Color, var localPosition: Vector3f) : Light(brightness, color), Component
-class SpotLight(brightness: Float, color: Color, var localPosition: Vector3f, var localRotation: Quaternion, var angle: Float) : Light(brightness, color), Component
+
+sealed class SceneLight(brightness: Float, color: Color, var parentTransform: Transform) : Light(brightness, color), Component
+
+class PointLight @JvmOverloads constructor(
+        brightness: Float,
+        color: Color,
+        parentTransform: Transform = Transform.identity(),
+        var localPosition: Vector3f
+) : SceneLight(brightness, color, parentTransform)
+
+class SpotLight @JvmOverloads constructor(
+        brightness: Float,
+        color: Color,
+        parentTransform: Transform = Transform.identity(),
+        var localPosition: Vector3f,
+        var localRotation: Quaternion,
+        var angle: Float
+) : SceneLight(brightness, color, parentTransform)

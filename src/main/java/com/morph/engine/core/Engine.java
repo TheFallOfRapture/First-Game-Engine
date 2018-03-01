@@ -12,7 +12,6 @@ import com.morph.engine.input.MouseActions;
 import com.morph.engine.math.Vector2f;
 import com.morph.engine.math.Vector3f;
 import com.morph.engine.physics.components.Transform2D;
-import com.morph.engine.script.ScriptContainer;
 import com.morph.engine.util.KotlinTestKt;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -40,17 +39,17 @@ public class Engine extends OpenGame {
 
 		KotlinTestKt.printMsg("Hello, world! Kotlin 1.1.1 is working in Morph 0.5.0!");
 
-		Entity player = EntityFactory.getCustomTintRectangle("player", 500, 500, new Color(1, 1, 1), new BasicLightShader());
-		ScriptContainer sc = new ScriptContainer(this, player);
-
-		player.addComponent(sc);
-		sc.addBehaviorAsync("EScript.kts");
-		sc.addBehaviorAsync("TestPythonScript.py");
-
-		addEntity(player);
-
-		attachBehaviorAsync("TestBehavior.kts");
-		attachBehaviorAsync("TestBehavior2.kts");
+//		Entity player = EntityFactory.getCustomTintRectangle("player", 500, 500, new Color(1, 1, 1), new BasicLightShader());
+//		ScriptContainer sc = new ScriptContainer(this, player);
+//
+//		player.addComponent(sc);
+//		sc.addBehaviorAsync("EScript.kts");
+//		sc.addBehaviorAsync("TestPythonScript.py");
+//
+//		addEntity(player);
+//
+//		attachBehaviorAsync("TestBehavior.kts");
+//		attachBehaviorAsync("TestBehavior2.kts");
 
 		Entity a = EntityFactory.getCustomTintRectangle("a", 2, 2, new Color(1, 0, 0), new BasicLightShader());
 		Entity b = EntityFactory.getCustomTintRectangle("b", 2, 2, new Color(0, 1, 0), new BasicLightShader());

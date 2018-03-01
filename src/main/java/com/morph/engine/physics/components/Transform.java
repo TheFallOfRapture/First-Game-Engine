@@ -20,4 +20,32 @@ public abstract class Transform implements Component {
 	public Matrix4f transform(Transform transform) {
 		return transform.getTransformationMatrix().mul(this.getTransformationMatrix());
 	}
+
+	public static Transform identity() {
+		return new Transform() {
+			@Override
+			public void translate(Matrix4f translation) { }
+
+			@Override
+			public void rotate(Quaternion rotation) {}
+
+			@Override
+			public void scale(Matrix4f scale) {}
+
+			@Override
+			public Matrix4f getTranslationMatrix() {
+				return Matrix4f.identity();
+			}
+
+			@Override
+			public Matrix4f getRotationMatrix() {
+				return Matrix4f.identity();
+			}
+
+			@Override
+			public Matrix4f getScaleMatrix() {
+				return Matrix4f.identity();
+			}
+		};
+	}
 }
