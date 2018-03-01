@@ -1,8 +1,8 @@
 package com.morph.engine.graphics;
 
+import com.morph.engine.core.Camera;
 import com.morph.engine.input.Keyboard;
 import com.morph.engine.input.Mouse;
-import com.morph.engine.math.Matrix4f;
 import com.morph.engine.math.Vector2f;
 import com.morph.engine.util.Feed;
 import io.reactivex.Observable;
@@ -32,7 +32,7 @@ public class GLDisplay {
 		this.title = title;
 	}
 	
-	public void init(Matrix4f projection) {
+	public void init(Camera camera) {
 		eventFeed.onNext(GLDisplayAction.OPEN);
 
 		GLFWErrorCallback.createPrint(System.err).set();
@@ -51,7 +51,7 @@ public class GLDisplay {
 		
 //		glfwSetWindowSizeCallback(window, (window, x, y) -> EventDispatcher.INSTANCE.dispatchEvent(new ResizeEvent(this, x, y, false)));
 		
-		glfwSetCursorPosCallback(window, (window, x, y) -> Mouse.INSTANCE.setMousePosition(window, new Vector2f(x, y), projection));
+		glfwSetCursorPosCallback(window, (window, x, y) -> Mouse.INSTANCE.setMousePosition(window, new Vector2f(x, y), camera));
 		
 		glfwSetMouseButtonCallback(window, Mouse.INSTANCE::handleMouseEvent);
 

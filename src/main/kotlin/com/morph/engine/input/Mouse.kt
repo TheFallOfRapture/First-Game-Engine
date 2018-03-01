@@ -1,5 +1,6 @@
 package com.morph.engine.input
 
+import com.morph.engine.core.Camera
 import com.morph.engine.math.Matrix4f
 import com.morph.engine.math.Vector2f
 import com.morph.engine.math.Vector4f
@@ -39,7 +40,7 @@ object Mouse {
         }
     }
 
-    fun setMousePosition(window: Long, v: Vector2f, projection: Matrix4f) {
+    fun setMousePosition(window: Long, v: Vector2f, camera: Camera) {
         val widthBuffer = BufferUtils.createIntBuffer(1)
         val heightBuffer = BufferUtils.createIntBuffer(1)
         glfwGetWindowSize(window, widthBuffer, heightBuffer)
@@ -51,7 +52,7 @@ object Mouse {
         screenMousePosition.onNext(currentScreenPos)
 
         if (screenToWorld == Matrix4f.empty()) {
-            screenToWorld = projection.inverse
+            screenToWorld = camera.projectionMatrix.inverse
         }
 
         val normalizedMousePos = currentScreenPos.div(Vector2f(width / 2f, height / 2f)).sub(Vector2f(1f, 1f)).mul(Vector2f(1f, -1f))

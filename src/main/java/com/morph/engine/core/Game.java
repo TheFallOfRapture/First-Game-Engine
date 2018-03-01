@@ -7,7 +7,6 @@ import com.morph.engine.input.Mouse;
 import com.morph.engine.input.MousePress;
 import com.morph.engine.input.MouseRelease;
 import com.morph.engine.input.StdMouseEvent;
-import com.morph.engine.math.Matrix4f;
 import com.morph.engine.math.Vector2f;
 import com.morph.engine.newgui.Container;
 import com.morph.engine.newgui.Element;
@@ -167,7 +166,7 @@ public abstract class Game implements Runnable {
 		addSystem(renderingEngine);
 		addSystem(scriptSystem);
 
-		display.init(getWorldProjection());
+		display.init(camera);
 		display.show();
 
 		if (fullscreen)
@@ -354,8 +353,6 @@ public abstract class Game implements Runnable {
 	public abstract void handleInput();
 
 	public abstract IWorld getWorld();
-
-	public abstract Matrix4f getWorldProjection();
 
 	public final void render() {
 		gameActionFeed.onNext(GameAction.RENDER);

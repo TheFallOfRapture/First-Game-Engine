@@ -4,12 +4,15 @@ layout(location = 1) in vec4 color;
 layout(location = 2) in vec2 texCoord;
 
 uniform mat4 mvp;
+uniform mat4 world;
 
 out vec4 fragColor;
 out vec2 textureCoord;
+out vec3 worldPos;
 
 void main() {
   gl_Position = mvp * vec4(position, 1);
   fragColor = color;
   textureCoord = texCoord;
+  worldPos = (world * vec4(position, 1)).xyz;
 }

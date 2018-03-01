@@ -1,5 +1,6 @@
 package com.morph.engine.graphics.shaders
 
+import com.morph.engine.core.Camera
 import com.morph.engine.graphics.Color
 import com.morph.engine.graphics.Texture
 import com.morph.engine.graphics.components.RenderData
@@ -17,11 +18,11 @@ class BasicTexturedShaderUniforms : Uniforms() {
         addUniform("diffuse", shader)
     }
 
-    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f, lights: List<Light>) {
+    override fun setUniforms(t: Transform, data: RenderData, camera: Camera, screen: Matrix4f, lights: List<Light>) {
         mvp = t.transformationMatrix
         diffuse = data.getTexture(0)
 
-        setUniformMatrix4fv("mvp", (mvp * world).transpose)
+        setUniformMatrix4fv("mvp", (mvp * camera.modelViewProjection).transpose)
         setUniform1i("diffuse", 0)
 
         diffuse.bind()
@@ -41,7 +42,7 @@ class GUIShaderUniforms : Uniforms() {
         addUniform("diffuse", shader)
     }
 
-    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f, lights: List<Light>) {
+    override fun setUniforms(t: Transform, data: RenderData, camera: Camera, screen: Matrix4f, lights: List<Light>) {
         mvp = t.transformationMatrix
         diffuse = data.getTexture(0)
 
@@ -66,7 +67,7 @@ class GUITextShaderUniforms : Uniforms() {
         addUniform("diffuseColor", shader)
     }
 
-    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f, lights: List<Light>) {
+    override fun setUniforms(t: Transform, data: RenderData, camera: Camera, screen: Matrix4f, lights: List<Light>) {
         mvp = t.transformationMatrix
         diffuse = data.getTexture(0)
 
@@ -92,7 +93,7 @@ class GUITintShaderUniforms : Uniforms() {
         addUniform("diffuseColor", shader)
     }
 
-    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f, lights: List<Light>) {
+    override fun setUniforms(t: Transform, data: RenderData, camera: Camera, screen: Matrix4f, lights: List<Light>) {
         mvp = t.transformationMatrix
         diffuse = data.getTexture(0)
 
@@ -123,7 +124,7 @@ class GUITintTransitionShaderUniforms : Uniforms() {
         addUniform("lerpFactor", shader)
     }
 
-    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f, lights: List<Light>) {
+    override fun setUniforms(t: Transform, data: RenderData, camera: Camera, screen: Matrix4f, lights: List<Light>) {
         this.mvp = t.transformationMatrix
         this.diff1 = data.getTexture(0)
         this.diff2 = data.getTexture(1)
@@ -159,7 +160,7 @@ class GUITransitionShaderUniforms : Uniforms() {
         addUniform("lerpFactor", shader)
     }
 
-    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f, lights: List<Light>) {
+    override fun setUniforms(t: Transform, data: RenderData, camera: Camera, screen: Matrix4f, lights: List<Light>) {
         this.mvp = t.transformationMatrix
         this.diff1 = data.getTexture(0)
         this.diff2 = data.getTexture(1)
@@ -190,11 +191,11 @@ class TextShaderUniforms : Uniforms() {
         addUniform("diffuseColor", shader)
     }
 
-    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f, lights: List<Light>) {
+    override fun setUniforms(t: Transform, data: RenderData, camera: Camera, screen: Matrix4f, lights: List<Light>) {
         mvp = t.transformationMatrix
         diffuse = data.getTexture(0)
 
-        setUniformMatrix4fv("mvp", (mvp * world).transpose)
+        setUniformMatrix4fv("mvp", (mvp * camera.modelViewProjection).transpose)
         setUniform1i("diffuse", 0)
         setUniform3f("diffuseColor", data.tint)
 
@@ -216,11 +217,11 @@ class TintShaderUniforms : Uniforms() {
         addUniform("diffuseColor", shader)
     }
 
-    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f, lights: List<Light>) {
+    override fun setUniforms(t: Transform, data: RenderData, camera: Camera, screen: Matrix4f, lights: List<Light>) {
         mvp = t.transformationMatrix
         diffuse = data.getTexture(0)
 
-        setUniformMatrix4fv("mvp", (mvp * world).transpose)
+        setUniformMatrix4fv("mvp", (mvp * camera.modelViewProjection).transpose)
         setUniform1i("diffuse", 0)
         setUniform4f("diffuseColor", data.tint)
 
@@ -245,13 +246,13 @@ class TransitionShaderUniforms : Uniforms() {
         addUniform("lerpFactor", shader)
     }
 
-    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f, lights: List<Light>) {
+    override fun setUniforms(t: Transform, data: RenderData, camera: Camera, screen: Matrix4f, lights: List<Light>) {
         this.mvp = t.transformationMatrix
         this.diff1 = data.getTexture(0)
         this.diff2 = data.getTexture(1)
         this.lerpFactor = data.lerpFactor
 
-        setUniformMatrix4fv("mvp", (mvp * world).transpose)
+        setUniformMatrix4fv("mvp", (mvp * camera.modelViewProjection).transpose)
         setUniform1i("diff1", 0)
         setUniform1i("diff2", 1)
         setUniform1f("lerpFactor", lerpFactor)
@@ -272,19 +273,21 @@ class BasicLightShaderUniforms : Uniforms() {
 
     override fun defineUniforms(shader: Int) {
         addUniform("mvp", shader)
+        addUniform("world", shader)
         addUniform("diffuse", shader)
         addUniform("diffuseColor", shader)
         addUniform("lightPosition", shader)
     }
 
-    override fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f, lights: List<Light>) {
+    override fun setUniforms(t: Transform, data: RenderData, camera: Camera, screen: Matrix4f, lights: List<Light>) {
         mvp = t.transformationMatrix
         diffuse = data.getTexture(0)
 
-        setUniformMatrix4fv("mvp", (mvp * world).transpose)
+        setUniformMatrix4fv("mvp", (mvp * camera.modelViewProjection).transpose)
+        setUniformMatrix4fv("world", (mvp * camera.transformationMatrix).transpose)
         setUniform1i("diffuse", 0)
         setUniform4f("diffuseColor", data.tint)
-        setUniform2f("lightPosition", (lights[0] as PointLight).localPosition.xy)
+        setUniform3f("lightPosition", (lights[0] as PointLight).localPosition)
 
         diffuse.bind()
     }

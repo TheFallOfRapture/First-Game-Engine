@@ -1,5 +1,6 @@
 package com.morph.engine.graphics.shaders
 
+import com.morph.engine.core.Camera
 import com.morph.engine.graphics.Color
 import com.morph.engine.graphics.components.RenderData
 import com.morph.engine.graphics.components.light.Light
@@ -20,7 +21,7 @@ abstract class Uniforms {
     }
 
     abstract fun defineUniforms(shader: Int)
-    abstract fun setUniforms(t: Transform, data: RenderData, world: Matrix4f, screen: Matrix4f, lights: List<Light>)
+    abstract fun setUniforms(t: Transform, data: RenderData, camera: Camera, screen: Matrix4f, lights: List<Light>)
     abstract fun unbind(t: Transform, data: RenderData)
 
     protected fun addUniform(name: String, shader: Int) {
