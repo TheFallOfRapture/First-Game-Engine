@@ -62,7 +62,6 @@ dependencies {
 	compile 'io.reactivex.rxjava2:rxkotlin:2.2.0'
 	compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.10"
 	compile "org.jetbrains.kotlin:kotlin-script-util:1.2.10"
-	compile "org.python:jython-standalone:2.7.1b3"
 }
 
 jar {

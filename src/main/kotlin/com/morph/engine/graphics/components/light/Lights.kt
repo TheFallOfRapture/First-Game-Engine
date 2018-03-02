@@ -9,20 +9,20 @@ import com.morph.engine.physics.components.Transform
 sealed class Light(var brightness: Float, var color: Color)
 class DirectionalLight(brightness: Float, color: Color) : Light(brightness, color)
 
-sealed class SceneLight(brightness: Float, color: Color, var parentTransform: Transform) : Light(brightness, color), Component
+sealed class SceneLight(brightness: Float, color: Color, var localPosition: Vector3f, var parentTransform: Transform) : Light(brightness, color), Component
 
 class PointLight @JvmOverloads constructor(
         brightness: Float,
         color: Color,
-        parentTransform: Transform = Transform.identity(),
-        var localPosition: Vector3f
-) : SceneLight(brightness, color, parentTransform)
+        localPosition: Vector3f,
+        parentTransform: Transform = Transform.identity()
+) : SceneLight(brightness, color, localPosition, parentTransform)
 
 class SpotLight @JvmOverloads constructor(
         brightness: Float,
         color: Color,
+        localPosition: Vector3f,
         parentTransform: Transform = Transform.identity(),
-        var localPosition: Vector3f,
         var localRotation: Quaternion,
         var angle: Float
-) : SceneLight(brightness, color, parentTransform)
+) : SceneLight(brightness, color, localPosition, parentTransform)

@@ -12,8 +12,6 @@ import io.reactivex.*;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import org.jetbrains.kotlin.script.jsr223.KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory;
-import org.python.jsr223.PyScriptEngineFactory;
-
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -69,11 +67,11 @@ public class ScriptUtils {
     private static boolean load(Game game) {
         Console.out.println("Morph Script Engine " + Game.VERSION_STRING + " initializing... Please wait...");
         KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory kotlinEngine = new KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory();
-        PyScriptEngineFactory pythonEngine = new PyScriptEngineFactory();
+//        PyScriptEngineFactory pythonEngine = new PyScriptEngineFactory();
 
         ScriptEngineManager manager = new ScriptEngineManager();
         manager.registerEngineExtension("kts", kotlinEngine);
-        manager.registerEngineExtension("py", pythonEngine);
+//        manager.registerEngineExtension("py", pythonEngine);
 
         supportedScriptEngines.put("kts", kotlinEngine.getScriptEngine());
 //        supportedScriptEngines.put("py", pythonEngine.getScriptEngine());

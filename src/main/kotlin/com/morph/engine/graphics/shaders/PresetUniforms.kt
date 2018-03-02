@@ -5,7 +5,7 @@ import com.morph.engine.graphics.Color
 import com.morph.engine.graphics.Texture
 import com.morph.engine.graphics.components.RenderData
 import com.morph.engine.graphics.components.light.Light
-import com.morph.engine.graphics.components.light.PointLight
+import com.morph.engine.graphics.components.light.SceneLight
 import com.morph.engine.math.Matrix4f
 import com.morph.engine.physics.components.Transform
 
@@ -270,30 +270,47 @@ class TransitionShaderUniforms : Uniforms() {
 class BasicLightShaderUniforms : Uniforms() {
     private lateinit var mvp: Matrix4f
     private lateinit var diffuse: Texture
+    private var normal: Texture? = null
 
     override fun defineUniforms(shader: Int) {
         addUniform("mvp", shader)
         addUniform("world", shader)
         addUniform("diffuse", shader)
+        addUniform("normal", shader)
         addUniform("diffuseColor", shader)
         addUniform("lightPosition", shader)
+
+        for (i in 0..9) {
+            addUniform("lights[$i].brightness", shader)
+            addUniform("lights[$i].color", shader)
+            addUniform("lights[$i].position", shader)
+        }
     }
 
     override fun setUniforms(t: Transform, data: RenderData, camera: Camera, screen: Matrix4f, lights: List<Light>) {
         mvp = t.transformationMatrix
         diffuse = data.getTexture(0)
+        normal = data.getTexture(1)
 
         setUniformMatrix4fv("mvp", (mvp * camera.modelViewProjection).transpose)
         setUniformMatrix4fv("world", (mvp * camera.transformationMatrix).transpose)
         setUniform1i("diffuse", 0)
+        setUniform1i("normal", 1)
         setUniform4f("diffuseColor", data.tint)
-        setUniform3f("lightPosition", (lights[0] as PointLight).localPosition)
 
-        diffuse.bind()
+        lights.take(10).mapIndexed { index, light ->
+            setUniform1f("lights[$index].brightness", light.brightness)
+            setUniform3f("lights[$index].color", light.color)
+            if (light is SceneLight) setUniform3f("lights[$index].position", light.localPosition)
+        }
+
+        diffuse.bind(0)
+        normal?.bind(1)
     }
 
     override fun unbind(t: Transform, data: RenderData) {
         diffuse.unbind()
+        normal?.unbind()
     }
 }
 

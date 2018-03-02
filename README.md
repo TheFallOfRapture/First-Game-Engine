@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/TheFallOfRapture/Morph.svg)](https://travis-ci.org/TheFallOfRapture/Morph)
+[![Build Status](https://travis-ci.org/the6thdoor/Morph.svg)](https://travis-ci.org/the6thdoor/Morph)
 # Morph
 
 A Java-based game engine with a simple and incredibly extensible workflow.

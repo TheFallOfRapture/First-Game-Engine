@@ -38,8 +38,6 @@ public class RenderData implements Component {
 	protected int vbo, cbo, tbo, ibo;
 	protected int vao;
 
-	private boolean initialized = false;
-	
 	public RenderData(Shader<?> shader, Texture texture) {
 		this.vertices = new ArrayList<>();
 		this.indices = new ArrayList<>();
@@ -71,8 +69,6 @@ public class RenderData implements Component {
 		this.shader = shader;
 
 		this.vao = vao;
-
-		initialized = true;
 	}
 
 	public void init() {
@@ -119,8 +115,6 @@ public class RenderData implements Component {
 		glBindVertexArray(0);
 		
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-		initialized = true;
 	}
 
 	public void refreshVertices() {
@@ -312,6 +306,7 @@ public class RenderData implements Component {
 	}
 	
 	public Texture getTexture(int index) {
+		if (index >= textures.size()) return null;
 		return textures.get(index);
 	}
 	
