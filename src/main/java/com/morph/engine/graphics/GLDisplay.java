@@ -51,7 +51,7 @@ public class GLDisplay {
 		
 //		glfwSetWindowSizeCallback(window, (window, x, y) -> EventDispatcher.INSTANCE.dispatchEvent(new ResizeEvent(this, x, y, false)));
 		
-		glfwSetCursorPosCallback(window, (window, x, y) -> Mouse.INSTANCE.setMousePosition(window, new Vector2f(x, y), camera));
+		glfwSetCursorPosCallback(window, (window, x, y) -> Mouse.INSTANCE.setMousePosition(window, new Vector2f((float) x, (float) y), camera));
 		
 		glfwSetMouseButtonCallback(window, Mouse.INSTANCE::handleMouseEvent);
 

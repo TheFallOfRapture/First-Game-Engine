@@ -39,9 +39,9 @@ public class Engine extends OpenGame {
 		renderingEngine.addLight(light3);
 
 		testGUI = new EngineGUI(this, width, height);
-//		testGUI.init();
+		testGUI.init();
 
-//		addGUI(testGUI);
+		addGUI(testGUI);
 
 		KotlinTestKt.printMsg("Hello, world! Kotlin 1.1.1 is working in Morph 0.5.0!");
 
@@ -74,10 +74,13 @@ public class Engine extends OpenGame {
 
 		InputMapping input = new InputMapping();
 
-		input.mapKey(GLFW_KEY_W, KeyActions.DOWN, () -> light1.setLocalPosition(light1.getLocalPosition().add(new Vector3f(0, 0.1f, 0))));
-		input.mapKey(GLFW_KEY_A, KeyActions.DOWN, () -> light1.setLocalPosition(light1.getLocalPosition().add(new Vector3f(-0.1f, 0, 0))));
-		input.mapKey(GLFW_KEY_S, KeyActions.DOWN, () -> light1.setLocalPosition(light1.getLocalPosition().add(new Vector3f(0, -0.1f, 0))));
-		input.mapKey(GLFW_KEY_D, KeyActions.DOWN, () -> light1.setLocalPosition(light1.getLocalPosition().add(new Vector3f(0.1f, 0, 0))));
+		OrthoCam2D camera = (OrthoCam2D) getCamera();
+
+		float speed = 0.1f;
+		input.mapKey(GLFW_KEY_W, KeyActions.DOWN, () -> camera.setPosition(camera.getPosition().add(new Vector2f(0, speed))));
+		input.mapKey(GLFW_KEY_A, KeyActions.DOWN, () -> camera.setPosition(camera.getPosition().add(new Vector2f(-speed, 0))));
+		input.mapKey(GLFW_KEY_S, KeyActions.DOWN, () -> camera.setPosition(camera.getPosition().add(new Vector2f(0, -speed))));
+		input.mapKey(GLFW_KEY_D, KeyActions.DOWN, () -> camera.setPosition(camera.getPosition().add(new Vector2f(speed, 0))));
 
 		input.mapButton(GLFW_MOUSE_BUTTON_1, MouseActions.PRESS, () -> System.out.println("PRESS LEFT"));
 		input.mapButton(GLFW_MOUSE_BUTTON_1, MouseActions.RELEASE, () -> System.out.println("RELEASE LEFT"));

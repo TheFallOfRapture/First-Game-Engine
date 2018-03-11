@@ -301,7 +301,7 @@ class BasicLightShaderUniforms : Uniforms() {
         lights.take(10).mapIndexed { index, light ->
             setUniform1f("lights[$index].brightness", light.brightness)
             setUniform3f("lights[$index].color", light.color)
-            if (light is SceneLight) setUniform3f("lights[$index].position", light.localPosition)
+            if (light is SceneLight) setUniform3f("lights[$index].position", camera.transformationMatrix * light.localPosition)
         }
 
         diffuse.bind(0)

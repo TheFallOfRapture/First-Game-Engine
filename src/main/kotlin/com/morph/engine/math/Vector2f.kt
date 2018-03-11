@@ -1,61 +1,30 @@
 package com.morph.engine.math
 
-import java.util.function.Function
-
-class Vector2f {
-    var x: Float = 0.toFloat()
-    var y: Float = 0.toFloat()
-
+data class Vector2f(var x: Float = 0f, var y: Float = 0f) {
     val length: Float
         get() = Math.sqrt((x * x + y * y).toDouble()).toFloat()
-
-    constructor(x: Float, y: Float) {
-        this.x = x
-        this.y = y
-    }
 
     /**
      * Clones a Vector2f.
      */
-    constructor(v: Vector2f) {
-        this.x = v.x
-        this.y = v.y
-    }
-
-    constructor() {
-        this.x = 0f
-        this.y = 0f
-    }
-
-    constructor(x: Double, y: Double) {
-        this.x = x.toFloat()
-        this.y = y.toFloat()
-    }
+    constructor(v: Vector2f) : this(v.x, v.y)
 
     override fun toString(): String {
         return "Vector2f($x, $y)"
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (o is Vector2f) {
-            val v = o as Vector2f?
-            val epsilon = 1e-8f
-
-            return Math.abs(x - v!!.x) < epsilon && Math.abs(y - v.y) < epsilon
-        }
-
-        return false
-    }
-
-    fun add(v: Vector2f): Vector2f {
+    @JvmName("add")
+    operator fun plus(v: Vector2f): Vector2f {
         return Vector2f(x + v.x, y + v.y)
     }
 
-    fun sub(v: Vector2f): Vector2f {
+    @JvmName("sub")
+    operator fun minus(v: Vector2f): Vector2f {
         return Vector2f(x - v.x, y - v.y)
     }
 
-    fun mul(v: Vector2f): Vector2f {
+    @JvmName("mul")
+    operator fun times(v: Vector2f): Vector2f {
         return Vector2f(x * v.x, y * v.y)
     }
 
@@ -63,17 +32,19 @@ class Vector2f {
         return Vector2f(x / v.x, y / v.y)
     }
 
-    fun scale(k: Float): Vector2f {
+    @JvmName("scale")
+    operator fun times(k: Float): Vector2f {
         return Vector2f(x * k, y * k)
     }
 
-    fun invScale(k: Float): Vector2f {
+    @JvmName("invScale")
+    operator fun div(k: Float): Vector2f {
         return Vector2f(x / k, y / k)
     }
 
     fun normalize(): Vector2f {
         val length = length
-        return this.invScale(length)
+        return this / length
     }
 
     fun abs(): Vector2f {
@@ -117,22 +88,20 @@ class Vector2f {
         this.y = 0f
     }
 
-    fun negate(): Vector2f {
+    @JvmName("negate")
+    operator fun unaryMinus(): Vector2f {
         return Vector2f(-x, -y)
     }
 
-    fun dot(v: Vector2f): Float {
+    infix fun dot(v: Vector2f): Float {
         return x * v.x + y * v.y
     }
 
-    fun map(`fun`: Function<Float, Float>): Vector2f {
-        return Vector2f(`fun`.apply(x), `fun`.apply(y))
-    }
+    fun map(f: (Float) -> Float) = Vector2f(f(x), f(y))
 
     companion object {
-
         fun reflect(n: Vector2f, v: Vector2f): Vector2f {
-            return v.add(n.scale(-2 * v.dot(n)))
+            return v + (n * (-2 * (v dot n)))
         }
     }
 }

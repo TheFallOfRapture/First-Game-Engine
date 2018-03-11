@@ -1,8 +1,6 @@
 package com.morph.engine.core
 
-import com.morph.engine.math.Matrix4f
-import com.morph.engine.math.MatrixUtils
-import com.morph.engine.math.Vector2f
+import com.morph.engine.math.*
 
 interface Camera {
     val projectionMatrix: Matrix4f
@@ -24,5 +22,17 @@ data class OrthoCam2D(
     override val projectionMatrix: Matrix4f
         get() = MatrixUtils.getOrthographicProjectionMatrix(height / 2f, -height / 2f, -width / 2f, width / 2f, 1f, -1f)
     override val transformationMatrix: Matrix4f
-        get() = position.asTranslationMatrix()
+        get() = (-position).asTranslationMatrix()
+}
+
+data class PerspectiveCam(
+        var position: Vector3f,
+        var orientation: Quaternion,
+        var width: Float,
+        var height: Float
+) : Camera {
+    override val projectionMatrix: Matrix4f
+        get() = MatrixUtils.getPerspectiveProjectionMatrix(height / 2f, -height / 2f, -width / 2f, width / 2f, -1f, 1f)
+    override val transformationMatrix: Matrix4f
+        get() = position.asTranslationMatrix() * orientation.asRotationMatrix()
 }

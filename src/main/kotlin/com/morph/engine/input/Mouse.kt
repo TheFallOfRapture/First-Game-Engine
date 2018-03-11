@@ -55,7 +55,7 @@ object Mouse {
             screenToWorld = camera.projectionMatrix.inverse
         }
 
-        val normalizedMousePos = currentScreenPos.div(Vector2f(width / 2f, height / 2f)).sub(Vector2f(1f, 1f)).mul(Vector2f(1f, -1f))
+        val normalizedMousePos = currentScreenPos.div(Vector2f(width / 2f, height / 2f)) - (Vector2f(1f, 1f)) * (Vector2f(1f, -1f))
         worldMousePosition.onNext(screenToWorld.times(Vector4f(normalizedMousePos, 0, 1)).xy)
     }
 
