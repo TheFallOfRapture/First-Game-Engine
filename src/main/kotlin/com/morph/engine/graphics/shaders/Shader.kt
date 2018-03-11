@@ -61,7 +61,7 @@ open class Shader<out T : Uniforms>(shaderURL: String, val uniforms: T) {
 
     fun setUniformMatrix4fv(name: String, value: Matrix4f) {
         val location = glGetUniformLocation(resource.id, name)
-        glUniformMatrix4fv(location, false, value.asArray())
+        glUniformMatrix4fv(location, false, value.toArray())
     }
 
     fun removeReference() {

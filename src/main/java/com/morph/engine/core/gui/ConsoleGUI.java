@@ -64,7 +64,7 @@ public class ConsoleGUI extends GUI {
 
     @Override
     public void load() {
-        consoleOutput.setText(console.getText());
+//        consoleOutput.setText(console.getText());
     }
 
     private void onKeyEvent(StdKeyEvent e) {

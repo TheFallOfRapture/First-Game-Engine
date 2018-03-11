@@ -116,7 +116,7 @@ class Matrix3f(
     }
 
     operator fun get(i: Int, j: Int): Float {
-        return values[i + j * 3]
+        return values[j + i * 3]
     }
 
     fun getMatrix2f(a: Int, b: Int, c: Int, d: Int): Matrix2f {

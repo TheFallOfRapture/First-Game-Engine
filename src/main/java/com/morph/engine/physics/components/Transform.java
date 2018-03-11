@@ -6,7 +6,7 @@ import com.morph.engine.math.Quaternion;
 
 public abstract class Transform implements Component {
 	public Matrix4f getTransformationMatrix() {
-		return getScaleMatrix().mul(getRotationMatrix()).mul(getTranslationMatrix());
+		return getTranslationMatrix().mul(getRotationMatrix().mul(getScaleMatrix()));
 	}
 	
 	public abstract void translate(Matrix4f translation);

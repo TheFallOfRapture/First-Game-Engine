@@ -6,7 +6,7 @@ class Matrix4f(
         m20: Float, m21: Float, m22: Float, m23: Float,
         m30: Float, m31: Float, m32: Float, m33: Float
 ) {
-    var values: FloatArray = floatArrayOf(
+    val values: FloatArray = floatArrayOf(
             m00, m01, m02, m03,
             m10, m11, m12, m13,
             m20, m21, m22, m23,
@@ -78,11 +78,11 @@ class Matrix4f(
     }
 
     operator fun get(i: Int, j: Int): Float {
-        return values[i + j * 4]
+        return values[j + (i * 4)]
     }
 
-    operator fun set(value: Float, i: Int, j: Int) {
-        this.values[i + j * 4] = value
+    operator fun set(i: Int, j: Int, value: Float) {
+        this.values[j + (i * 4)] = value
     }
 
     fun asTranslationVector(): Vector3f {
@@ -105,10 +105,10 @@ class Matrix4f(
 
         for (i in 0..3) {
             for (j in 0..3) {
-                result[this[i, 0] * other[0, j] +
+                result[i, j] = this[i, 0] * other[0, j] +
                         this[i, 1] * other[1, j] +
                         this[i, 2] * other[2, j] +
-                        this[i, 3] * other[3, j], i] = j
+                        this[i, 3] * other[3, j]
             }
         }
 
@@ -116,16 +116,14 @@ class Matrix4f(
     }
 
     @JvmName("mul")
-    operator fun times(v: Vector4f): Vector4f {
-        val newX = values[0] * v.x + values[1] * v.y + values[2] * v.z + values[3] * v.w
-        val newY = values[4] * v.x + values[5] * v.y + values[6] * v.z + values[7] * v.w
-        val newZ = values[8] * v.x + values[9] * v.y + values[10] * v.z + values[11] * v.w
-        val newW = values[12] * v.x + values[13] * v.y + values[14] * v.z + values[15] * v.w
+    operator fun times(v: Vector4f) = Vector4f(
+            x = this[0, 0] * v.x + this[0, 1] * v.y + this[0, 2] * v.z + this[0, 3] * v.w,
+            y = this[1, 0] * v.x + this[1, 1] * v.y + this[1, 2] * v.z + this[1, 3] * v.w,
+            z = this[2, 0] * v.x + this[2, 1] * v.y + this[2, 2] * v.z + this[2, 3] * v.w,
+            w = this[3, 0] * v.x + this[3, 1] * v.y + this[3, 2] * v.z + this[3, 3] * v.w
+    )
 
-        return Vector4f(newX, newY, newZ, newW)
-    }
-
-    fun asArray(): FloatArray? {
+    fun toArray(): FloatArray {
         return values
     }
 

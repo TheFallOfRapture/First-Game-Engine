@@ -22,7 +22,7 @@ class BasicTexturedShaderUniforms : Uniforms() {
         mvp = t.transformationMatrix
         diffuse = data.getTexture(0)
 
-        setUniformMatrix4fv("mvp", (mvp * camera.modelViewProjection).transpose)
+        setUniformMatrix4fv("mvp", camera.modelViewProjection * mvp)
         setUniform1i("diffuse", 0)
 
         diffuse.bind()
@@ -46,7 +46,7 @@ class GUIShaderUniforms : Uniforms() {
         mvp = t.transformationMatrix
         diffuse = data.getTexture(0)
 
-        setUniformMatrix4fv("mvp", (mvp * screen).transpose)
+        setUniformMatrix4fv("mvp", screen * mvp)
         setUniform1i("diffuse", 0)
 
         diffuse.bind()
@@ -71,7 +71,7 @@ class GUITextShaderUniforms : Uniforms() {
         mvp = t.transformationMatrix
         diffuse = data.getTexture(0)
 
-        setUniformMatrix4fv("mvp", (mvp * screen).transpose)
+        setUniformMatrix4fv("mvp", screen * mvp)
         setUniform1i("diffuse", 0)
         setUniform3f("diffuseColor", data.tint)
 
@@ -97,7 +97,7 @@ class GUITintShaderUniforms : Uniforms() {
         mvp = t.transformationMatrix
         diffuse = data.getTexture(0)
 
-        setUniformMatrix4fv("mvp", (mvp * screen).transpose)
+        setUniformMatrix4fv("mvp", screen * mvp)
         setUniform1i("diffuse", 0)
         setUniform4f("diffuseColor", data.tint)
 
@@ -131,7 +131,7 @@ class GUITintTransitionShaderUniforms : Uniforms() {
         this.diffuseColor = data.tint
         this.lerpFactor = data.lerpFactor
 
-        setUniformMatrix4fv("mvp", (mvp * screen).transpose)
+        setUniformMatrix4fv("mvp", screen * mvp)
         setUniform1i("diff1", 0)
         setUniform1i("diff2", 1)
         setUniform4f("diffuseColor", diffuseColor)
@@ -166,7 +166,7 @@ class GUITransitionShaderUniforms : Uniforms() {
         this.diff2 = data.getTexture(1)
         this.lerpFactor = data.lerpFactor
 
-        setUniformMatrix4fv("mvp", (mvp * screen).transpose)
+        setUniformMatrix4fv("mvp", screen * mvp)
         setUniform1i("diff1", 0)
         setUniform1i("diff2", 1)
         setUniform1f("lerpFactor", lerpFactor)
@@ -195,7 +195,7 @@ class TextShaderUniforms : Uniforms() {
         mvp = t.transformationMatrix
         diffuse = data.getTexture(0)
 
-        setUniformMatrix4fv("mvp", (mvp * camera.modelViewProjection).transpose)
+        setUniformMatrix4fv("mvp", camera.modelViewProjection * mvp)
         setUniform1i("diffuse", 0)
         setUniform3f("diffuseColor", data.tint)
 
@@ -221,7 +221,7 @@ class TintShaderUniforms : Uniforms() {
         mvp = t.transformationMatrix
         diffuse = data.getTexture(0)
 
-        setUniformMatrix4fv("mvp", (mvp * camera.modelViewProjection).transpose)
+        setUniformMatrix4fv("mvp", camera.modelViewProjection * mvp)
         setUniform1i("diffuse", 0)
         setUniform4f("diffuseColor", data.tint)
 
@@ -252,7 +252,7 @@ class TransitionShaderUniforms : Uniforms() {
         this.diff2 = data.getTexture(1)
         this.lerpFactor = data.lerpFactor
 
-        setUniformMatrix4fv("mvp", (mvp * camera.modelViewProjection).transpose)
+        setUniformMatrix4fv("mvp", camera.modelViewProjection * mvp)
         setUniform1i("diff1", 0)
         setUniform1i("diff2", 1)
         setUniform1f("lerpFactor", lerpFactor)
@@ -292,8 +292,8 @@ class BasicLightShaderUniforms : Uniforms() {
         diffuse = data.getTexture(0)
         normal = data.getTexture(1)
 
-        setUniformMatrix4fv("mvp", (mvp * camera.modelViewProjection).transpose)
-        setUniformMatrix4fv("world", (mvp * camera.transformationMatrix).transpose)
+        setUniformMatrix4fv("mvp", camera.modelViewProjection * mvp)
+        setUniformMatrix4fv("world", camera.transformationMatrix * mvp)
         setUniform1i("diffuse", 0)
         setUniform1i("normal", 1)
         setUniform4f("diffuseColor", data.tint)

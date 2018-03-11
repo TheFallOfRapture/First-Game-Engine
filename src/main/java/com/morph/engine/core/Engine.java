@@ -20,9 +20,9 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class Engine extends OpenGame {
 	private EngineGUI testGUI;
-	private PointLight light1 = new PointLight(15f, new Color(1f, 1f, 1f), new Vector3f(5f, -5f, 0f));
-//	private PointLight light2 = new PointLight(2f, new Color(1f, 0.5f, 0f), new Vector3f(-2f, 0f, 0f));
-//	private PointLight light3 = new PointLight(2f, new Color(0f, 0.5f, 1f), new Vector3f(2f, 0f, 0f));
+	private PointLight light1 = new PointLight(15f, new Color(0.5f, 1f, 0.5f), new Vector3f(5f, -5f, 0f));
+	private PointLight light2 = new PointLight(15f, new Color(1f, 0.5f, 0f), new Vector3f(-2f, 0f, 0f));
+	private PointLight light3 = new PointLight(15f, new Color(0f, 0.5f, 1f), new Vector3f(2f, 0f, 0f));
 	private float time = 0f;
 
 	public Engine(int width, int height, float fps, boolean fullscreen) {
@@ -35,8 +35,8 @@ public class Engine extends OpenGame {
 		setCamera(new OrthoCam2D(new Vector2f(0, 0), 10f * ((float) width / height), 10f));
 
 		renderingEngine.addLight(light1);
-//		renderingEngine.addLight(light2);
-//		renderingEngine.addLight(light3);
+		renderingEngine.addLight(light2);
+		renderingEngine.addLight(light3);
 
 		testGUI = new EngineGUI(this, width, height);
 //		testGUI.init();
@@ -101,10 +101,11 @@ public class Engine extends OpenGame {
 		// TODO Auto-generated method stub
 		float speed = 1.5f;
 		float radius = 5f;
+		float depth = 0.8f;
 
-//		light1.setLocalPosition(new Vector3f((float) Math.cos(time * speed) * radius, (float) Math.sin(time * speed) * radius, 0));
-//		light2.setLocalPosition(new Vector3f((float) Math.cos(time * speed + (2f * Math.PI / 3f)) * radius, (float) Math.sin(time * speed + (2f * Math.PI / 3f)) * radius, 0));
-//		light3.setLocalPosition(new Vector3f((float) Math.cos(time * speed + (4f * Math.PI / 3f)) * radius, (float) Math.sin(time * speed + (4f * Math.PI / 3f)) * radius, 0));
+		light1.setLocalPosition(new Vector3f((float) Math.cos(time * speed) * radius, (float) Math.sin(time * speed) * radius, depth));
+		light2.setLocalPosition(new Vector3f((float) Math.cos(time * speed + (2f * Math.PI / 3f)) * radius, (float) Math.sin(time * speed + (2f * Math.PI / 3f)) * radius, depth));
+		light3.setLocalPosition(new Vector3f((float) Math.cos(time * speed + (4f * Math.PI / 3f)) * radius, (float) Math.sin(time * speed + (4f * Math.PI / 3f)) * radius, depth));
 		time += dt;
 	}
 

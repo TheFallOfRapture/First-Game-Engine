@@ -66,6 +66,6 @@ abstract class Uniforms {
 
     fun setUniformMatrix4fv(name: String, value: Matrix4f) {
         val location = uniforms[name]
-        location?.let { glUniformMatrix4fv(it, false, value.asArray()) }
+        location?.let { glUniformMatrix4fv(it, true, value.toArray()) }
     }
 }
