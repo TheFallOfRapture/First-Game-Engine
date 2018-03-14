@@ -57,6 +57,7 @@ bin/
 # Gradle Project Files
 .gradle
 build/
+out/
 
 # Gradle build/execute batch files
 build.bat
