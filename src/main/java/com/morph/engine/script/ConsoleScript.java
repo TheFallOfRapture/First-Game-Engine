@@ -1,9 +1,9 @@
 package com.morph.engine.script;
 
 import com.morph.engine.core.Game;
-import com.morph.engine.script.debug.Console;
 import com.morph.engine.entities.Component;
 import com.morph.engine.entities.Entity;
+import com.morph.engine.script.debug.Console;
 import com.morph.engine.util.EntityGenUtils;
 
 public abstract class ConsoleScript implements Runnable {
@@ -28,13 +28,13 @@ public abstract class ConsoleScript implements Runnable {
     protected void addEntity(String name, Component... components) {
         Entity e = EntityGenUtils.createEntity(name, components);
         console.getGame().getWorld().addEntity(e);
-        echo("Created new entity " + name + " (ID #" + e.getID() + ")");
+        echo("Created new entity " + name + " (ID #" + e.getId() + ")");
     }
 
     protected void addEntityRectangle(String name, float width, float height, boolean isTrigger, Component... components) {
         Entity e = EntityGenUtils.createEntityRectangle(name, width, height, isTrigger, components);
         console.getGame().getWorld().addEntity(e);
-        echo("Created new entity " + name + " (ID #" + e.getID() + ")");
+        echo("Created new entity " + name + " (ID #" + e.getId() + ")");
     }
 
     protected Entity getEntity(String name) {

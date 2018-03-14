@@ -3,7 +3,7 @@ package com.morph.engine.physics.components;
 import com.morph.engine.entities.Component;
 import com.morph.engine.math.Vector2f;
 
-public class Velocity2D implements Component {
+public class Velocity2D extends Component {
 	private Vector2f velocity;
 	
 	public Velocity2D(Vector2f velocity) {

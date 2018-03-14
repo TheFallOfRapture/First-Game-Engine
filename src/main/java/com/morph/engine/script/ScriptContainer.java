@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Created on 7/5/2017.
  */
-public class ScriptContainer implements Component {
+public class ScriptContainer extends Component {
     private HashMap<String, EntityBehavior> behaviors;
     private Game game;
     private Entity parent;

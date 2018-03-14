@@ -9,20 +9,21 @@ interface Camera {
         get() = projectionMatrix * transformationMatrix
 
     object Identity : Camera {
-        override val projectionMatrix: Matrix4f = Matrix4f.identity()
-        override val transformationMatrix: Matrix4f = Matrix4f.identity()
+        override val projectionMatrix: Matrix4f = Matrix4f.identity
+        override val transformationMatrix: Matrix4f = Matrix4f.identity
     }
 }
 
 data class OrthoCam2D(
         var position: Vector2f,
+        var rotation: Float,
         var width: Float,
         var height: Float
 ) : Camera {
     override val projectionMatrix: Matrix4f
         get() = MatrixUtils.getOrthographicProjectionMatrix(height / 2f, -height / 2f, -width / 2f, width / 2f, 1f, -1f)
     override val transformationMatrix: Matrix4f
-        get() = (-position).asTranslationMatrix()
+        get() = (-position).asTranslationMatrix() * Quaternion(Vector3f(0f, 0f, 1f), rotation).asRotationMatrix()
 }
 
 data class PerspectiveCam(
@@ -34,5 +35,5 @@ data class PerspectiveCam(
     override val projectionMatrix: Matrix4f
         get() = MatrixUtils.getPerspectiveProjectionMatrix(height / 2f, -height / 2f, -width / 2f, width / 2f, -1f, 1f)
     override val transformationMatrix: Matrix4f
-        get() = position.asTranslationMatrix() * orientation.asRotationMatrix()
+        get() = (-position).asTranslationMatrix() * orientation.asRotationMatrix()
 }

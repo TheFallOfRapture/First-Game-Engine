@@ -101,7 +101,7 @@ class Matrix4f(
 
     @JvmName("mul")
     operator fun times(other: Matrix4f): Matrix4f {
-        val result = Matrix4f.empty()
+        val result = Matrix4f.empty
 
         for (i in 0..3) {
             for (j in 0..3) {
@@ -185,17 +185,21 @@ class Matrix4f(
     }
 
     companion object {
-        @JvmStatic fun identity(): Matrix4f {
-            return Matrix4f(
+        @JvmStatic
+        val identity: Matrix4f
+            get() = Matrix4f(
                     1f, 0f, 0f, 0f,
                     0f, 1f, 0f, 0f,
                     0f, 0f, 1f, 0f,
                     0f, 0f, 0f, 1f
             )
-        }
 
-        @JvmStatic fun empty(): Matrix4f {
-            return Matrix4f(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)
-        }
+        @JvmStatic
+        val empty: Matrix4f
+            get() = Matrix4f(0f, 0f, 0f, 0f,
+                    0f, 0f, 0f, 0f,
+                    0f, 0f, 0f, 0f,
+                    0f, 0f, 0f, 0f
+            )
     }
 }

@@ -26,7 +26,7 @@ object Mouse {
     private val screenMousePosition = PublishSubject.create<Vector2f>()
     private val worldMousePosition = PublishSubject.create<Vector2f>()
 
-    private var screenToWorld: Matrix4f = Matrix4f.empty()
+    private var screenToWorld: Matrix4f = Matrix4f.empty
 
     fun handleMouseEvent(window: Long, button: Int, action: Int, mods: Int) {
         mouseEventFeed.onNext(StdMouseEvent(getAction(action), button, mods))
@@ -51,7 +51,7 @@ object Mouse {
         val currentScreenPos = Vector2f(v.x, height - v.y)
         screenMousePosition.onNext(currentScreenPos)
 
-        if (screenToWorld == Matrix4f.empty()) {
+        if (screenToWorld == Matrix4f.empty) {
             screenToWorld = camera.projectionMatrix.inverse
         }
 

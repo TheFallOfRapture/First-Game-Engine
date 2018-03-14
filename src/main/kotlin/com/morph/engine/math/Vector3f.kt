@@ -58,27 +58,31 @@ class Vector3f {
         )
     }
 
-    fun add(v: Vector3f): Vector3f {
+    @JvmName("add")
+    operator fun plus(v: Vector3f): Vector3f {
         return Vector3f(x + v.x, y + v.y, z + v.z)
     }
 
-    fun sub(v: Vector3f): Vector3f {
+    @JvmName("sub")
+    operator fun minus(v: Vector3f): Vector3f {
         return Vector3f(x - v.x, y - v.y, z - v.z)
     }
 
-    fun scale(k: Float): Vector3f {
+    @JvmName("scale")
+    operator fun times(k: Float): Vector3f {
         return Vector3f(x * k, y * k, z * k)
     }
 
-    fun invScale(k: Float): Vector3f {
+    @JvmName("invScale")
+    operator fun div(k: Float): Vector3f {
         return Vector3f(x / k, y / k, z / k)
     }
 
-    fun cross(v: Vector3f): Vector3f {
+    infix fun cross(v: Vector3f): Vector3f {
         return Vector3f(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x)
     }
 
-    fun dot(v: Vector3f): Float {
+    infix fun dot(v: Vector3f): Float {
         return x * v.x + y * v.y + z * v.z
     }
 
@@ -94,7 +98,8 @@ class Vector3f {
         this.z = v.z
     }
 
-    fun negate(): Vector3f {
+    @JvmName("negate")
+    operator fun unaryMinus(): Vector3f {
         return Vector3f(-x, -y, -z)
     }
 
@@ -104,7 +109,7 @@ class Vector3f {
 
     companion object {
         fun reflect(n: Vector3f, v: Vector3f): Vector3f {
-            return v.add(n.scale(2 * v.dot(n)))
+            return v + (n * (2 * (v dot n)))
         }
     }
 }

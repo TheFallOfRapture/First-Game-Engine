@@ -4,7 +4,7 @@ import com.morph.engine.entities.Component;
 import com.morph.engine.entities.Entity;
 import com.morph.engine.math.Vector3f;
 
-public class CollisionComponent implements Component {
+public class CollisionComponent extends Component {
 	private final Entity other;
 	private final Vector3f normal;
 	private final float distance;

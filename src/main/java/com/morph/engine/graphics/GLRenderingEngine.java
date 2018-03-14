@@ -53,6 +53,7 @@ public class GLRenderingEngine extends GameSystem {
 	private void render(Entity e) {
 		render(e.getComponent(RenderData.class), e.getComponent(Transform.class));
 	}
+
 	private void render(Element e) {
 		render(e.getRenderData(), e.getTransform());
 	}

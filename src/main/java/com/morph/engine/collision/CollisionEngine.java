@@ -6,7 +6,6 @@ import com.morph.engine.collision.components.TriggerComponent;
 import com.morph.engine.core.Game;
 import com.morph.engine.core.GameSystem;
 import com.morph.engine.entities.Entity;
-import com.morph.engine.entities.EntityRectangle;
 import com.morph.engine.math.MathUtils;
 import com.morph.engine.math.Vector2f;
 import com.morph.engine.math.Vector3f;
@@ -46,8 +45,7 @@ public class CollisionEngine extends GameSystem {
 	}
 
 	private static void updateCollider(Entity e, BoundingBox2D collider, Transform2D transform) {
-		if (e instanceof EntityRectangle) collider.setCenter(((EntityRectangle) e).getCenter());
-		else collider.setCenter(e.getComponent(Transform2D.class).getPosition());
+		collider.setCenter(e.getComponent(Transform2D.class).getPosition());
 	}
 	
 	public static List<CollisionData> checkAgainstWorldStatic(BoundingBox2D boxA, List<Entity> entities) {

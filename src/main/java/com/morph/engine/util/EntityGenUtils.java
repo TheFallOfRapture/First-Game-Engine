@@ -17,7 +17,7 @@ import java.util.Arrays;
  */
 public class EntityGenUtils {
     public static Entity createEntity(String name, Component... components) {
-        Entity e = EntityFactory.getEntity(name);
+        Entity e = EntityFactory.INSTANCE.getEntity(name);
         Arrays.stream(components).forEach(e::addComponent);
         return e;
     }

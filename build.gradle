@@ -15,7 +15,7 @@ buildscript {
 plugins {
 	id 'java'
 	id 'application'
-	id "org.jetbrains.kotlin.jvm" version "1.2.10"
+	id "org.jetbrains.kotlin.jvm" version "1.2.30"
 }
 
 import org.gradle.internal.os.OperatingSystem
@@ -40,6 +40,7 @@ task sourcesJar(type : Jar, dependsOn : classes) {
 repositories {
 	mavenCentral()
 	jcenter()
+	maven { url "https://kotlin.bintray.com/kotlinx" }
 	maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 	maven { url "https://jitpack.io" }
 }
@@ -60,8 +61,9 @@ dependencies {
 	compile "org.lwjgl:lwjgl-stb:$lwjglVersion:$lwjglNatives"
 	// LWJGL dependencies END
 	compile 'io.reactivex.rxjava2:rxkotlin:2.2.0'
-	compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.10"
-	compile "org.jetbrains.kotlin:kotlin-script-util:1.2.10"
+	compile "org.jetbrains.kotlin:kotlin-compiler:1.2.30"
+	compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.30"
+	compile "org.jetbrains.kotlin:kotlin-script-util:1.2.30"
 }
 
 jar {

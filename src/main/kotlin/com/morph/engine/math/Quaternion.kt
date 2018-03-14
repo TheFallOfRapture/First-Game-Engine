@@ -71,4 +71,9 @@ class Quaternion {
 
         return Quaternion(x, y, z, w)
     }
+
+    companion object {
+        @JvmStatic val identity: Quaternion
+            get() = Quaternion(0f, 0f, 0f, 1f)
+    }
 }

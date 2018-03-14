@@ -32,7 +32,7 @@ public class Engine extends OpenGame {
 	@Override
 	public void initGame() {
 		renderingEngine.setClearColor(0, 0, 0, 0);
-		setCamera(new OrthoCam2D(new Vector2f(0, 0), 10f * ((float) width / height), 10f));
+		setCamera(new OrthoCam2D(new Vector2f(0, 0), 0f, 10f * ((float) width / height), 10f));
 
 		renderingEngine.addLight(light1);
 		renderingEngine.addLight(light2);
@@ -59,7 +59,7 @@ public class Engine extends OpenGame {
 //		addEntity(b);
 //		addEntity(c);
 
-		Entity player = EntityFactory.getCustomTintRectangle("player", 15, 15, new Color(0.1f, 0.1f, 0.1f), new BasicLightShader());
+		Entity player = EntityFactory.INSTANCE.getCustomTintRectangle("player", 15, 15, new Color(0.1f, 0.1f, 0.1f), new BasicLightShader());
 		ScriptContainer sc = new ScriptContainer(this, player);
         player.getComponent(RenderData.class).setTexture(new Texture("textures/testNormalMap.png"), 1);
 
@@ -106,10 +106,12 @@ public class Engine extends OpenGame {
 		float radius = 5f;
 		float depth = 0.8f;
 
-		light1.setLocalPosition(new Vector3f((float) Math.cos(time * speed) * radius, (float) Math.sin(time * speed) * radius, depth));
-		light2.setLocalPosition(new Vector3f((float) Math.cos(time * speed + (2f * Math.PI / 3f)) * radius, (float) Math.sin(time * speed + (2f * Math.PI / 3f)) * radius, depth));
-		light3.setLocalPosition(new Vector3f((float) Math.cos(time * speed + (4f * Math.PI / 3f)) * radius, (float) Math.sin(time * speed + (4f * Math.PI / 3f)) * radius, depth));
+//		light1.setLocalPosition(new Vector3f((float) Math.cos(time * speed) * radius, (float) Math.sin(time * speed) * radius, depth));
+//		light2.setLocalPosition(new Vector3f((float) Math.cos(time * speed + (2f * Math.PI / 3f)) * radius, (float) Math.sin(time * speed + (2f * Math.PI / 3f)) * radius, depth));
+//		light3.setLocalPosition(new Vector3f((float) Math.cos(time * speed + (4f * Math.PI / 3f)) * radius, (float) Math.sin(time * speed + (4f * Math.PI / 3f)) * radius, depth));
 		time += dt;
+
+		((OrthoCam2D)getCamera()).setRotation(time);
 	}
 
 	@Override

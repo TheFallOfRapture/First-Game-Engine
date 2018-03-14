@@ -1,6 +1,6 @@
 package com.morph.engine.entities
 
-interface Component {
+abstract class Component {
     open fun init() {}
     open fun destroy() {}
 }

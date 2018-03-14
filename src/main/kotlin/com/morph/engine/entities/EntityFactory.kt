@@ -2,10 +2,9 @@ package com.morph.engine.entities
 
 import com.morph.engine.collision.components.BoundingBox2D
 import com.morph.engine.graphics.Color
-import com.morph.engine.graphics.shaders.Shader
 import com.morph.engine.graphics.Texture
-import com.morph.engine.graphics.components.RenderData
 import com.morph.engine.graphics.shaders.BasicTexturedShader
+import com.morph.engine.graphics.shaders.Shader
 import com.morph.engine.math.Vector2f
 import com.morph.engine.physics.components.Transform2D
 import com.morph.engine.util.RenderDataUtils
@@ -26,7 +25,6 @@ object EntityFactory {
         val halfSize = Vector2f(width / 2.0f, height / 2.0f)
         result.addComponent(Transform2D(Vector2f(x, y), Vector2f(width, height)))
         result.addComponent(BoundingBox2D(Vector2f(x, y), halfSize, isTrigger))
-
         result.addComponent(RenderDataUtils.createSquare(c, BasicTexturedShader(), Texture(null)))
 
         return result

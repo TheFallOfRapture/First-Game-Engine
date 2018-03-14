@@ -1,18 +1,14 @@
 package com.morph.engine.entities
 
-import java.util.Arrays
+import java.util.*
 
 /**
  * Created by Fernando on 2/11/2017.
  */
 open class EntityGrid(val width: Int, val height: Int) {
-    private val entities: Array<Entity>
+    private val entities: Array<Entity?> = arrayOfNulls(width * height)
 
-    init {
-        this.entities = arrayOfNulls(width * height)
-    }
-
-    fun getEntities(): List<Entity> {
+    fun getEntities(): List<Entity?> {
         return Arrays.asList(*entities)
     }
 

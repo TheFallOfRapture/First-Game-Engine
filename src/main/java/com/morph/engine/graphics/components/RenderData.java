@@ -25,7 +25,7 @@ import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
-public class RenderData implements Component {
+public class RenderData extends Component {
 	protected List<Vertex> vertices;
 	protected List<Integer> indices;
 	protected List<Texture> textures;

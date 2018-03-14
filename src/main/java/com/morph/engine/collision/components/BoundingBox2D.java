@@ -3,7 +3,7 @@ package com.morph.engine.collision.components;
 import com.morph.engine.entities.Component;
 import com.morph.engine.math.Vector2f;
 
-public class BoundingBox2D implements Component {
+public class BoundingBox2D extends Component {
 	private Vector2f center;
 	private Vector2f halfSize;
 	private boolean isTrigger;

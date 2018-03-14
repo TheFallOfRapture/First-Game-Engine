@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 /**
  * Created by Fernando on 1/18/2017.
  */
-public class TextureAnimation implements Component {
+public class TextureAnimation extends Component {
     private Texture[] frames;
     private float delay;
     private float accumulator;
