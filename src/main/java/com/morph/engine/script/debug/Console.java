@@ -173,13 +173,13 @@ public class Console {
             case MULTI:
                 String[] parts = line.split(":");
                 parts[1] = parts[1].trim();
-                ScriptUtils.readScriptBlocking(parts[1], parts[0], this);
+                ScriptUtils.readScriptAsync(parts[1], parts[0], this).subscribe(() -> {}, e -> Console.out.println("Script Error: Input script malformed"));
                 break;
             case KOTLIN:
-                ScriptUtils.readScriptBlocking(line, "kts", this);
+                ScriptUtils.readScriptAsync(line, "kts", this).subscribe(() -> {}, e -> Console.out.println("Script Error: Input script malformed"));
                 break;
             case PYTHON:
-                ScriptUtils.readScriptBlocking(line, "py", this);
+                ScriptUtils.readScriptAsync(line, "py", this).subscribe(() -> {}, e -> Console.out.println("Script Error: Input script malformed"));
         }
     }
 

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
@@ -187,23 +188,22 @@ public class ScriptUtils {
     }
 
     public static Completable readScriptAsync(String script, String lang, Console console) {
-        return getScriptEngine(lang).flatMapCompletable(engine -> Completable.fromAction(() -> readScriptDI(script, engine, console)));
+        return getScriptEngine(lang).flatMapCompletable(engine -> Completable.fromCallable((Callable<Void>) () -> {
+            readScriptDI(script, engine, console);
+            return null;
+        }));
     }
 
-    private static void readScriptDI(String script, ScriptEngine engine, Console console) {
-        try {
-            String sanitizedScript = script.chars().mapToObj(c -> (char) c).filter(LoadedFont::isValidChar).map(String::valueOf).reduce(new StringBuilder(), StringBuilder::append, StringBuilder::append).toString();
-            ConsoleScript behavior = (ConsoleScript) engine.eval(genScript(sanitizedScript), bindings);
-            behavior.setConsole(console);
-            behavior.run();
-        } catch (ScriptException e) {
-            e.printStackTrace();
-        }
+    private static void readScriptDI(String script, ScriptEngine engine, Console console) throws ScriptException {
+        String sanitizedScript = script.chars().mapToObj(c -> (char) c).filter(LoadedFont::isValidChar).map(String::valueOf).reduce(new StringBuilder(), StringBuilder::append, StringBuilder::append).toString();
+        ConsoleScript behavior = (ConsoleScript) engine.eval(genScript(sanitizedScript), bindings);
+        behavior.setConsole(console);
+        behavior.run();
 
         bindings.clear();
     }
 
-    public static void readScriptBlocking(String script, String lang, Console console) {
+    public static void readScriptBlocking(String script, String lang, Console console) throws ScriptException {
         ScriptEngine engine = getScriptEngine(lang).blockingGet();
         readScriptDI(script, engine, console);
     }
