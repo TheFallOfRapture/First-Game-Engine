@@ -24,7 +24,7 @@ class ConsoleGUI(game: Game, private val console: Console, private val width: In
     private lateinit var consoleOutput: TextField
 
     override fun init() {
-        val fontSize = 21
+        val fontSize = 16
 
         val consoleBG = Panel("consoleBackground", Vector2f(0f, (height - 500).toFloat()), Vector2f(width.toFloat(), 500f), Color(0f, 1f, 0f, 0.3f), Texture("textures/solid.png"))
         val consoleInputBG = Panel("consoleInput", Vector2f(0f, (height - 520).toFloat()), Vector2f(width.toFloat(), 20f), Color(0f, 0f, 1f, 0.3f), Texture("textures/solid.png"))

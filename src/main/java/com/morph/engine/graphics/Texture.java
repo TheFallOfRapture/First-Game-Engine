@@ -125,7 +125,7 @@ public class Texture {
 		STBTTBakedChar.Buffer chars = STBTTBakedChar.malloc(96);
 		
 		try {
-			ByteBuffer fontBuffer = IOUtils.getFileAsByteBuffer(font, 160 * 1024);
+			ByteBuffer fontBuffer = IOUtils.INSTANCE.getFileAsByteBuffer(font, 160 * 1024);
 			ByteBuffer bitmap = BufferUtils.createByteBuffer(bitmapWidth * bitmapHeight);
 			
 			STBTruetype.stbtt_BakeFontBitmap(fontBuffer, size, bitmap, bitmapWidth, bitmapHeight, 32, chars);

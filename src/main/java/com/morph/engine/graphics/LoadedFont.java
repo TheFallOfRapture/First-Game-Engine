@@ -51,7 +51,7 @@ public class LoadedFont {
         try (STBTTPackContext context = STBTTPackContext.malloc(); STBTTPackedchar.Buffer packedChars = STBTTPackedchar.malloc(CHARSET_RANGE)) {
             pixels = BufferUtils.createByteBuffer(LoadedFont.BITMAP_WIDTH * LoadedFont.BITMAP_HEIGHT);
 
-            ByteBuffer fontBuffer = IOUtils.getFileAsByteBuffer(font, 160 * 1024);
+            ByteBuffer fontBuffer = IOUtils.INSTANCE.getFileAsByteBuffer(font, 160 * 1024);
 
             STBTruetype.stbtt_PackSetOversampling(context, 2, 2);
 
@@ -76,7 +76,7 @@ public class LoadedFont {
             FloatBuffer y = stack.floats(0.0f);
             STBTTAlignedQuad q = STBTTAlignedQuad.mallocStack(stack);
             STBTTFontinfo fontInfo = STBTTFontinfo.mallocStack(stack);
-            ByteBuffer fontBuffer = IOUtils.getFileAsByteBuffer(fontName, 160 * 1024);
+            ByteBuffer fontBuffer = IOUtils.INSTANCE.getFileAsByteBuffer(fontName, 160 * 1024);
 
             int[] ascent = new int[1], descent = new int[1], lineGap = new int[1];
 

@@ -145,7 +145,7 @@ public abstract class Game implements Runnable {
 
 	protected void destroy() {
 		display.destroy();
-		ScriptUtils.stop();
+		ScriptUtils.INSTANCE.stop();
 
 		try {
 			Thread.currentThread().join();
@@ -157,7 +157,7 @@ public abstract class Game implements Runnable {
 	private void init() {
 		gameActionFeed.onNext(GameAction.INIT);
 
-		ScriptUtils.init(this);
+		ScriptUtils.INSTANCE.init(this);
 
 		display = new GLDisplay(width, height, title);
 		renderingEngine = new GLRenderingEngine(this);
@@ -317,7 +317,7 @@ public abstract class Game implements Runnable {
 
 	@Deprecated
 	public void attachBehavior(String filename) {
-		GameBehavior behavior = ScriptUtils.getScriptBehavior(filename);
+		GameBehavior behavior = ScriptUtils.INSTANCE.getScriptBehavior(filename);
 
 		behavior.setGame(this);
 
@@ -327,7 +327,7 @@ public abstract class Game implements Runnable {
 	}
 
 	public void attachBehaviorAsync(String filename) {
-		ScriptUtils.getScriptBehaviorAsync(filename).subscribe(behavior -> {
+		ScriptUtils.INSTANCE.getScriptBehaviorAsync(filename).subscribe(behavior -> {
 			behavior.setGame(this);
 			behaviors.put(filename, behavior);
 			behavior.init();
