@@ -1,20 +1,19 @@
 package com.morph.engine.graphics;
 
+import com.morph.engine.util.IOUtils;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.stb.STBTTBakedChar;
+import org.lwjgl.stb.STBTruetype;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 
-import javax.imageio.ImageIO;
-
-import org.lwjgl.BufferUtils;
-import org.lwjgl.stb.STBTTBakedChar;
-import org.lwjgl.stb.STBTruetype;
-
-import com.morph.engine.util.IOUtils;
-
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL13.*;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
 
 public class Texture {
 	private TextureResource resource;
@@ -147,12 +146,12 @@ public class Texture {
 	
 	public void bind() {
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, resource.getID());
+		glBindTexture(GL_TEXTURE_2D, resource.getId());
 	}
 
 	public void bind(int i) {
 		glActiveTexture(GL_TEXTURE0 + i);
-		glBindTexture(GL_TEXTURE_2D, resource.getID());
+		glBindTexture(GL_TEXTURE_2D, resource.getId());
 	}
 	
 	public void unbind() {

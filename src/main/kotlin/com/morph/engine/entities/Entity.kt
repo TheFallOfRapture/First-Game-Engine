@@ -38,3 +38,5 @@ data class Entity @JvmOverloads constructor(val name: String, val id: Int, var c
     @SafeVarargs
     fun hasComponents(vararg requiredTypes: Class<out Component>) = requiredTypes.all { this.hasComponent(it) }
 }
+
+inline fun <reified T: Component> given(e: Entity, block: (T) -> Unit) = e.getComponent<T>()?.let { block(it) } ?: println("No component found.")

@@ -11,8 +11,6 @@ import java.nio.CharBuffer;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
-import static com.morph.engine.graphics.LoadedFont.CHARSET;
-
 /**
  * Created on 7/30/2017.
  */
@@ -41,7 +39,7 @@ public class TextRenderData extends RenderData {
 
         if (c == '\r') return;
 
-        if (!CHARSET.contains(String.valueOf(c))) return;
+        if (!LoadedFont.getCHARSET().contains(String.valueOf(c))) return;
 
         LoadedCharacter charData = font.getCharacter(c);
         float[] offsetData = charData.getOffsetData();
