@@ -15,6 +15,6 @@ class Panel(
         texture: Texture
 ) : Container(
         name,
-        Transform2D(position + (size * 0.5f), size),
+        Transform2D(position + (size * 0.5f), scale = size),
         RenderDataUtils.createTintedSquare(color, GUITintShader(), texture)
 )

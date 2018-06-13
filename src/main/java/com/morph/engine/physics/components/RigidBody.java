@@ -88,7 +88,7 @@ public class RigidBody extends Component {
 	public void applyImpulse(Vector2f impulse, float dt) {
 		// J = integral F dt -> F * dt (finite dt)
 		// F = J / dt
-		netForce = netForce.add(impulse.invScale(dt));
+		netForce = netForce.add(impulse.scale(1f / dt));
 	}
 
 	/**

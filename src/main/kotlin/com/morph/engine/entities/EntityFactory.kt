@@ -23,7 +23,7 @@ object EntityFactory {
     fun getRectangleAt(name: String, x: Float, y: Float, width: Float, height: Float, c: Color, isTrigger: Boolean): Entity {
         val result = getEntity(name)
         val halfSize = Vector2f(width / 2.0f, height / 2.0f)
-        result.addComponent(Transform2D(Vector2f(x, y), Vector2f(width, height)))
+        result.addComponent(Transform2D(Vector2f(x, y), scale = Vector2f(width, height)))
         result.addComponent(BoundingBox2D(Vector2f(x, y), halfSize, isTrigger))
         result.addComponent(RenderDataUtils.createSquare(c, BasicTexturedShader(), Texture(null)))
 
@@ -33,7 +33,7 @@ object EntityFactory {
     fun getRectangle(name: String, width: Float, height: Float, c: Color): Entity {
         val result = getEntity(name)
         val halfSize = Vector2f(width / 2.0f, height / 2.0f)
-        result.addComponent(Transform2D(Vector2f(0f, 0f), Vector2f(width, height)))
+        result.addComponent(Transform2D(Vector2f(0f, 0f), scale = Vector2f(width, height)))
         result.addComponent(BoundingBox2D(Vector2f(0f, 0f), halfSize, false))
 
         result.addComponent(RenderDataUtils.createSquare(c, BasicTexturedShader(), Texture(null)))
@@ -44,7 +44,7 @@ object EntityFactory {
     fun getCustomRectangle(name: String, width: Float, height: Float, c: Color, shader: Shader<*>): Entity {
         val result = getEntity(name)
         val halfSize = Vector2f(width / 2.0f, height / 2.0f)
-        result.addComponent(Transform2D(Vector2f(0f, 0f), Vector2f(width, height)))
+        result.addComponent(Transform2D(Vector2f(0f, 0f), scale = Vector2f(width, height)))
         result.addComponent(BoundingBox2D(Vector2f(0f, 0f), halfSize, false))
 
         result.addComponent(RenderDataUtils.createSquare(c, shader, Texture(null)))
@@ -55,7 +55,7 @@ object EntityFactory {
     fun getCustomTintRectangle(name: String, width: Float, height: Float, c: Color, shader: Shader<*>): Entity {
         val result = getEntity(name)
         val halfSize = Vector2f(width / 2.0f, height / 2.0f)
-        result.addComponent(Transform2D(Vector2f(0f, 0f), Vector2f(width, height)))
+        result.addComponent(Transform2D(Vector2f(0f, 0f), scale = Vector2f(width, height)))
         result.addComponent(BoundingBox2D(Vector2f(0f, 0f), halfSize, false))
 
         val data = RenderDataUtils.createSquare(Color(1f, 1f, 1f), shader, Texture(null))

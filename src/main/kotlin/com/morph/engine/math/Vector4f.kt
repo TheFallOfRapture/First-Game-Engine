@@ -32,13 +32,6 @@ class Vector4f {
      */
     @JvmOverloads constructor(v: Vector3f, w: Float = 0f) : this(v.x, v.y, v.z, w) {}
 
-    constructor() {
-        this.x = 0f
-        this.y = 0f
-        this.z = 0f
-        this.w = 0f
-    }
-
     constructor(xy: Vector2f, z: Int, w: Int) {
         this.x = xy.x
         this.y = xy.y
@@ -50,19 +43,23 @@ class Vector4f {
         return "Vector4f($x, $y, $z, $w)"
     }
 
-    fun add(v: Vector4f): Vector4f {
+    @JvmName("add")
+    operator fun plus(v: Vector4f): Vector4f {
         return Vector4f(x + v.x, y + v.y, z + v.z, w + v.w)
     }
 
-    fun sub(v: Vector4f): Vector4f {
+    @JvmName("sub")
+    operator fun minus(v: Vector4f): Vector4f {
         return Vector4f(x - v.x, y - v.y, z - v.z, w - v.w)
     }
 
-    fun scale(k: Float): Vector4f {
+    @JvmName("scale")
+    operator fun times(k: Float): Vector4f {
         return Vector4f(x * k, y * k, z * k, w * k)
     }
 
-    fun invScale(k: Float): Vector4f {
+    @JvmName("invScale")
+    operator fun div(k: Float): Vector4f {
         return Vector4f(x / k, y / k, z / k, w / k)
     }
 

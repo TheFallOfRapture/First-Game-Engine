@@ -64,6 +64,8 @@ dependencies {
 	compile "org.jetbrains.kotlin:kotlin-compiler:1.2.30"
 	compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.30"
 	compile "org.jetbrains.kotlin:kotlin-script-util:1.2.30"
+
+	testCompile "org.jetbrains.kotlin:kotlin-test:1.2.30"
 }
 
 jar {

@@ -25,7 +25,7 @@ object EntityGenUtils {
         val e = createEntity(name)
         val halfSize = Vector2f(width / 2.0f, height / 2.0f)
 
-        e.addComponent(Transform2D(Vector2f(0f, 0f), Vector2f(width, height)))
+        e.addComponent(Transform2D(Vector2f(0f, 0f), scale = Vector2f(width, height)))
         e.addComponent(BoundingBox2D(Vector2f(0f, 0f), halfSize, isTrigger))
         e.addComponent(RenderDataUtils.createSquare(Color(1f, 1f, 1f), BasicTexturedShader(), Texture(null)))
         Arrays.stream(additionalComponents).forEach { e.addComponent(it) }

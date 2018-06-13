@@ -115,18 +115,19 @@ class CollisionEngine(game: Game) : GameSystem(game) {
     }
 
     private fun updateAPriori(entities: List<Entity>, dt: Float) {
-        val boundingBoxes = ArrayList<BoundingBox2D>()
-        for (e in entities)
-            given<BoundingBox2D>(e) {
-                boundingBoxes.add(it)
-            }
+//        val boundingBoxes = ArrayList<BoundingBox2D>()
+//        entities.forEach { e ->
+//            given<BoundingBox2D>(e) {
+//                boundingBoxes.add(it)
+//            }
+//        }
 
+        val boundingBoxes = entities.mapNotNull { it.getComponent<BoundingBox2D>() }
         val boundingBoxSweeps = ArrayList<BoundingBox2DSweep>()
 
-        for (e in entities) {
-            if (e.hasComponent(BoundingBox2D::class.java)) {
-                val start = e.getComponent(BoundingBox2D::class.java)
-                val vel2D = e.getComponent(Velocity2D::class.java)
+        entities.forEach { e ->
+            given<BoundingBox2D>(e) {
+                val vel2D = e.getComponent<Velocity2D>()
                 val velocity = if (vel2D == null) Vector2f(0f, 0f) else vel2D.velocity * dt
 
                 val moving = velocity != Vector2f(0f, 0f)
@@ -143,16 +144,13 @@ class CollisionEngine(game: Game) : GameSystem(game) {
 
                 if (!a.isMoving && b.isMoving) {
                     // Inflate A by B's size
-                    //					System.out.println("A STILL");
                     val still = BoundingBox2D(a.boundingBox.center, a.boundingBox.halfSize + (b.boundingBox.halfSize))
                     collisionTime = getAABBSweepCollision(b, still)
                 } else if (!b.isMoving && a.isMoving) {
                     // Inflate B by A's size
-                    //					System.out.println("B STILL");
                     val still = BoundingBox2D(b.boundingBox.center, b.boundingBox.halfSize + (a.boundingBox.halfSize))
                     collisionTime = getAABBSweepCollision(a, still)
                 } else if (!a.isMoving && !b.isMoving) {
-                    //					System.out.println("BOTH STILL");
                     val colliding = a.boundingBox.intersects(b.boundingBox)
                     //					System.out.println(a.getBoundingBox().getCenter() + " : " + b.getBoundingBox().getCenter() + " : " + (colliding ? "YES" : "NO"));
 
@@ -174,8 +172,6 @@ class CollisionEngine(game: Game) : GameSystem(game) {
                         val normal: Vector3f
                         val distance: Float
 
-                        //						System.out.println(boundingBoxes.get(i).getCenter() + " : " + boundingBoxes.get(j).getCenter());
-
                         if (dX < dY) {
                             normal = Vector3f(Math.signum(e1Center.x - e2Center.x), 0f, 0f)
                             distance = dX
@@ -183,8 +179,6 @@ class CollisionEngine(game: Game) : GameSystem(game) {
                             normal = Vector3f(0f, Math.signum(e1Center.y - e2Center.y), 0f)
                             distance = dY
                         }
-
-                        //						System.out.println("X: " + dX + ", Y: " + dY);
 
                         if (boundingBoxes[i].isTrigger)
                             e2.addComponent(TriggerComponent(e1, -normal))

@@ -79,7 +79,7 @@ data class Vector2f(var x: Float = 0f, var y: Float = 0f) {
         )
     }
 
-    fun cross(v: Vector2f): Float {
+    infix fun cross(v: Vector2f): Float {
         return x * v.y - y * v.x
     }
 

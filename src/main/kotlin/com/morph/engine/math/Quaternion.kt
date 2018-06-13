@@ -26,7 +26,8 @@ class Quaternion {
         this.w = cos
     }
 
-    fun mul(other: Quaternion): Quaternion {
+    @JvmName("mul")
+    operator fun times(other: Quaternion): Quaternion {
         val newW = w * other.w - x * other.x - y * other.y - z * other.z
         val newX = w * other.x + x * other.w + y * other.z - z * other.y
         val newY = w * other.y - x * other.z + y * other.w + z * other.x

@@ -23,39 +23,14 @@ class Matrix4f(
 
     val inverse: Matrix4f
         get() {
-            val matOfMinors = Matrix4f(
-                    minorDet(0, 0), minorDet(1, 0), minorDet(2, 0), minorDet(3, 0),
-                    minorDet(0, 1), minorDet(1, 1), minorDet(2, 1), minorDet(3, 1),
-                    minorDet(0, 2), minorDet(1, 2), minorDet(2, 2), minorDet(3, 2),
-                    minorDet(0, 3), minorDet(1, 3), minorDet(2, 3), minorDet(3, 3)
-            )
-
-            val sign = Matrix4f(
-                    1f, -1f, 1f, -1f,
-                    -1f, 1f, -1f, 1f,
-                    1f, -1f, 1f, -1f,
-                    -1f, 1f, -1f, 1f
-            )
-
-            val cofactor = matOfMinors.mulComp(sign)
-            val adjugate = cofactor.transpose
-            val invDet = 1f / determinant
-
-            val inverse = adjugate * invDet
-
-            return adjugate * invDet
+            return computeGaussJordan()
         }
 
     val determinant: Float
         get() {
-            var det = 0f
-
-            for (i in 0..3) {
-                val sign = if (i % 2 == 0) 1 else -1
-                det += sign.toFloat() * values[i] * minorDet(i, 0)
-            }
-
-            return det
+            val (reduction, swaps) = this.toRowEchelonForm()
+            val power = (sequenceOf(1) + generateSequence { -1 }).take(swaps + 1).reduce {a, b -> a * b}
+            return power * reduction[0, 0] * reduction[1, 1] * reduction[2, 2] * reduction[3, 3]
         }
 
     constructor(m: FloatArray) : this(
@@ -137,28 +112,6 @@ class Matrix4f(
         return times(Vector4f(v, 1f)).xyz
     }
 
-    private fun minor(i: Int, j: Int): Matrix3f {
-        val values = FloatArray(9)
-        var index = 0
-        for (y in 0..3) {
-            for (x in 0..3) {
-                if (x != i && y != j) {
-                    values[index] = get(x, y)
-                    index++
-                }
-                if (index == 9) {
-                    break
-                }
-            }
-        }
-
-        return Matrix3f(values)
-    }
-
-    private fun minorDet(i: Int, j: Int): Float {
-        return minor(i, j).determinant
-    }
-
     @JvmName("scale")
     operator fun times(k: Float): Matrix4f {
         val values = FloatArray(16)
@@ -168,6 +121,151 @@ class Matrix4f(
         }
 
         return Matrix4f(values)
+    }
+
+    fun swapRows(a: Int, b: Int) : Matrix4f {
+        require(a < 4 && b < 4) { "Attempt to swap rows outside 0-3" }
+        val rows = values.asList().chunked(4).toMutableList()
+        val temp = rows[a]
+        rows[a] = rows[b]
+        rows[b] = temp
+        return Matrix4f(rows.flatten().toFloatArray())
+    }
+
+    fun scaleRow(a: Int, k: Float) : Matrix4f {
+        val result = Matrix4f(this.values)
+        result[a, 0] *= k
+        result[a, 1] *= k
+        result[a, 2] *= k
+        result[a, 3] *= k
+        return result
+    }
+
+    fun addScaledRow(unscaledRow: Int, scaleFactor: Float, scaledRow: Int) : Matrix4f {
+        val rowAdded = Vector4f(this[scaledRow, 0], this[scaledRow, 1], this[scaledRow, 2], this[scaledRow, 3]) * scaleFactor
+        val rowKept = Vector4f(this[unscaledRow, 0], this[unscaledRow, 1], this[unscaledRow, 2], this[unscaledRow, 3])
+        val newRow = rowAdded + rowKept
+        val result = Matrix4f(this.values)
+        result[unscaledRow, 0] = newRow.x
+        result[unscaledRow, 1] = newRow.y
+        result[unscaledRow, 2] = newRow.z
+        result[unscaledRow, 3] = newRow.w
+        return result
+    }
+
+    fun computeGaussJordan() : Matrix4f {
+        var result = Matrix4f(this.values)
+        var inverse = Matrix4f.identity
+
+        if (Math.abs(this.determinant) == 0f) return Matrix4f.empty
+
+        fun swap(a: Int, b: Int) {
+            result = result.swapRows(a, b)
+            inverse = inverse.swapRows(a, b)
+        }
+
+        fun scale(a: Int, k: Float) {
+            result = result.scaleRow(a, k)
+            inverse = inverse.scaleRow(a, k)
+        }
+
+        fun addScaled(a: Int, b: Int, k: Float) {
+            result = result.addScaledRow(a, k, b)
+            inverse = inverse.addScaledRow(a, k, b)
+        }
+
+        var row = 0
+        var col = 0
+        while (row <= 3 && col <= 3) {
+            val max = (row..3).maxBy { Math.abs(result[it, col]) }!!
+            if (result[max, col] == 0f) {
+                col++
+            } else {
+                swap(row, max)
+                for (i in (row + 1)..3) {
+                    val k = result[i, col] / result[row, col]
+                    addScaled(i, row, -k)
+                }
+
+                row++
+                col++
+            }
+        }
+
+        if (result[3, 3] != 0f) {
+            addScaled(2, 3,  -result[2, 3] * (1f / result[3, 3]))
+        }
+
+        if (result[2, 2] != 0f) {
+            addScaled(1, 2, -result[1, 2] * (1f / result[2, 2]))
+        }
+
+        if (result[3, 3] != 0f) {
+            addScaled(1, 3, -result[1, 3] * (1f / result[3, 3]))
+        }
+
+        if (result[1, 1] != 0f) {
+            addScaled(0, 1, -result[0, 1] * (1f / result[1, 1]))
+        }
+
+        if (result[2, 2] != 0f) {
+            addScaled(0, 2, -result[0, 2] * (1f / result[2, 2]))
+        }
+
+        if (result[3, 3] != 0f) {
+            addScaled(0, 3, -result[0, 3] * (1f / result[3, 3]))
+        }
+
+        if (result[0, 0] != 0f) scale(0, 1f / result[0, 0])
+        if (result[1, 1] != 0f) scale(1, 1f / result[1, 1])
+        if (result[2, 2] != 0f) scale(2, 1f / result[2, 2])
+        if (result[3, 3] != 0f) scale(3, 1f / result[3, 3])
+
+        return inverse
+    }
+
+    fun toRowEchelonForm() : Pair<Matrix4f, Int> {
+        var result = Matrix4f(this.values)
+        val pivot1 = sequenceOf(0, 1, 2, 3).filter { result[it, 0] != 0f }.min()
+        var swaps = 0
+
+        pivot1?.let {
+            if (it != 0) {
+                result = result.swapRows(it, 0)
+                swaps++
+            }
+            for (i in 1..3) {
+                if (result[i, 0] != 0f) {
+                    result = result.addScaledRow(i, -result[i, 0] / result[0, 0], 0)
+                }
+            }
+        }
+
+        val pivot2 = sequenceOf(1, 2, 3).filter { result[it, 1] != 0f }.min()
+        pivot2?.let {
+            if (it != 1) {
+                result = result.swapRows(it, 1)
+                swaps++
+            }
+            for (i in 2..3) {
+                if (result[i, 1] != 0f) {
+                    result = result.addScaledRow(i, -result[i, 1] / result[1, 1], 1)
+                }
+            }
+        }
+
+        val pivot3 = sequenceOf(2, 3).filter { result[it, 2] != 0f }.min()
+        pivot3?.let {
+            if (it != 2) {
+                result = result.swapRows(2, 3)
+                swaps++
+            }
+            if (result[3, 2] != 0f) {
+                result = result.addScaledRow(3, -result[3, 2] / result[2, 2], 2)
+            }
+        }
+
+        return result to swaps
     }
 
     private fun mulComp(mat: Matrix4f): Matrix4f {
@@ -196,10 +294,21 @@ class Matrix4f(
 
         @JvmStatic
         val empty: Matrix4f
-            get() = Matrix4f(0f, 0f, 0f, 0f,
+            get() = Matrix4f(
+                    0f, 0f, 0f, 0f,
                     0f, 0f, 0f, 0f,
                     0f, 0f, 0f, 0f,
                     0f, 0f, 0f, 0f
             )
+
+        @JvmStatic
+        fun scaleMatrix(k: Float) = Matrix4f.identity * k
+
+        @JvmStatic
+        fun approxIdentity(mat: Matrix4f, epsilon: Float): Boolean = (0..15).all {
+            val i = it / 4
+            val j = it % 4
+            if (i == j) Math.abs(mat[i, j] - 1f) < epsilon else Math.abs(mat[i, j]) < epsilon
+        }
     }
 }
