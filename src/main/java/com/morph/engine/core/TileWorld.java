@@ -4,11 +4,12 @@ import com.morph.engine.entities.Entity;
 import com.morph.engine.entities.EntityGrid;
 import com.morph.engine.math.Vector2f;
 import com.morph.engine.physics.components.Transform2D;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by Fernando on 1/19/2017.
  */
-public class TileWorld extends EntityGrid implements IWorld {
+public abstract class TileWorld extends EntityGrid implements IWorld {
     private Game game;
     private float xOffset;
     private float yOffset;
@@ -49,7 +50,7 @@ public class TileWorld extends EntityGrid implements IWorld {
     }
 
     @Override
-    public boolean addEntity(Entity e, int tileX, int tileY) {
+    public boolean addEntity(@NotNull Entity e, int tileX, int tileY) {
         if (tileX < 0 || tileX >= getWidth() || tileY < 0 || tileY >= getHeight())
             return false;
 

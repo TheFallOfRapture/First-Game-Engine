@@ -22,4 +22,9 @@ public interface IWorld {
 
     boolean addEntity(Entity e); // TODO: Should this really be required?
     boolean removeEntity(Entity e);
+
+    void init(Game game);
+    default void destroy() {
+        getEntities().forEach(Entity::destroy);
+    }
 }

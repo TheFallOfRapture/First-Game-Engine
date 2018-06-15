@@ -30,23 +30,23 @@ public abstract class Game implements Runnable {
 	protected boolean fullscreen;
 
 	protected IWorld world;
-	protected List<GameSystem> systems;
+	protected List<GameSystem> systems = new ArrayList<>();
 
-	protected HashMap<String, GameBehavior> behaviors;
+	protected HashMap<String, GameBehavior> behaviors = new HashMap<>();
 
 	protected GLDisplay display;
 	protected GLRenderingEngine renderingEngine;
 
 	protected float dt;
 
-	protected List<Element> guiElements;
-	private List<GUI> guis;
+	protected List<Element> guiElements = new ArrayList<>();
+	private List<GUI> guis = new ArrayList<>();
 
 	private ScriptSystem scriptSystem;
 	private Console console;
 	private ConsoleGUI consoleGUI;
 
-	private Camera camera;
+	private Camera camera = Camera.Identity.INSTANCE;
 
 	public static final int VERSION_MAJOR = 0;
 	public static final int VERSION_MINOR = 6;
@@ -69,16 +69,9 @@ public abstract class Game implements Runnable {
 		this.height = height;
 		this.title = title;
 		this.dt = 1.0f / fps;
-		systems = new ArrayList<>();
-		guiElements = new ArrayList<>();
-		guis = new ArrayList<>();
-		behaviors = new HashMap<>();
 		this.fullscreen = fullscreen;
 		this.console = new Console(Console.ScriptType.KOTLIN, this);
 		this.consoleGUI = new ConsoleGUI(this, console, width, height);
-		this.camera = Camera.Identity.INSTANCE;
-
-//		System.setOut(Console.out);
 	}
 
 	public void start() {
@@ -180,7 +173,7 @@ public abstract class Game implements Runnable {
 
 		display.getEvents().filter(e -> e == GLDisplay.GLDisplayAction.CLOSE).subscribe(e -> handleExitEvent());
 
-		// TODO: Oh my god please move this somewhere else
+		// TODO: Oh my god please move this somewhere else this is evil code
 		Observable.combineLatest(
 		        events.filter(e -> e == GameAction.UPDATE),
                 Observable.concat(Observable.just(new StdMouseEvent(MouseRelease.INSTANCE, 0, 0)), Mouse.getStandardMouseEvents()),
@@ -352,11 +345,19 @@ public abstract class Game implements Runnable {
 	public abstract void postGameUpdate();
 	public abstract void handleInput();
 
-	public abstract IWorld getWorld();
+	public IWorld getWorld() {
+		return world;
+	}
+
+	public void setWorld(IWorld nextWorld) {
+		if (world != null) world.destroy();
+		nextWorld.init(this);
+		nextWorld.getEntities().forEach(renderingEngine::register);
+		this.world = nextWorld;
+	}
 
 	public final void render() {
 		gameActionFeed.onNext(GameAction.RENDER);
-
 		renderingEngine.render(display);
 	}
 

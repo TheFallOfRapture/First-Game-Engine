@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by Fernando on 1/19/2017.
  */
-public class ListWorld implements IWorld {
+public abstract class ListWorld implements IWorld {
     private Game game;
     private List<Entity> entities;
 

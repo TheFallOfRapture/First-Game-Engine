@@ -1,24 +1,18 @@
 package com.morph.engine.core;
 
 import com.morph.engine.core.gui.EngineGUI;
-import com.morph.engine.entities.Entity;
-import com.morph.engine.entities.EntityFactory;
 import com.morph.engine.graphics.Color;
-import com.morph.engine.graphics.Texture;
-import com.morph.engine.graphics.components.RenderData;
 import com.morph.engine.graphics.components.light.PointLight;
-import com.morph.engine.graphics.shaders.BasicLightShader;
 import com.morph.engine.input.InputMapping;
 import com.morph.engine.input.KeyActions;
 import com.morph.engine.input.MouseActions;
 import com.morph.engine.math.Vector2f;
 import com.morph.engine.math.Vector3f;
-import com.morph.engine.script.ScriptContainer;
 import com.morph.engine.util.KotlinTestKt;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-public class Engine extends OpenGame {
+public class Engine extends Game {
 	private EngineGUI testGUI;
 	private PointLight light1 = new PointLight(15f, new Color(0.5f, 1f, 0.5f), new Vector3f(5f, -5f, 0f));
 	private PointLight light2 = new PointLight(15f, new Color(1f, 0.5f, 0f), new Vector3f(-2f, 0f, 0f));
@@ -31,6 +25,7 @@ public class Engine extends OpenGame {
 
 	@Override
 	public void initGame() {
+		setWorld(new EngineWorld(this));
 		renderingEngine.setClearColor(0, 0, 0, 0);
 		setCamera(new OrthoCam2D(new Vector2f(0, 0), 0f, 10f * ((float) width / height), 10f));
 
@@ -58,19 +53,6 @@ public class Engine extends OpenGame {
 //		addEntity(a);
 //		addEntity(b);
 //		addEntity(c);
-
-		Entity player = EntityFactory.INSTANCE.getCustomTintRectangle("player", 15, 15, new Color(0.1f, 0.1f, 0.1f), new BasicLightShader());
-		ScriptContainer sc = new ScriptContainer(this, player);
-        player.getComponent(RenderData.class).setTexture(new Texture("textures/testNormalMap.png"), 1);
-
-		player.addComponent(sc);
-		sc.addBehaviorAsync("EScript.kts");
-		sc.addBehaviorAsync("TestPythonScript.py");
-
-		addEntity(player);
-
-		attachBehaviorAsync("TestBehavior.kts");
-		attachBehaviorAsync("TestBehavior2.kts");
 
 		InputMapping input = new InputMapping();
 
