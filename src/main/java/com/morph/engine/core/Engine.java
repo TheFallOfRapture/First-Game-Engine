@@ -8,7 +8,6 @@ import com.morph.engine.input.KeyActions;
 import com.morph.engine.input.MouseActions;
 import com.morph.engine.math.Vector2f;
 import com.morph.engine.math.Vector3f;
-import com.morph.engine.util.KotlinTestKt;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -25,9 +24,11 @@ public class Engine extends Game {
 
 	@Override
 	public void initGame() {
+		OrthoCam2D camera;
+
 		setWorld(new EngineWorld(this));
 		renderingEngine.setClearColor(0, 0, 0, 0);
-		setCamera(new OrthoCam2D(new Vector2f(0, 0), 0f, 10f * ((float) width / height), 10f));
+		setCamera(camera = new OrthoCam2D(new Vector2f(0, 0), 0f, 10f * ((float) width / height), 10f));
 
 		renderingEngine.addLight(light1);
 		renderingEngine.addLight(light2);
@@ -38,25 +39,7 @@ public class Engine extends Game {
 
 		addGUI(testGUI);
 
-		KotlinTestKt.printMsg("Hello, world! Kotlin 1.1.1 is working in Morph 0.5.0!");
-
-//		Entity a = EntityFactory.getCustomTintRectangle("a", 2, 2, new Color(1, 0.5f, 0.5f), new BasicLightShader());
-//		Entity b = EntityFactory.getCustomTintRectangle("b", 2, 2, new Color(0.5f, 1, 0.5f), new BasicLightShader());
-//		Entity c = EntityFactory.getCustomTintRectangle("c", 2, 2, new Color(0.5f, 0.5f, 1), new BasicLightShader());
-//		a.getComponent(RenderData.class).setTexture(new Texture("textures/testNormalMap.png"), 1);
-//		b.getComponent(RenderData.class).setTexture(new Texture("textures/testNormalMap.png"), 1);
-//		c.getComponent(RenderData.class).setTexture(new Texture("textures/testNormalMap.png"), 1);
-//
-//		a.getComponent(Transform2D.class).translate(new Vector2f(0, 2));
-//		b.getComponent(Transform2D.class).translate(new Vector2f(0, -2));
-//
-//		addEntity(a);
-//		addEntity(b);
-//		addEntity(c);
-
 		InputMapping input = new InputMapping();
-
-		OrthoCam2D camera = (OrthoCam2D) getCamera();
 
 		float speed = 0.1f;
 		input.mapKey(GLFW_KEY_W, KeyActions.DOWN, () -> camera.setPosition(camera.getPosition().add(new Vector2f(0, speed))));

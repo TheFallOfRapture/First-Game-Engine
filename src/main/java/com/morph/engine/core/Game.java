@@ -32,21 +32,21 @@ public abstract class Game implements Runnable {
 	protected IWorld world;
 	protected List<GameSystem> systems = new ArrayList<>();
 
-	protected HashMap<String, GameBehavior> behaviors = new HashMap<>();
+	protected HashMap<String, GameBehavior> behaviors = new HashMap<>(); // TODO: Consider moving to a different class
 
-	protected GLDisplay display;
-	protected GLRenderingEngine renderingEngine;
+	protected GLDisplay display; // TODO: Consider moving to a different class
+	protected GLRenderingEngine renderingEngine; // TODO: Consider moving to a different class
 
 	protected float dt;
 
-	protected List<Element> guiElements = new ArrayList<>();
-	private List<GUI> guis = new ArrayList<>();
+	protected List<Element> guiElements = new ArrayList<>(); // TODO: Consider moving to a different class
+	private List<GUI> guis = new ArrayList<>(); // TODO: Consider moving to a different class
 
-	private ScriptSystem scriptSystem;
-	private Console console;
-	private ConsoleGUI consoleGUI;
+	private ScriptSystem scriptSystem; // TODO: Is it okay to have a hardcoded version of this, instead of adding it to the queue?
+	private Console console; // TODO: Consider moving to a different class
+	private ConsoleGUI consoleGUI; // TODO: Consider moving to a different class
 
-	private Camera camera = Camera.Identity.INSTANCE;
+	private Camera camera = Camera.Identity.INSTANCE; // TODO: Consider moving to a different class
 
 	public static final int VERSION_MAJOR = 0;
 	public static final int VERSION_MINOR = 6;
@@ -351,7 +351,7 @@ public abstract class Game implements Runnable {
 
 	public void setWorld(IWorld nextWorld) {
 		if (world != null) world.destroy();
-		nextWorld.init(this);
+		nextWorld.init();
 		nextWorld.getEntities().forEach(renderingEngine::register);
 		this.world = nextWorld;
 	}

@@ -14,7 +14,9 @@ public class EngineWorld extends ListWorld {
     }
 
     @Override
-    public void init(Game game) {
+    public void init() {
+        Engine game = (Engine) this.getGame();
+
         Entity player = EntityFactory.INSTANCE.getCustomTintRectangle("player", 15, 15, new Color(0.1f, 0.1f, 0.1f), new BasicLightShader());
         ScriptContainer sc = new ScriptContainer(game, player);
         player.getComponent(RenderData.class).setTexture(new Texture("textures/testNormalMap.png"), 1);
