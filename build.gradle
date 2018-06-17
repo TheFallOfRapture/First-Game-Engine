@@ -53,12 +53,27 @@ dependencies {
 	compile "org.lwjgl:lwjgl-openal:$lwjglVersion"
 	compile "org.lwjgl:lwjgl-opengl:$lwjglVersion"
 	compile "org.lwjgl:lwjgl-stb:$lwjglVersion"
-	compile "org.lwjgl:lwjgl:$lwjglVersion:$lwjglNatives"
-	compile "org.lwjgl:lwjgl-assimp:$lwjglVersion:$lwjglNatives"
-	compile "org.lwjgl:lwjgl-glfw:$lwjglVersion:$lwjglNatives"
-	compile "org.lwjgl:lwjgl-openal:$lwjglVersion:$lwjglNatives"
-	compile "org.lwjgl:lwjgl-opengl:$lwjglVersion:$lwjglNatives"
-	compile "org.lwjgl:lwjgl-stb:$lwjglVersion:$lwjglNatives"
+	// LWJGL Natives for Windows
+	compile "org.lwjgl:lwjgl:$lwjglVersion:natives-windows"
+	compile "org.lwjgl:lwjgl-assimp:$lwjglVersion:natives-windows"
+	compile "org.lwjgl:lwjgl-glfw:$lwjglVersion:natives-windows"
+	compile "org.lwjgl:lwjgl-openal:$lwjglVersion:natives-windows"
+	compile "org.lwjgl:lwjgl-opengl:$lwjglVersion:natives-windows"
+	compile "org.lwjgl:lwjgl-stb:$lwjglVersion:natives-windows"
+	// LWJGL Natives for Linux
+	compile "org.lwjgl:lwjgl:$lwjglVersion:natives-linux"
+	compile "org.lwjgl:lwjgl-assimp:$lwjglVersion:natives-linux"
+	compile "org.lwjgl:lwjgl-glfw:$lwjglVersion:natives-linux"
+	compile "org.lwjgl:lwjgl-openal:$lwjglVersion:natives-linux"
+	compile "org.lwjgl:lwjgl-opengl:$lwjglVersion:natives-linux"
+	compile "org.lwjgl:lwjgl-stb:$lwjglVersion:natives-linux"
+	// LWJGL Natives for Mac OS
+	compile "org.lwjgl:lwjgl:$lwjglVersion:natives-macos"
+	compile "org.lwjgl:lwjgl-assimp:$lwjglVersion:natives-macos"
+	compile "org.lwjgl:lwjgl-glfw:$lwjglVersion:natives-macos"
+	compile "org.lwjgl:lwjgl-openal:$lwjglVersion:natives-macos"
+	compile "org.lwjgl:lwjgl-opengl:$lwjglVersion:natives-macos"
+	compile "org.lwjgl:lwjgl-stb:$lwjglVersion:natives-macos"
 	// LWJGL dependencies END
 	compile 'io.reactivex.rxjava2:rxkotlin:2.2.0'
 	compile "org.jetbrains.kotlin:kotlin-compiler:1.2.30"
