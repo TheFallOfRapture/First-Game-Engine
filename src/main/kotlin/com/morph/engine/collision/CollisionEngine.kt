@@ -18,7 +18,7 @@ import java.util.*
 
 // Reference: noonat.github.io/intersect/
 
-class CollisionEngine(game: Game) : GameSystem(game) {
+class CollisionEngine(game: Game, val collisionSolver: CollisionSolver) : GameSystem(game) {
     private val collisionFeed = Feed<Collision>()
     private val collisionEvents = Observable.create<Collision> { collisionFeed.emit(it) }
 
@@ -58,7 +58,7 @@ class CollisionEngine(game: Game) : GameSystem(game) {
                             val normal = Vector3f(coll.collisionData.normal, 0f)
 
                             if (!boxA.isTrigger && !boxB.isTrigger)
-                                solveCollision(coll)
+                                collisionSolver.solveCollision(coll)
 
                             if (boxA.isTrigger)
                                 b.addComponent(TriggerComponent(a, normal))
@@ -79,32 +79,32 @@ class CollisionEngine(game: Game) : GameSystem(game) {
         }
     }
 
-    private fun solveCollision(coll: SweepCollision) {
-        if (coll !is SweepCollision.Hit) return
-
-        val a = coll.entity
-        val b = coll.hit
-
-        given<Velocity2D>(a) { v2D ->
-            val vel = v2D.velocity
-            val blockDir = -coll.collisionData.normal
-            val remove = blockDir * (blockDir dot vel) * (1.0f - coll.collisionData.time)
-
-            val newVelocity = vel - remove
-
-            v2D.velocity = newVelocity
-        }
-
-        given<Velocity2D>(b) { v2D ->
-            val vel = v2D.velocity
-            val blockDir = coll.collisionData.normal
-            val remove = blockDir * (blockDir dot vel) * (1.0f - coll.collisionData.time)
-
-            val newVelocity = vel - remove
-
-            v2D.velocity = newVelocity
-        }
-    }
+//    private fun solveCollision(coll: SweepCollision) {
+//        if (coll !is SweepCollision.Hit) return
+//
+//        val a = coll.entity
+//        val b = coll.hit
+//
+//        given<Velocity2D>(a) { v2D ->
+//            val vel = v2D.velocity
+//            val blockDir = -coll.collisionData.normal
+//            val remove = blockDir * (blockDir dot vel) * (1.0f - coll.collisionData.time)
+//
+//            val newVelocity = vel - remove
+//
+//            v2D.velocity = newVelocity
+//        }
+//
+//        given<Velocity2D>(b) { v2D ->
+//            val vel = v2D.velocity
+//            val blockDir = coll.collisionData.normal
+//            val remove = blockDir * (blockDir dot vel) * (1.0f - coll.collisionData.time)
+//
+//            val newVelocity = vel - remove
+//
+//            v2D.velocity = newVelocity
+//        }
+//    }
 
     fun update(entities: List<Entity>, dt: Float) {
         for (e in entities)
@@ -201,7 +201,7 @@ class CollisionEngine(game: Game) : GameSystem(game) {
 
                     val newVel = aVel - bVel
 
-                    val newHalfSize = bStart!!.halfSize + (a.boundingBox!!.halfSize)
+                    val newHalfSize = bStart.halfSize + (a.boundingBox.halfSize)
                     val still = BoundingBox2D(bStart.center, newHalfSize)
 
                     val moving = BoundingBox2DSweep(a.entity, newVel, true)
@@ -251,7 +251,7 @@ class CollisionEngine(game: Game) : GameSystem(game) {
     }
 
     private fun getAABBSweepCollision(a: BoundingBox2DSweep, b: BoundingBox2D): Float {
-        val (x, y) = a.boundingBox!!.center
+        val (x, y) = a.boundingBox.center
         val velocity = a.velocity
 
         val nearTimeX: Float
@@ -313,8 +313,8 @@ class CollisionEngine(game: Game) : GameSystem(game) {
 
             for (entity in entities) {
                 given<BoundingBox2D>(entity) { boxB ->
-                    val vel2D = entity.getComponent(Velocity2D::class.java)
-                    val velB = if (vel2D == null) Vector2f(0f, 0f) else vel2D.velocity
+                    val vel2D = entity.getComponent<Velocity2D>()
+                    val velB = vel2D?.velocity ?: Vector2f(0f, 0f)
 
                     val coll: CollisionData?
 
@@ -337,13 +337,13 @@ class CollisionEngine(game: Game) : GameSystem(game) {
         }
 
         private fun checkCollision(a: Entity, b: Entity, dt: Float): SweepCollision {
-            val velA = a.getComponent(Velocity2D::class.java)
-            val velB = b.getComponent(Velocity2D::class.java)
+            val velA = a.getComponent<Velocity2D>()
+            val velB = b.getComponent<Velocity2D>()
 
             given<BoundingBox2D>(a) { boxA ->
                 given<BoundingBox2D>(b) { boxB ->
-                    val vA = if (velA == null) Vector2f(0f, 0f) else velA.velocity
-                    val vB = if (velB == null) Vector2f(0f, 0f) else velB.velocity
+                    val vA = velA?.velocity ?: Vector2f(0f, 0f)
+                    val vB = velB?.velocity ?: Vector2f(0f, 0f)
 
                     if (vA.x == 0f && vA.y == 0f) { // A STILL
                         if (vB.x == 0f && vB.y == 0f) { // A STILL | B STILL
@@ -444,10 +444,10 @@ class CollisionEngine(game: Game) : GameSystem(game) {
 
             val time = MathUtils.clamp(nearTime, 0f, 1f)
             val n: Vector2f
-            if (nearTimeX > nearTimeY) {
-                n = Vector2f(-signX, 0f)
+            n = if (nearTimeX > nearTimeY) {
+                Vector2f(-signX, 0f)
             } else {
-                n = Vector2f(0f, -signY)
+                Vector2f(0f, -signY)
             }
 
             val inter = delta * time
@@ -469,8 +469,8 @@ class CollisionEngine(game: Game) : GameSystem(game) {
             if (delta.x == 0.0f) scaleX = signX * java.lang.Float.MAX_VALUE
             if (delta.y == 0.0f) scaleY = signY * java.lang.Float.MAX_VALUE
 
-            val (x1, y1) = Vector2f(signX, signY)
-            val scale = Vector2f(scaleX, scaleY)
+//            val (x1, y1) = Pair(signX, signY)
+//            val scale = Vector2f(scaleX, scaleY)
 
             val nearTimeX = (boxStill.center.x - signX * (boxStill.halfSize.x + x) - position.x) * scaleX
             val nearTimeY = (boxStill.center.y - signY * (boxStill.halfSize.y + y) - position.y) * scaleY
@@ -488,10 +488,10 @@ class CollisionEngine(game: Game) : GameSystem(game) {
 
             val time = MathUtils.clamp(nearTime, 0f, 1f)
             val n: Vector2f
-            if (nearTimeX > nearTimeY) {
-                n = Vector2f(-signX, 0f)
+            n = if (nearTimeX > nearTimeY) {
+                Vector2f(-signX, 0f)
             } else {
-                n = Vector2f(0f, -signY)
+                Vector2f(0f, -signY)
             }
 
             val inter = delta * time

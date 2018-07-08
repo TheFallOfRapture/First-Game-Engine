@@ -1,12 +1,12 @@
 package com.morph.engine.graphics
 
-import org.lwjgl.opengl.GL11.glDeleteTextures
+import org.lwjgl.opengl.GL20.glDeleteProgram
 
-class TextureResource(val id: Int) {
+class ShaderResource(val id: Int) {
     private var count: Int = 0
 
     fun finalize() {
-        glDeleteTextures(id)
+        glDeleteProgram(id)
     }
 
     fun addReference() {

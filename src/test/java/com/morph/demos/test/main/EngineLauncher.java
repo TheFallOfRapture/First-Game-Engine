@@ -1,4 +1,6 @@
-package com.morph.engine.core;
+package com.morph.demos.test.main;
+
+import com.morph.engine.core.GameApplication;
 
 public class EngineLauncher {
 	private static GameApplication launcher;

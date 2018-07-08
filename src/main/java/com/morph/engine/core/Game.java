@@ -28,6 +28,7 @@ public abstract class Game implements Runnable {
 	protected String title;
 	protected boolean isRunning = false;
 	protected boolean fullscreen;
+	protected float dt;
 
 	protected IWorld world;
 	protected List<GameSystem> systems = new ArrayList<>();
@@ -37,19 +38,16 @@ public abstract class Game implements Runnable {
 	protected GLDisplay display; // TODO: Consider moving to a different class
 	protected GLRenderingEngine renderingEngine; // TODO: Consider moving to a different class
 
-	protected float dt;
-
 	protected List<Element> guiElements = new ArrayList<>(); // TODO: Consider moving to a different class
 	private List<GUI> guis = new ArrayList<>(); // TODO: Consider moving to a different class
 
-	private ScriptSystem scriptSystem; // TODO: Is it okay to have a hardcoded version of this, instead of adding it to the queue?
 	private Console console; // TODO: Consider moving to a different class
 	private ConsoleGUI consoleGUI; // TODO: Consider moving to a different class
 
 	private Camera camera = Camera.Identity.INSTANCE; // TODO: Consider moving to a different class
 
 	public static final int VERSION_MAJOR = 0;
-	public static final int VERSION_MINOR = 6;
+	public static final int VERSION_MINOR = 7;
 	public static final int VERSION_PATCH = 0;
 
 	public static final String VERSION_STRING = VERSION_MAJOR + "." + VERSION_MINOR + "." + VERSION_PATCH;
@@ -154,7 +152,7 @@ public abstract class Game implements Runnable {
 
 		display = new GLDisplay(width, height, title);
 		renderingEngine = new GLRenderingEngine(this);
-		scriptSystem = new ScriptSystem(this);
+		ScriptSystem scriptSystem = new ScriptSystem(this);
 
 		addSystem(renderingEngine);
 		addSystem(scriptSystem);
@@ -350,7 +348,11 @@ public abstract class Game implements Runnable {
 	}
 
 	public void setWorld(IWorld nextWorld) {
-		if (world != null) world.destroy();
+		if (world != null) {
+			world.getEntities().forEach(renderingEngine::unregister);
+			world.destroy();
+		}
+
 		nextWorld.init();
 		nextWorld.getEntities().forEach(renderingEngine::register);
 		this.world = nextWorld;

@@ -1,18 +1,16 @@
 package com.morph.engine.entities
 
-import java.util.*
-
 /**
  * Created by Fernando on 2/11/2017.
  */
 open class EntityGrid(val width: Int, val height: Int) {
     private val entities: Array<Entity?> = arrayOfNulls(width * height)
 
-    fun getEntities(): List<Entity?> {
-        return Arrays.asList(*entities)
+    fun asList(): List<Entity> {
+        return entities.filterNotNull()
     }
 
-    open fun addEntity(e: Entity, tileX: Int, tileY: Int): Boolean {
+    open operator fun set(tileX: Int, tileY: Int, e: Entity?): Boolean {
         if (tileX < 0 || tileX >= width || tileY < 0 || tileY >= height)
             return false
 
@@ -71,7 +69,7 @@ open class EntityGrid(val width: Int, val height: Int) {
         return intArrayOf(-1, -1)
     }
 
-    fun getEntity(tileX: Int, tileY: Int): Entity? {
+    operator fun get(tileX: Int, tileY: Int): Entity? {
         return if (tileX >= width || tileY >= height) null else entities[tileX + tileY * width]
 
     }
