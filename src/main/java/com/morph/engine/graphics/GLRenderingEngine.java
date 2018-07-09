@@ -42,9 +42,14 @@ public class GLRenderingEngine extends GameSystem {
 		data.getShader().bind();
 		data.getShader().getUniforms().setUniforms(transform, data, camera, screenProjection, lights);
 
+//		glEnable(GL_ALPHA_TEST);
+//		glAlphaFunc(GL_GEQUAL, 0.1f);
+
 		glBindVertexArray(data.getVertexArrayObject());
 		glDrawElements(GL_TRIANGLES, data.getIndices().size(), GL_UNSIGNED_INT, NULL);
 		glBindVertexArray(0);
+
+//		glDisable(GL_ALPHA_TEST);
 
 		data.getShader().getUniforms().unbind(transform, data);
 		data.getShader().unbind();

@@ -8,15 +8,21 @@ import com.morph.engine.script.EntityBehavior
 import com.morph.engine.script.GameBehavior
 import com.morph.engine.script.ScriptContainer
 import com.morph.engine.script.debug.Console
-import io.reactivex.*
+import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Observable
+import io.reactivex.ObservableEmitter
+import io.reactivex.rxkotlin.toCompletable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import org.jetbrains.kotlin.script.jsr223.KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory
 import java.io.IOException
-import java.nio.file.*
+import java.nio.file.FileSystems
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY
 import java.nio.file.StandardWatchEventKinds.OVERFLOW
+import java.nio.file.WatchEvent
 import java.util.*
 import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
@@ -31,37 +37,28 @@ object ScriptUtils {
     private val scriptedEntities = HashMap<String, MutableList<Entity>>()
     private val bindings = SimpleBindings()
     private var isRunning: Boolean = false
-    var isInitialized: Boolean = false
-        private set
-    var initializationTask: Completable? = null
-        private set
+    private var isInitialized: Boolean = false
+    private val initializationTask: Completable = ScriptUtils::load.toCompletable().subscribeOn(Schedulers.io()).cache()
     private val closeRequests = PublishSubject.create<Boolean>()
 
     private val SCRIPT_ENGINE_EXTENSIONS = listOf("kts")
 
     fun init(game: Game) {
-        initializationTask = Single.just(game).flatMapCompletable { g -> Completable.fromCallable { ScriptUtils.load(g) } }.cache()
+        initializationTask.subscribe()
 
-        val loadedScripts = initializationTask?.subscribeOn(Schedulers.io())
-                ?.andThen<WatchEvent<Path>>(Observable.create { runReactive(it) })
-                ?.map { event -> Paths.get("scripts/").resolve(event.context()).fileName.toString() }
-                ?.flatMapMaybe { getScriptBehaviorAsync(it) }
-
-        loadedScripts
-                ?.filter { EntityBehavior::class.java.isInstance(it) }
-                ?.subscribe { behavior -> scriptedEntities[behavior.name]?.forEach { entity -> entity.getComponent(ScriptContainer::class.java)?.replaceBehavior(behavior.name!!, behavior as EntityBehavior) } }
-
-        loadedScripts
-                ?.filter { behavior -> !EntityBehavior::class.java.isInstance(behavior) }
-                ?.subscribe { behavior -> game.replaceBehavior(behavior.name, behavior) }
-
-        //                .subscribe(behavior -> {
-        //                    if (behavior instanceof EntityBehavior) scriptedEntities.get(behavior.getName()).forEach(entity -> entity.getComponent(ScriptContainer.class).replaceBehavior(behavior.getName(), (EntityBehavior)behavior));
-        //                    else game.replaceBehavior(behavior.getName(), behavior);
-        //                });
+        initializationTask
+                .andThen<WatchEvent<Path>>(Observable.create { runReactive(it) })
+                .map { event -> Paths.get("scripts/").resolve(event.context()).fileName.toString() }
+                .flatMapMaybe { getScriptBehaviorAsync(it) }
+                .subscribe { behavior ->
+                    when (behavior) {
+                        is EntityBehavior -> scriptedEntities[behavior.name]?.forEach { entity -> entity.getComponent<ScriptContainer>()?.replaceBehavior(behavior.name!!, behavior) }
+                        else -> game.replaceBehavior(behavior.name, behavior)
+                    }
+                }
     }
 
-    private fun load(game: Game): Boolean {
+    private fun load(): Boolean {
         Console.out.println("Morph Script Engine " + Game.VERSION_STRING + " initializing... Please wait...")
         val kotlinEngine = KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory()
         //        PyScriptEngineFactory pythonEngine = new PyScriptEngineFactory();
@@ -78,7 +75,7 @@ object ScriptUtils {
 
         isInitialized = true
 
-        Console.out.println("[Morph Script Engine " + Game.VERSION_STRING + "] Engine initialized.")
+        Console.out.println("[Morph Script Engine ${Game.VERSION_STRING}] Engine initialized.")
 
         return true
     }
@@ -115,61 +112,10 @@ object ScriptUtils {
 
     }
 
-    @Deprecated("")
-    private fun run(game: Game) {
-        try {
-            FileSystems.getDefault().newWatchService().use { watchService ->
-                val key = Paths.get(System.getProperty("user.dir") + "/src/main/resources/scripts/").register(watchService, ENTRY_MODIFY)
-                while (isRunning) {
-                    pollEvents(watchService, game)
-                }
-            }
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-
-    }
-
-    @Deprecated("")
-    private fun start(game: Game) {
-        if (isRunning) return
-
-        isRunning = true
-        run(game)
-    }
-
     fun stop() {
         if (!isRunning) return
 
         closeRequests.onNext(true)
-    }
-
-    @Deprecated("")
-    fun pollEvents(watchService: WatchService, game: Game) {
-        val key = watchService.poll()
-        if (key != null) {
-            for (e in key.pollEvents()) {
-                val kind = e.kind()
-
-                if (kind === OVERFLOW) continue
-
-                val event = e as WatchEvent<Path>
-                val filename = event.context()
-
-                val file = Paths.get("scripts/").resolve(filename)
-                val simpleName = file.fileName.toString()
-
-                println(simpleName)
-                val newBehavior = getScriptBehavior<GameBehavior>(simpleName)
-
-                if (newBehavior is EntityBehavior)
-                    scriptedEntities[simpleName]?.forEach { entity -> entity.getComponent(ScriptContainer::class.java)!!.replaceBehavior(simpleName, (newBehavior as EntityBehavior?)!!) }
-                else
-                    game.replaceBehavior(simpleName, newBehavior)
-            }
-
-            key.reset()
-        }
     }
 
     fun register(scriptName: String, e: Entity) {
@@ -208,15 +154,9 @@ object ScriptUtils {
         bindings.clear()
     }
 
-    @Throws(ScriptException::class)
-    fun readScriptBlocking(script: String, lang: String, console: Console) {
-        val engine = getScriptEngine(lang).blockingGet()
-        readScriptDI(script, engine, console)
-    }
-
     // TODO: When initialization is finished, return all requested script behaviors.
     private fun getScriptEngine(lang: String): Maybe<ScriptEngine> {
-        return initializationTask!!.andThen(resolveScriptEngine(lang))
+        return initializationTask.andThen(resolveScriptEngine(lang))
     }
 
     private fun resolveScriptEngine(lang: String): Maybe<ScriptEngine> {
@@ -246,7 +186,7 @@ object ScriptUtils {
         var behavior: T? = null
 
         try {
-            behavior = engine.eval(scriptSource, bindings) as T
+            behavior = engine.eval(scriptSource, bindings) as? T
             if (behavior == null) {
                 println("No result from eval, getting script variable")
                 behavior = bindings["script"] as T

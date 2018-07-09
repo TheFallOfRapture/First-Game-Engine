@@ -16,19 +16,19 @@ abstract class ConsoleScript : Runnable {
     protected fun echo(message: Any) = Console.out.println(message)
 
     protected fun getVersion() {
-        echo("Morph " + Game.VERSION_STRING)
+        echo("Morph ${Game.VERSION_STRING}")
     }
 
     protected fun addEntity(name: String, vararg components: Component) {
         val e = EntityGenUtils.createEntity(name, *components)
         console?.getGame()?.world?.addEntity(e)
-        echo("Created new entity " + name + " (ID #" + e.id + ")")
+        echo("Created new entity $name (ID #${e.id})")
     }
 
     protected fun addEntityRectangle(name: String, width: Float, height: Float, isTrigger: Boolean, vararg components: Component) {
         val e = EntityGenUtils.createEntityRectangle(name, width, height, isTrigger, *components)
         console?.getGame()?.world?.addEntity(e)
-        echo("Created new entity " + name + " (ID #" + e.id + ")")
+        echo("Created new entity $name (ID #${e.id})")
     }
 
     protected fun getEntity(name: String): Entity? {

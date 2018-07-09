@@ -1,4 +1,4 @@
-package com.morph.engine.core.gui
+package com.morph.demos.test.main.gui
 
 import com.morph.engine.core.Game
 import com.morph.engine.graphics.Color

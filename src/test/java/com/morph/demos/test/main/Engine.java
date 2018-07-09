@@ -2,7 +2,7 @@ package com.morph.demos.test.main;
 
 import com.morph.engine.core.Game;
 import com.morph.engine.core.OrthoCam2D;
-import com.morph.engine.core.gui.EngineGUI;
+import com.morph.demos.test.main.gui.EngineGUI;
 import com.morph.engine.graphics.Color;
 import com.morph.engine.graphics.components.light.PointLight;
 import com.morph.engine.input.InputMapping;
