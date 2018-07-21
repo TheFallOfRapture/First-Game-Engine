@@ -12,7 +12,7 @@ import java.util.*
 class ScriptContainer(private val game: Game, private val parent: Entity) : Component() {
     private val behaviors: HashMap<String, EntityBehavior> = HashMap()
 
-    fun addBehaviorAsync(filename: String) {
+    fun addBehavior(filename: String) {
         ScriptUtils.getScriptBehaviorAsync(filename).subscribe({ behavior ->
             val eBehavior = behavior as EntityBehavior
             eBehavior.setGame(game)
@@ -21,20 +21,6 @@ class ScriptContainer(private val game: Game, private val parent: Entity) : Comp
             eBehavior.init()
             eBehavior.start()
         })
-    }
-
-    @Deprecated("Adding scripts in this way blocks the current thread.", ReplaceWith("addBehaviorAsync"), DeprecationLevel.WARNING)
-    private fun addBehaviorStrict(filename: String) {
-        val behavior = ScriptUtils.getScriptBehavior<EntityBehavior>(filename)
-        behavior?.let {
-            behavior.setGame(game)
-            behavior.self = parent
-            behaviors[filename] = behavior
-            behavior.init()
-            behavior.start()
-        }
-
-        ScriptUtils.register(filename, parent)
     }
 
     fun replaceBehavior(filename: String, newBehavior: EntityBehavior) {

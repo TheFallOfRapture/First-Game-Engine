@@ -1,29 +1,26 @@
 package com.morph.engine.input
 
+import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
 import org.lwjgl.glfw.GLFW.*
 
-import com.morph.engine.util.Feed
-import io.reactivex.Observable
-
 object Keyboard {
-    private val keyEventFeed = Feed<StdKeyEvent>()
-
     // PRESS, REPEAT, RELEASE
-    @JvmStatic val standardKeyEvents: Observable<StdKeyEvent> = Observable.create { keyEventFeed.emit(it) }
+    private val keyEvents: PublishSubject<StdKeyEvent> = PublishSubject.create()
+    @JvmStatic val standardKeyEvents: Observable<StdKeyEvent> = keyEvents
 
     // UP, DOWN
-    @JvmStatic val binaryKeyEvents: Observable<BinKeyEvent> = Observable.create {
-        keyEventFeed.emit(it) { e ->
-            when (e.action) {
-                KeyPress -> onNext(BinKeyEvent(KeyDown, e.key, e.mods))
-                KeyRelease -> onNext(BinKeyEvent(KeyUp, e.key, e.mods))
-                KeyRepeat -> {
+    @JvmStatic val binaryKeyEvents: Observable<BinKeyEvent> = standardKeyEvents
+            .filter { it.action != KeyRepeat }
+            .map {
+                when (it.action) {
+                    KeyPress -> BinKeyEvent(KeyDown, it.key, it.mods)
+                    KeyRelease -> BinKeyEvent(KeyUp, it.key, it.mods)
+                    KeyRepeat -> BinKeyEvent(KeyDown, it.key, it.mods) // Unreachable branch
                 }
             }
-        }
-    }
 
-    fun handleKeyEvent(window: Long, key: Int, scancode: Int, action: Int, mods: Int) = keyEventFeed.onNext(StdKeyEvent(getKeyAction(action), key, mods))
+    fun handleKeyEvent(window: Long, key: Int, scancode: Int, action: Int, mods: Int) = keyEvents.onNext(StdKeyEvent(getKeyAction(action), key, mods))
 
     private fun getKeyAction(action: Int): StdKeyAction = when (action) {
         GLFW_PRESS -> KeyPress

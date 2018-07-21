@@ -24,8 +24,8 @@ public class EngineWorld extends ListWorld {
         player.getComponent(RenderData.class).setTexture(new Texture("textures/testNormalMap.png"), 1);
 
         player.addComponent(sc);
-        sc.addBehaviorAsync("EScript.kts");
-        sc.addBehaviorAsync("TestPythonScript.py");
+        sc.addBehavior("EScript.kts");
+        sc.addBehavior("TestPythonScript.py");
 
         addEntity(player);
 

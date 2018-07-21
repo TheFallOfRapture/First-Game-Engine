@@ -59,8 +59,6 @@ object IOUtils {
 //            fileSource.append(line).append("\n")
 //        }
 
-        reader.close()
-
         return fileSource.toString()
     }
 

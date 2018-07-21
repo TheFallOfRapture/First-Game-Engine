@@ -2,6 +2,8 @@ package com.morph.engine.util
 
 import java.util.*
 
+class State(val name: String)
+
 class StateMachine(private var currentState: State) {
     private val transitions: HashMap<String, () -> Unit> = HashMap()
     private val possibleStates: HashMap<String, State> = HashMap()
@@ -32,12 +34,10 @@ class StateMachine(private var currentState: State) {
 
         var transition: (() -> Unit)? = transitions[currentState.name + " > " + endState]
 
-        if (transition == null) {
-            transition = transitions["* > $endState"]
-        }
-
         if (transition != null) {
             transition()
+        } else {
+            transition = transitions["* > $endState"]
         }
 
         currentState = possibleStates[endState] ?: throw IllegalArgumentException("End state does not exist")

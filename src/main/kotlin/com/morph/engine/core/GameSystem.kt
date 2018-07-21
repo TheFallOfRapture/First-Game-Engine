@@ -1,29 +1,48 @@
 package com.morph.engine.core
 
+import com.morph.engine.core.Game.GameAction.*
 import com.morph.engine.entities.Entity
+import io.reactivex.disposables.Disposable
 
-abstract class GameSystem(protected var game: Game) {
+abstract class GameSystem(val game: Game) {
+    private var gameLinkHandle : Disposable? = null
+
+    fun link(game: Game) {
+        gameLinkHandle = game.events.subscribe {
+            when (it) {
+                PRE_UPDATE -> preUpdate(game)
+                UPDATE -> update(game)
+                FIXED_UPDATE -> fixedUpdate(game, game.dt)
+                POST_UPDATE -> postUpdate(game)
+                else -> {}
+            }
+        }
+    }
+
+    fun unlink() {
+        gameLinkHandle?.dispose()
+    }
 
     protected abstract fun acceptEntity(e: Entity): Boolean
 
     abstract fun initSystem()
 
-    fun preUpdate() {
+    private fun preUpdate(game: Game) {
         game.getWorld().entities.filter(this::acceptEntity).forEach(this::preUpdate)
         systemPreUpdate()
     }
 
-    fun update() {
+    private fun update(game: Game) {
         game.getWorld().entities.filter(this::acceptEntity).forEach(this::update)
         systemUpdate()
     }
 
-    fun fixedUpdate(dt: Float) {
+    private fun fixedUpdate(game: Game, dt: Float) {
         game.getWorld().entities.filter(this::acceptEntity).forEach { fixedUpdate(it, dt) }
         systemFixedUpdate(dt)
     }
 
-    fun postUpdate() {
+    private fun postUpdate(game: Game) {
         game.getWorld().entities.filter(this::acceptEntity).forEach(this::postUpdate)
         systemPostUpdate()
     }

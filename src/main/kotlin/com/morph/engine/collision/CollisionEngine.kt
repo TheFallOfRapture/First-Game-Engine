@@ -4,6 +4,7 @@ import com.morph.engine.collision.components.BoundingBox2D
 import com.morph.engine.collision.components.CollisionComponent
 import com.morph.engine.collision.components.TriggerComponent
 import com.morph.engine.core.Game
+import com.morph.engine.core.Game.GameAction.FIXED_UPDATE
 import com.morph.engine.core.GameSystem
 import com.morph.engine.entities.Entity
 import com.morph.engine.entities.given
@@ -12,29 +13,25 @@ import com.morph.engine.math.Vector2f
 import com.morph.engine.math.Vector3f
 import com.morph.engine.physics.components.Transform2D
 import com.morph.engine.physics.components.Velocity2D
-import com.morph.engine.util.Feed
-import io.reactivex.Observable
 import java.util.*
 
 // Reference: noonat.github.io/intersect/
 
 class CollisionEngine(game: Game, val collisionSolver: CollisionSolver) : GameSystem(game) {
-    private val collisionFeed = Feed<Collision>()
-    private val collisionEvents = Observable.create<Collision> { collisionFeed.emit(it) }
-
-    init {
-        game.events.filter { e -> e == Game.GameAction.CLOSE }.subscribe { e -> collisionFeed.onComplete() }
-    }
+    val collisionEvents = game.events.filter { it == FIXED_UPDATE }
+            .map { checkCollision(game.world.entities.filter(::acceptEntity), game.timestep) }
+            .filter { it is Collision.Hit }
+            .share()
 
     override fun fixedUpdate(e: Entity, dt: Float) {
-        updateCollider(e, e.getComponent(BoundingBox2D::class.java)!!, e.getComponent(Transform2D::class.java))
+        updateCollider(e.getComponent()!!, e.getComponent()!!)
     }
 
     override fun systemFixedUpdate(dt: Float) {
         val collidables = ArrayList<Entity>()
         for (i in game.world.entities.size - 1 downTo 0) {
             val e = game.world.entities[i]
-            if (e != null && acceptEntity(e)) {
+            if (acceptEntity(e)) {
                 collidables.add(e)
             }
         }
@@ -42,7 +39,7 @@ class CollisionEngine(game: Game, val collisionSolver: CollisionSolver) : GameSy
         checkCollision(collidables, dt)
     }
 
-    private fun checkCollision(entities: List<Entity>, dt: Float) {
+    private fun checkCollision(entities: List<Entity>, dt: Float) : Collision {
         for (i in entities.indices) {
             for (j in i + 1 until entities.size) {
                 val a = entities[i]
@@ -70,41 +67,15 @@ class CollisionEngine(game: Game, val collisionSolver: CollisionSolver) : GameSy
                             else
                                 a.addComponent(CollisionComponent(b, normal, distance, coll.time))
 
-                            val collision = Collision.Hit(a, b, coll.collisionData)
-                            collisionFeed.onNext(collision)
+                           return Collision.Hit(a, b, coll.collisionData)
                         }
                     }
                 }
             }
         }
-    }
 
-//    private fun solveCollision(coll: SweepCollision) {
-//        if (coll !is SweepCollision.Hit) return
-//
-//        val a = coll.entity
-//        val b = coll.hit
-//
-//        given<Velocity2D>(a) { v2D ->
-//            val vel = v2D.velocity
-//            val blockDir = -coll.collisionData.normal
-//            val remove = blockDir * (blockDir dot vel) * (1.0f - coll.collisionData.time)
-//
-//            val newVelocity = vel - remove
-//
-//            v2D.velocity = newVelocity
-//        }
-//
-//        given<Velocity2D>(b) { v2D ->
-//            val vel = v2D.velocity
-//            val blockDir = coll.collisionData.normal
-//            val remove = blockDir * (blockDir dot vel) * (1.0f - coll.collisionData.time)
-//
-//            val newVelocity = vel - remove
-//
-//            v2D.velocity = newVelocity
-//        }
-//    }
+        return Collision.NoHit()
+    }
 
     fun update(entities: List<Entity>, dt: Float) {
         for (e in entities)
@@ -115,13 +86,6 @@ class CollisionEngine(game: Game, val collisionSolver: CollisionSolver) : GameSy
     }
 
     private fun updateAPriori(entities: List<Entity>, dt: Float) {
-//        val boundingBoxes = ArrayList<BoundingBox2D>()
-//        entities.forEach { e ->
-//            given<BoundingBox2D>(e) {
-//                boundingBoxes.add(it)
-//            }
-//        }
-
         val boundingBoxes = entities.mapNotNull { it.getComponent<BoundingBox2D>() }
         val boundingBoxSweeps = ArrayList<BoundingBox2DSweep>()
 
@@ -280,9 +244,7 @@ class CollisionEngine(game: Game, val collisionSolver: CollisionSolver) : GameSy
 
     }
 
-    override fun acceptEntity(e: Entity): Boolean {
-        return e.hasComponent(BoundingBox2D::class.java)
-    }
+    override fun acceptEntity(e: Entity): Boolean = e.hasComponent<BoundingBox2D>()
 
     override fun initSystem() {
         // TODO Auto-generated method stub
@@ -291,8 +253,8 @@ class CollisionEngine(game: Game, val collisionSolver: CollisionSolver) : GameSy
 
     companion object {
 
-        private fun updateCollider(e: Entity, collider: BoundingBox2D, transform: Transform2D?) {
-            collider.center = e.getComponent(Transform2D::class.java)!!.position
+        private fun updateCollider(collider: BoundingBox2D, transform: Transform2D) {
+            collider.center = transform.position
         }
 
         fun checkAgainstWorldStatic(boxA: BoundingBox2D, entities: List<Entity>): List<CollisionData> {

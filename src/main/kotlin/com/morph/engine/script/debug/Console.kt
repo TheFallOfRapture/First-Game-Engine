@@ -1,12 +1,10 @@
 package com.morph.engine.script.debug
 
 import com.morph.engine.core.Game
-import com.morph.engine.util.Feed
-import com.morph.engine.util.Listener
 import com.morph.engine.util.ScriptUtils
 import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
 import org.jetbrains.annotations.Contract
-
 import java.io.OutputStream
 import java.io.PrintStream
 
@@ -93,7 +91,7 @@ class Console(private val type: Console.ScriptType, game: Game) {
     init {
         Console.game = game
 
-        game.events.filter({ e -> e == Game.GameAction.CLOSE }).subscribe({ e -> eventFeed.onComplete() })
+        game.events.filter { e -> e == Game.GameAction.CLOSE }.subscribe { events.onComplete() }
     }
 
     fun readIn(line: String) {
@@ -107,8 +105,8 @@ class Console(private val type: Console.ScriptType, game: Game) {
     private fun runLine(line: String) {
         when (type) {
             Console.ScriptType.MULTI -> {
-                val parts = line.split(":").dropLastWhile({ it.isEmpty() }).toTypedArray()
-                parts[1] = parts[1].trim({ it <= ' ' })
+                val parts = line.split(":").dropLastWhile { it.isEmpty() }.toTypedArray()
+                parts[1] = parts[1].trim { it <= ' ' }
                 ScriptUtils.readScriptAsync(parts[1], parts[0], this).subscribe({ }, { Console.out.println("Script Error: Input script malformed") })
             }
             Console.ScriptType.KOTLIN -> ScriptUtils.readScriptAsync(line, "kts", this).subscribe()
@@ -124,28 +122,11 @@ class Console(private val type: Console.ScriptType, game: Game) {
         Console.text = ""
         Console.currentLine = ""
 
-        eventFeed.onNext(EventType.CLEAR)
+        events.onNext(EventType.CLEAR)
     }
 
     companion object {
-        private val eventFeed = Feed<EventType>()
-
-        private val events = Observable.create<EventType>({ emitter ->
-            val eventListener = object : Listener<EventType> {
-                override fun onNext(eventType: EventType) {
-                    emitter.onNext(eventType)
-                }
-
-                override fun onError(t: Throwable) {
-                    emitter.onError(t)
-                }
-
-                override fun onComplete() {
-                    emitter.onComplete()
-                }
-            }
-            eventFeed.register(eventListener)
-        })
+        private val events = PublishSubject.create<EventType>()
 
         private var text = ""
         private var currentLine = ""
@@ -161,14 +142,14 @@ class Console(private val type: Console.ScriptType, game: Game) {
             Console.currentLine = line
             Console.text += line
 
-            eventFeed.onNext(EventType.UPDATE)
+            events.onNext(EventType.UPDATE)
         }
 
         private fun newLine() {
             Console.currentLine = "\n"
             Console.text += "\n"
 
-            eventFeed.onNext(EventType.UPDATE)
+            events.onNext(EventType.UPDATE)
         }
 
         @Contract(pure = true)

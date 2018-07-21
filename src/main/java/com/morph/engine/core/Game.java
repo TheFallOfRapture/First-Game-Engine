@@ -14,19 +14,19 @@ import com.morph.engine.newgui.GUI;
 import com.morph.engine.script.GameBehavior;
 import com.morph.engine.script.ScriptSystem;
 import com.morph.engine.script.debug.Console;
-import com.morph.engine.util.Feed;
 import com.morph.engine.util.ScriptUtils;
 import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
 import kotlin.Triple;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public abstract class Game implements Runnable {
+public abstract class Game {
 	protected int width, height;
 	protected String title;
-	protected boolean isRunning = false;
+	protected volatile boolean isRunning = false;
 	protected boolean fullscreen;
 	protected float dt;
 
@@ -54,13 +54,11 @@ public abstract class Game implements Runnable {
 
 	private long delta;
 
-	private Feed<GameAction> gameActionFeed = new Feed<>();
-
 	public enum GameAction {
 		INIT, PRE_UPDATE, UPDATE, FIXED_UPDATE, POST_UPDATE, RENDER, CLOSE
 	}
 
-	private Observable<GameAction> events = Observable.create(gameActionFeed::emit);
+	private PublishSubject<GameAction> events = PublishSubject.create();
 
 	public Game(int width, int height, String title, float fps, boolean fullscreen) {
 		this.width = width;
@@ -111,25 +109,21 @@ public abstract class Game implements Runnable {
 	}
 
 	private void preUpdate() {
-		gameActionFeed.onNext(GameAction.PRE_UPDATE);
+		events.onNext(GameAction.PRE_UPDATE);
 
 		preGameUpdate();
 
-		for (GameSystem gs : systems) {
-			gs.preUpdate();
-		}
+//		for (GameSystem gs : systems) {
+//			gs.preUpdate();
+//		}
 
 		behaviors.values().forEach(GameBehavior::preUpdate);
 	}
 
 	private void postUpdate() {
-		gameActionFeed.onNext(GameAction.POST_UPDATE);
+		events.onNext(GameAction.POST_UPDATE);
 
 		postGameUpdate();
-
-		for (GameSystem gs : systems) {
-			gs.postUpdate();
-		}
 
 		behaviors.values().forEach(GameBehavior::postUpdate);
 	}
@@ -138,15 +132,11 @@ public abstract class Game implements Runnable {
 		display.destroy();
 		ScriptUtils.INSTANCE.stop();
 
-		try {
-			Thread.currentThread().join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		System.exit(0);
 	}
 
 	private void init() {
-		gameActionFeed.onNext(GameAction.INIT);
+		events.onNext(GameAction.INIT);
 
 		ScriptUtils.INSTANCE.init(this);
 
@@ -221,21 +211,23 @@ public abstract class Game implements Runnable {
 	}
 
 	private void update() {
-		gameActionFeed.onNext(GameAction.UPDATE);
+		events.onNext(GameAction.UPDATE);
 
-		for (GameSystem gs : systems) {
-			gs.update();
-		}
+//		for (GameSystem gs : systems) {
+//			gs.update();
+//		}
 
 		behaviors.values().forEach(GameBehavior::update);
 	}
 
 	public void addSystem(GameSystem gs) {
 		systems.add(gs);
+		gs.link(this);
 	}
 
 	public void removeSystem(GameSystem gs) {
 		systems.remove(gs);
+		gs.unlink();
 	}
 
 	protected void pollEvents() {
@@ -247,7 +239,7 @@ public abstract class Game implements Runnable {
 			return;
 
 		isRunning = false;
-		gameActionFeed.onNext(GameAction.CLOSE);
+		events.onNext(GameAction.CLOSE);
 	}
 
 	public void run() {
@@ -293,28 +285,17 @@ public abstract class Game implements Runnable {
 	}
 
 	public void fixedUpdate(float dt) {
-		gameActionFeed.onNext(GameAction.FIXED_UPDATE);
+		events.onNext(GameAction.FIXED_UPDATE);
 
 		fixedGameUpdate(dt);
 
-		for (GameSystem gs : systems) {
-			gs.fixedUpdate(dt);
-		}
+//		for (GameSystem gs : systems) {
+//			gs.fixedUpdate(dt);
+//		}
 
 		guis.forEach(gui -> gui.fixedUpdate(dt));
 
 		behaviors.values().forEach(b -> b.fixedUpdate(dt));
-	}
-
-	@Deprecated
-	public void attachBehavior(String filename) {
-		GameBehavior behavior = ScriptUtils.INSTANCE.getScriptBehavior(filename);
-
-		behavior.setGame(this);
-
-		behaviors.put(filename, behavior);
-		behavior.init();
-		behavior.start();
 	}
 
 	public void attachBehaviorAsync(String filename) {
@@ -336,6 +317,10 @@ public abstract class Game implements Runnable {
 	public double getActualFPS() {
 		return (1.0 / delta) * 1000000000.0;
 	}
+
+	public float getTimestep() {
+	    return dt;
+    }
 
 	public abstract void initGame();
 	public abstract void preGameUpdate();
@@ -359,7 +344,7 @@ public abstract class Game implements Runnable {
 	}
 
 	public final void render() {
-		gameActionFeed.onNext(GameAction.RENDER);
+		events.onNext(GameAction.RENDER);
 		renderingEngine.render(display);
 	}
 

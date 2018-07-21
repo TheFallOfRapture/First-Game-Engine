@@ -14,7 +14,6 @@ import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 import io.reactivex.rxkotlin.toCompletable
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.PublishSubject
 import org.jetbrains.kotlin.script.jsr223.KotlinJsr223JvmDaemonLocalEvalScriptEngineFactory
 import java.io.IOException
 import java.nio.file.FileSystems
@@ -36,26 +35,23 @@ object ScriptUtils {
     private val supportedScriptEngines = HashMap<String, ScriptEngine>()
     private val scriptedEntities = HashMap<String, MutableList<Entity>>()
     private val bindings = SimpleBindings()
-    private var isRunning: Boolean = false
+    @Volatile private var isRunning: Boolean = false
     private var isInitialized: Boolean = false
     private val initializationTask: Completable = ScriptUtils::load.toCompletable().subscribeOn(Schedulers.io()).cache()
-    private val closeRequests = PublishSubject.create<Boolean>()
 
     private val SCRIPT_ENGINE_EXTENSIONS = listOf("kts")
 
     fun init(game: Game) {
-        initializationTask.subscribe()
-
         initializationTask
                 .andThen<WatchEvent<Path>>(Observable.create { runReactive(it) })
                 .map { event -> Paths.get("scripts/").resolve(event.context()).fileName.toString() }
                 .flatMapMaybe { getScriptBehaviorAsync(it) }
-                .subscribe { behavior ->
+                .subscribe ({ behavior ->
                     when (behavior) {
                         is EntityBehavior -> scriptedEntities[behavior.name]?.forEach { entity -> entity.getComponent<ScriptContainer>()?.replaceBehavior(behavior.name!!, behavior) }
                         else -> game.replaceBehavior(behavior.name, behavior)
                     }
-                }
+                })
     }
 
     private fun load(): Boolean {
@@ -81,8 +77,6 @@ object ScriptUtils {
     }
 
     private fun runReactive(subscriber: ObservableEmitter<WatchEvent<Path>>) {
-        closeRequests.subscribe { if (it) isRunning = false }
-
         isRunning = true
 
         try {
@@ -109,13 +103,12 @@ object ScriptUtils {
         } catch (e: IOException) {
             subscriber.onError(e)
         }
-
     }
 
     fun stop() {
         if (!isRunning) return
 
-        closeRequests.onNext(true)
+        isRunning = false
     }
 
     fun register(scriptName: String, e: Entity) {
@@ -204,14 +197,6 @@ object ScriptUtils {
     private fun getFileExtension(filename: String): String {
         val fullFilename = System.getProperty("user.dir") + "/src/main/resources/scripts/" + filename
         return fullFilename.substring(fullFilename.indexOf(".") + 1)
-    }
-
-    @Deprecated("")
-    fun <T : GameBehavior> getScriptBehavior(filename: String): T? {
-        val extension = getFileExtension(filename)
-        val engine = getScriptEngine(extension).blockingGet()
-
-        return getScriptBehaviorDI(filename, engine)
     }
 
     fun isSupported(lang: String): Boolean {

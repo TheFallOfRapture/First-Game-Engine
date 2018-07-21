@@ -4,8 +4,8 @@ import com.morph.engine.core.Camera;
 import com.morph.engine.input.Keyboard;
 import com.morph.engine.input.Mouse;
 import com.morph.engine.math.Vector2f;
-import com.morph.engine.util.Feed;
 import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
@@ -19,8 +19,7 @@ public class GLDisplay {
 	private int width, height;
 	private String title;
 
-	private Feed<GLDisplayAction> eventFeed = new Feed<>();
-	private Observable<GLDisplayAction> events = Observable.create(eventFeed::emit);
+	private PublishSubject<GLDisplayAction> events = PublishSubject.create();
 
 	public enum GLDisplayAction {
 		OPEN, CLOSE
@@ -33,7 +32,7 @@ public class GLDisplay {
 	}
 	
 	public void init(Camera camera) {
-		eventFeed.onNext(GLDisplayAction.OPEN);
+		events.onNext(GLDisplayAction.OPEN);
 
 		GLFWErrorCallback.createPrint(System.err).set();
 		if (!glfwInit())
@@ -56,8 +55,8 @@ public class GLDisplay {
 		glfwSetMouseButtonCallback(window, Mouse.INSTANCE::handleMouseEvent);
 
 		glfwSetWindowCloseCallback(window, (window) -> {
-			eventFeed.onNext(GLDisplayAction.CLOSE);
-			eventFeed.onComplete();
+			events.onNext(GLDisplayAction.CLOSE);
+			events.onComplete();
 		});
 		
 		GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());

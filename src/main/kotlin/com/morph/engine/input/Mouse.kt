@@ -4,24 +4,22 @@ import com.morph.engine.core.Camera
 import com.morph.engine.math.Matrix4f
 import com.morph.engine.math.Vector2f
 import com.morph.engine.math.Vector4f
-import com.morph.engine.util.Feed
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import org.lwjgl.BufferUtils
 import org.lwjgl.glfw.GLFW.*
 
 object Mouse {
-    private val mouseEventFeed = Feed<StdMouseEvent>()
+    private val mouseEvents : PublishSubject<StdMouseEvent> = PublishSubject.create()
 
-    @JvmStatic val standardMouseEvents: Observable<StdMouseEvent> = Observable.create { mouseEventFeed.emit(it) }
-    @JvmStatic val binaryMouseEvents: Observable<BinMouseEvent> = Observable.create {
-        mouseEventFeed.emit(it) { e ->
-            when (e.action) {
-                MousePress -> onNext(BinMouseEvent(MouseDown, e.button, e.mods))
-                MouseRelease -> onNext(BinMouseEvent(MouseUp, e.button, e.mods))
+    @JvmStatic val standardMouseEvents : Observable<StdMouseEvent> = mouseEvents
+    @JvmStatic val binaryMouseEvents : Observable<BinMouseEvent> = mouseEvents
+            .map {
+                when (it.action) {
+                    MousePress -> BinMouseEvent(MouseDown, it.button, it.mods)
+                    MouseRelease -> BinMouseEvent(MouseUp, it.button, it.mods)
+                }
             }
-        }
-    }
 
     private val screenMousePosition = PublishSubject.create<Vector2f>()
     private val worldMousePosition = PublishSubject.create<Vector2f>()
@@ -29,7 +27,7 @@ object Mouse {
     private var screenToWorld: Matrix4f = Matrix4f.empty
 
     fun handleMouseEvent(window: Long, button: Int, action: Int, mods: Int) {
-        mouseEventFeed.onNext(StdMouseEvent(getAction(action), button, mods))
+        mouseEvents.onNext(StdMouseEvent(getAction(action), button, mods))
     }
 
     private fun getAction(action: Int): StdMouseAction {
