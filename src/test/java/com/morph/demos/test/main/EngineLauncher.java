@@ -10,6 +10,6 @@ public class EngineLauncher {
 		engine = new Engine(1366, 768, 60, false);
 		launcher = new GameApplication(engine);
 		
-		launcher.launch();
+		launcher.launchGame();
 	}
 }

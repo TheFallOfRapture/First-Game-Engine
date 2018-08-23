@@ -76,6 +76,7 @@ dependencies {
 	compile "org.lwjgl:lwjgl-stb:$lwjglVersion:natives-macos"
 	// LWJGL dependencies END
 	compile 'io.reactivex.rxjava2:rxkotlin:2.2.0'
+	implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.24.0'
 	compile "org.jetbrains.kotlin:kotlin-compiler:1.2.30"
 	compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.30"
 	compile "org.jetbrains.kotlin:kotlin-script-util:1.2.30"
@@ -86,5 +87,10 @@ dependencies {
 jar {
 	manifest {
 		attributes 'Main-Class': 'com.morph.engine.core.EngineLauncher'
+	}
+}
+kotlin {
+	experimental {
+		coroutines "enable"
 	}
 }

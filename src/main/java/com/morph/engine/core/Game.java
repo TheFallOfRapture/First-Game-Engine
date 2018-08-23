@@ -113,10 +113,6 @@ public abstract class Game {
 
 		preGameUpdate();
 
-//		for (GameSystem gs : systems) {
-//			gs.preUpdate();
-//		}
-
 		behaviors.values().forEach(GameBehavior::preUpdate);
 	}
 
@@ -212,11 +208,6 @@ public abstract class Game {
 
 	private void update() {
 		events.onNext(GameAction.UPDATE);
-
-//		for (GameSystem gs : systems) {
-//			gs.update();
-//		}
-
 		behaviors.values().forEach(GameBehavior::update);
 	}
 

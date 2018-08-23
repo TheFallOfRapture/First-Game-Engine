@@ -1,9 +1,13 @@
 package com.morph.engine.core
 
-import io.reactivex.rxkotlin.toCompletable
+import kotlin.concurrent.thread
 
 class GameApplication(val game: Game) {
-    fun launch() {
-        game::start.toCompletable().subscribe()
+    fun launchGame() {
+        thread {
+            game.start()
+        }
     }
+
+    //        game::start.toCompletable().subscribe()
 }
