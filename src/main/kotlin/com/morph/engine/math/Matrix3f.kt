@@ -187,7 +187,7 @@ class Matrix3f(
     fun computeLUDecomposition() : Pair<Matrix3f, Int> {
         var result = this
         val pivot1 = sequenceOf(0, 1, 2).filter { result[it, 0] != 0f }.min()
-        var swaps : Int = 0
+        var swaps = 0
 
         pivot1?.let {
             if (it != 0) {
