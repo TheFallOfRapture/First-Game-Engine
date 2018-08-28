@@ -4,7 +4,7 @@ import com.morph.engine.math.Matrix4f
 import com.morph.engine.math.Quaternion
 import com.morph.engine.math.Vector2f
 
-class Transform2D @JvmOverloads constructor(var position: Vector2f = Vector2f(0f, 0f), var orientation: Float = 0f, var scale: Vector2f = Vector2f(1f, 1f)) : Transform() {
+data class Transform2D @JvmOverloads constructor(var position: Vector2f = Vector2f(0f, 0f), var orientation: Float = 0f, var scale: Vector2f = Vector2f(1f, 1f)) : Transform() {
 
     override val translationMatrix: Matrix4f
         get() = position.asTranslationMatrix()
@@ -24,10 +24,6 @@ class Transform2D @JvmOverloads constructor(var position: Vector2f = Vector2f(0f
 
     override val scaleMatrix: Matrix4f
         get() = scale.asScaleMatrix()
-
-    override fun toString(): String {
-        return "Transform2D($position, $orientation, $scale)"
-    }
 
     override fun translate(translation: Matrix4f) {
         position += translation.asTranslationVector().xy

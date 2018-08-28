@@ -4,6 +4,7 @@ import com.morph.engine.entities.Component
 import com.morph.engine.math.Matrix4f
 import com.morph.engine.math.Quaternion
 
+// TODO: Consider making Transform a sealed class, with two child classes Transform2D and Transform3D
 abstract class Transform : Component() {
     val transformationMatrix: Matrix4f
         get() = translationMatrix * (rotationMatrix * scaleMatrix)

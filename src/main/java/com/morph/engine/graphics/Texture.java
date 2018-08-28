@@ -16,6 +16,9 @@ import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 
+// TODO: Generalize to platform agnostic version
+// TODO: Migrate to Kotlin
+
 public class Texture {
 	private TextureResource resource;
 	private String filename;

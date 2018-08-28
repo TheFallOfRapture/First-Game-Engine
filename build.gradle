@@ -15,7 +15,7 @@ buildscript {
 plugins {
 	id 'java'
 	id 'application'
-	id "org.jetbrains.kotlin.jvm" version "1.2.30"
+	id "org.jetbrains.kotlin.jvm" version "1.2.61"
 }
 
 import org.gradle.internal.os.OperatingSystem
@@ -77,11 +77,11 @@ dependencies {
 	// LWJGL dependencies END
 	compile 'io.reactivex.rxjava2:rxkotlin:2.2.0'
 	implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.24.0'
-	compile "org.jetbrains.kotlin:kotlin-compiler:1.2.30"
-	compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.30"
-	compile "org.jetbrains.kotlin:kotlin-script-util:1.2.30"
+	compile "org.jetbrains.kotlin:kotlin-compiler"
+	compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+	compile "org.jetbrains.kotlin:kotlin-script-util"
 
-	testCompile "org.jetbrains.kotlin:kotlin-test:1.2.30"
+	testCompile "org.jetbrains.kotlin:kotlin-test"
 }
 
 jar {

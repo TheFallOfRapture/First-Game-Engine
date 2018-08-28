@@ -4,7 +4,7 @@ import com.morph.engine.math.Matrix4f
 import com.morph.engine.math.Quaternion
 import com.morph.engine.math.Vector3f
 
-class Transform3D @JvmOverloads constructor(var position: Vector3f = Vector3f(0f, 0f ,0f), var orientation: Quaternion = Quaternion(Vector3f(0f, 1f, 0f), 0f), var scale: Vector3f = Vector3f(1f, 1f, 1f)) : Transform() {
+data class Transform3D @JvmOverloads constructor(var position: Vector3f = Vector3f(0f, 0f ,0f), var orientation: Quaternion = Quaternion(Vector3f(0f, 1f, 0f), 0f), var scale: Vector3f = Vector3f(1f, 1f, 1f)) : Transform() {
     override val translationMatrix: Matrix4f
         get() = position.asTranslationMatrix()
 

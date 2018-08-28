@@ -14,6 +14,9 @@ import org.lwjgl.opengl.GL;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
+// TODO: Generalize to platform agnostic version
+// TODO: Migrate to Kotlin
+
 public class GLDisplay {
 	private long window;
 	private int width, height;

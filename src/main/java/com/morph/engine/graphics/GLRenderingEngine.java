@@ -10,6 +10,7 @@ import com.morph.engine.math.Matrix4f;
 import com.morph.engine.math.MatrixUtils;
 import com.morph.engine.newgui.Element;
 import com.morph.engine.physics.components.Transform;
+import com.morph.engine.physics.components.Transform2D;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,18 +21,23 @@ import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
+// TODO: Generalize to platform agnostic version
+// TODO: Migrate to Kotlin
+
 public class GLRenderingEngine extends GameSystem {
 	private Matrix4f screenProjection;
 	private Camera camera;
 	private List<Entity> gameRenderables;
 	private List<Element> guiRenderables;
 	private List<Light> lights;
+	private RenderBatcher batcher;
 
 	public GLRenderingEngine(Game game) {
 		super(game);
 		this.gameRenderables = new ArrayList<>();
 		this.guiRenderables = new ArrayList<>();
 		this.lights = new ArrayList<>();
+		this.batcher = new RenderBatcher();
 		this.screenProjection = MatrixUtils.getOrthographicProjectionMatrix(game.getHeight(), 0, 0, game.getWidth(), -1, 1);
 	}
 
@@ -40,7 +46,7 @@ public class GLRenderingEngine extends GameSystem {
 			return;
 
 		data.getShader().bind();
-		data.getShader().getUniforms().setUniforms(transform, data, camera, screenProjection, lights);
+		data.getShader().getUniforms().setUniforms(transform, data, camera, screenProjection, lights); // TODO: Generate UBO instead of setting uniforms
 
 		glBindVertexArray(data.getVertexArrayObject());
 		glDrawElements(GL_TRIANGLES, data.getIndices().size(), GL_UNSIGNED_INT, NULL);
@@ -59,23 +65,38 @@ public class GLRenderingEngine extends GameSystem {
 	}
 
 	public void register(Entity e) {
+		if (!e.hasComponents(RenderData.class, Transform2D.class)) return;
+
 		gameRenderables.add(0, e);
+
+		var renderable = new Renderable.REntity(e);
+		batcher.add(renderable);
 	}
+
 	public void unregister(Entity e) {
 		gameRenderables.remove(e);
+
+		var renderable = new Renderable.REntity(e);
+		batcher.remove(renderable);
 	}
 
 	public void register(Element e) {
 		guiRenderables.add(0, e);
+
+		var renderable = new Renderable.RElement(e);
+		batcher.add(renderable);
 	}
+
 	public void unregister(Element e) {
 		guiRenderables.remove(e);
+
+		var renderable = new Renderable.RElement(e);
+		batcher.remove(renderable);
 	}
 
 	public void addLight(Light l) {
 		lights.add(l);
 	}
-
 	public void removeLight(Light l) {
 		lights.remove(l);
 	}

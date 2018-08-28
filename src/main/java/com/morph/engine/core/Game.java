@@ -33,18 +33,20 @@ public abstract class Game {
 	protected IWorld world;
 	protected List<GameSystem> systems = new ArrayList<>();
 
-	protected HashMap<String, GameBehavior> behaviors = new HashMap<>(); // TODO: Consider moving to a different class
+	// TODO: Game is a god class, consider moving below fields to different classes (behaviors to camera)
 
-	protected GLDisplay display; // TODO: Consider moving to a different class
-	protected GLRenderingEngine renderingEngine; // TODO: Consider moving to a different class
+	protected HashMap<String, GameBehavior> behaviors = new HashMap<>();
 
-	protected List<Element> guiElements = new ArrayList<>(); // TODO: Consider moving to a different class
-	private List<GUI> guis = new ArrayList<>(); // TODO: Consider moving to a different class
+	protected GLDisplay display;
+	protected GLRenderingEngine renderingEngine;
 
-	private Console console; // TODO: Consider moving to a different class
-	private ConsoleGUI consoleGUI; // TODO: Consider moving to a different class
+	protected List<Element> guiElements = new ArrayList<>();
+	private List<GUI> guis = new ArrayList<>();
 
-	private Camera camera = Camera.Identity.INSTANCE; // TODO: Consider moving to a different class
+	private Console console;
+	private ConsoleGUI consoleGUI;
+
+	private Camera camera = Camera.Identity.INSTANCE;
 
 	public static final int VERSION_MAJOR = 0;
 	public static final int VERSION_MINOR = 7;

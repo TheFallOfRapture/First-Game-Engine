@@ -25,6 +25,9 @@ import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
+// TODO: Generalize to platform agnostic version
+// TODO: Migrate to Kotlin
+
 public class RenderData extends Component {
 	protected List<Vertex> vertices;
 	protected List<Integer> indices;
