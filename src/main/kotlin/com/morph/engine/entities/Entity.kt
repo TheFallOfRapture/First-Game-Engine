@@ -1,38 +1,51 @@
 package com.morph.engine.entities
 
-data class Entity @JvmOverloads constructor(val name: String, val id: Int, var components: List<Component> = listOf()) : Cloneable {
+import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
+
+data class Entity @JvmOverloads constructor(
+        val name: String,
+        val id: Int,
+        private val components: MutableList<Component> = mutableListOf()
+) : Cloneable, Iterable<Component> by components {
     fun addComponent(c: Component) : Entity {
-        components += (c)
+        components.add(c)
         c.init()
+        c.parent = this
 
         return this
     }
 
-    fun removeComponent(c: Component) : Entity {
-        components -= (c)
+    fun <T : Component> removeComponent(c: T) : Entity {
+        components.remove(c)
         c.destroy()
+        c.parent = null
 
         return this
     }
 
     fun clearComponents(type: Class<out Component>) {
-        components.indices.reversed()
-                .asSequence()
-                .map { components[it] }
-                .filter { type.isInstance(it) }
-                .forEach { removeComponent(it) }
+        fun destroyComponent(c : Component) {
+            c.destroy()
+            c.parent = null
+        }
+
+        components.filter(type::isInstance).forEach { removeComponent(it) }
     }
 
     fun clearAllComponents() {
-        for (i in components.indices.reversed()) {
-            removeComponent(components[i])
+        fun destroyComponent(c : Component) {
+            c.destroy()
+            c.parent = null
         }
+
+        components.forEach { destroyComponent(it) }
+        components.clear()
     }
 
-    inline fun <reified T : Component> getComponent() = components.filterIsInstance<T>().firstOrNull()
-    fun <T : Component> getComponent(type: Class<T>) = components.filterIsInstance(type).map(type::cast).firstOrNull()
+    inline fun <reified T : Component> getComponent() : T? = this.filterIsInstance<T>().firstOrNull()
+    fun <T : Component> getComponent(type: Class<T>) = components.filterIsInstance(type).firstOrNull()
 
-    inline fun <reified T : Component> hasComponent() = components.filterIsInstance<T>().isNotEmpty()
+    inline fun <reified T : Component> hasComponent() = getComponent<T>() != null
     fun <T : Component> hasComponent(type: Class<T>) = components.filterIsInstance(type).isNotEmpty()
 
     fun destroy() {
@@ -43,5 +56,6 @@ data class Entity @JvmOverloads constructor(val name: String, val id: Int, var c
     fun hasComponents(vararg requiredTypes: Class<out Component>) = requiredTypes.all { this.hasComponent(it) }
 }
 
+// TODO: Remove
 inline fun <reified T: Component> given(e: Entity, block: (T) -> Unit) = e.getComponent<T>()?.let(block) ?: println("No component found.")
 inline fun <reified T: Component> withComponent(e: Entity, block: T.() -> Unit) = e.getComponent<T>()?.apply(block) ?: println("No component found.")

@@ -314,4 +314,23 @@ class BasicLightShaderUniforms : Uniforms() {
     }
 }
 
+class InstancedShaderUniforms : Uniforms() {
+//    private lateinit var diffuse: Texture
+
+    override fun defineUniforms(shader: Int) {
+//        addUniform("diffuse", shader)
+    }
+
+    override fun setUniforms(t: Transform, data: RenderData, camera: Camera, screen: Matrix4f, lights: List<Light>) {
+//        diffuse = data.getTexture(0)
+
+//        setUniform1i("diffuse", 0)
+
+//        diffuse.bind()
+    }
+
+    override fun unbind(t: Transform, data: RenderData) {
+//        diffuse.unbind()
+    }
+}
 

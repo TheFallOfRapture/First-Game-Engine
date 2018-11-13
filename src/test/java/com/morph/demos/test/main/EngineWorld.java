@@ -20,7 +20,7 @@ public class EngineWorld extends ListWorld {
         Engine game = (Engine) this.getGame();
 
         Entity player = EntityFactory.INSTANCE.getCustomTintRectangle("player", 15, 15, new Color(0.1f, 0.1f, 0.1f), new BasicLightShader());
-        ScriptContainer sc = new ScriptContainer(game, player);
+        ScriptContainer sc = new ScriptContainer(game);
         player.getComponent(RenderData.class).setTexture(new Texture("textures/testNormalMap.png"), 1);
 
         player.addComponent(sc);

@@ -1,13 +1,12 @@
 package com.morph.engine.core
 
 import com.morph.engine.entities.Entity
-import java.util.*
 
 /**
  * Created by Fernando on 1/19/2017.
  */
 abstract class ListWorld(override val game: Game) : IWorld {
-    override val entities : MutableList<Entity> = ArrayList()
+    override val entities : MutableList<Entity> = mutableListOf()
 
     override fun addEntity(e: Entity): Boolean {
         game.renderingEngine.register(e)

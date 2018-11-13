@@ -19,17 +19,25 @@ class EmitterSystem(game : Game) : GameSystem(game) {
         val emitter = e.getComponent<Emitter>()!!
         val t2d = e.getComponent<Transform2D>()!!
         emitter.age += dt
+
         if (emitter.age % (1f / emitter.spawnRate) < dt) {
             val particle = Particle(emitter.color, emitter)
             val spread = 1f
             val randomOffset = Vector2f((Math.random() - 0.5).toFloat() * spread, (Math.random() - 0.5).toFloat() * spread)
             val particlePos = t2d.position + randomOffset
 
-            val entity = EntityFactory.getCustomTintRectangle("$particle", 0.05f, 0.05f, emitter.color, emitter.shader).addComponent(particle)
+            val entity = EntityFactory.getEntity("Particle-${System.nanoTime()}")
+                    .addComponent(Transform2D(scale = Vector2f(0.05f, 0.05f)))
+                    .addComponent(particle)
             entity.getComponent<Transform2D>()!!.position = particlePos
 
             game.world.addEntity(entity)
-            emitter += particle
+            emitter.add(particle)
+        }
+
+        while (emitter.peek().age >= emitter.lifetime) {
+            emitter.peek().parent?.apply { game.world.removeEntity(this) }
+            emitter.remove()
         }
     }
 }

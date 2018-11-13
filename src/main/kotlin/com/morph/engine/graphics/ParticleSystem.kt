@@ -21,10 +21,5 @@ class ParticleSystem(game : Game) : GameSystem(game) {
         particle.age += dt
 
         t2d.position -= Vector2f(0f, 0.01f)
-
-        if (particle.age >= particle.emitter.lifetime) {
-            game.world.removeEntity(e)
-            particle.emitter -= particle
-        }
     }
 }

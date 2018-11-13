@@ -282,6 +282,8 @@ class Matrix4f(
         return values[i]
     }
 
+    fun toDoubleArray(): DoubleArray = values.map { it.toDouble() }.toDoubleArray()
+
     companion object {
         @JvmStatic
         val identity: Matrix4f

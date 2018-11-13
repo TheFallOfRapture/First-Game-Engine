@@ -6,8 +6,6 @@ class GameApplication(val game: Game) {
     fun launchGame() {
         thread {
             game.start()
-        }
+        }.join()
     }
-
-    //        game::start.toCompletable().subscribe()
 }

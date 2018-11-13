@@ -1,10 +1,6 @@
 package com.morph.engine.graphics
 
 data class Color @JvmOverloads constructor(var red: Float, var green: Float, var blue: Float, var alpha: Float = 1f) {
-    override fun toString(): String {
-        return "Color($red, $green, $blue, $alpha)"
-    }
-
     operator fun times(k: Float): Color {
         return Color(red * k, green * k, blue * k)
     }
@@ -34,7 +30,12 @@ data class Color @JvmOverloads constructor(var red: Float, var green: Float, var
         this.green = c.green
         this.blue = c.blue
     }
+
+    fun toFloatArray(): FloatArray = floatArrayOf(red, green, blue, alpha)
+
+    fun toDoubleArray(): DoubleArray = doubleArrayOf(red.toDouble(), green.toDouble(), blue.toDouble(), alpha.toDouble())
 }
+
 object Colors {
     @JvmStatic fun fromARGBHex(argb: Int): Color {
         val alpha = (argb and -0x1000000 shr 24) / 256f

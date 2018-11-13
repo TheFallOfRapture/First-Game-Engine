@@ -9,7 +9,7 @@ import java.util.*
 /**
  * Created on 7/5/2017.
  */
-class ScriptContainer(private val game: Game, private val parent: Entity) : Component() {
+class ScriptContainer(private val game: Game) : Component() {
     private val behaviors: HashMap<String, EntityBehavior> = HashMap()
 
     fun addBehavior(filename: String) {
