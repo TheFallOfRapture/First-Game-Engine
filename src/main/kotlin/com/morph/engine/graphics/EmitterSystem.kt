@@ -18,9 +18,9 @@ class EmitterSystem(game : Game) : GameSystem(game) {
         super.fixedUpdate(e, dt)
         val emitter = e.getComponent<Emitter>()!!
         val t2d = e.getComponent<Transform2D>()!!
-        emitter.age += dt
+        emitter.acc += dt
 
-        if (emitter.age % (1f / emitter.spawnRate) < dt) {
+        while (emitter.acc >= (1f / emitter.spawnRate)) {
             val particle = Particle(emitter.color, emitter)
             val spread = 1f
             val randomOffset = Vector2f((Math.random() - 0.5).toFloat() * spread, (Math.random() - 0.5).toFloat() * spread)
@@ -33,11 +33,15 @@ class EmitterSystem(game : Game) : GameSystem(game) {
 
             game.world.addEntity(entity)
             emitter.add(particle)
+
+            emitter.acc -= (1f / emitter.spawnRate)
         }
 
-        while (emitter.peek().age >= emitter.lifetime) {
-            emitter.peek().parent?.apply { game.world.removeEntity(this) }
-            emitter.remove()
+        emitter.peek()?.let {
+            while (emitter.peek().age >= emitter.lifetime) {
+                emitter.peek().parent?.apply { game.world.removeEntity(this) }
+                emitter.remove()
+            }
         }
     }
 }

@@ -28,7 +28,7 @@ class Emitter(
         val texture : Texture = Texture(null),
         private val particles: Queue<Particle> = LinkedList()
 ) : Component(), Queue<Particle> by particles {
-    var age = 0f
+    var acc = 0f
     val maxParticles
         get() = Math.ceil((lifetime * spawnRate).toDouble()).toLong()
     var vao : Int = 0
