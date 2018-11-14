@@ -1,9 +1,8 @@
 package com.morph.engine.graphics.components
 
-import com.morph.engine.core.Camera
+import com.morph.engine.collision.components.BoundingBox2D
 import com.morph.engine.core.IWorld
 import com.morph.engine.entities.Component
-import com.morph.engine.entities.Entity
 import com.morph.engine.entities.EntityFactory
 import com.morph.engine.graphics.Color
 import com.morph.engine.graphics.Texture
@@ -16,7 +15,6 @@ import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL15.*
 import org.lwjgl.opengl.GL20.*
 import org.lwjgl.opengl.GL30.*
-import org.lwjgl.opengl.GL31.glDrawArraysInstanced
 import org.lwjgl.opengl.GL33.*
 import java.util.*
 
@@ -126,15 +124,18 @@ class Emitter(
 
     fun spawnParticle(world : IWorld) {
         val particle = Particle(color, this)
-        val spread = 1f
+        val spread = 5f
         val randomOffset = Vector2f((Math.random() - 0.5).toFloat() * spread, (Math.random() - 0.5).toFloat() * spread)
         val particlePos = parent?.getComponent<Transform2D>()?.position!! + randomOffset
         // TODO: Handle the case where a particle emitter has no parent entity (?)
 
+        val size = 0.05f
+
         val entity = EntityFactory.getEntity("Particle-${System.nanoTime()}")
-                .addComponent(Transform2D(position = particlePos, scale = Vector2f(0.05f, 0.05f)))
+                .addComponent(Transform2D(position = particlePos, scale = Vector2f(size, size)))
                 .addComponent(particle)
-                .addComponent(RigidBody()) // TODO: Remove; generalize
+                .addComponent(RigidBody(mass = 10f))
+                .addComponent(BoundingBox2D(Vector2f(), Vector2f(size, size) * 0.5f))// TODO: Remove; generalize
 
         entity.getComponent<Transform2D>()!!.position = particlePos
 

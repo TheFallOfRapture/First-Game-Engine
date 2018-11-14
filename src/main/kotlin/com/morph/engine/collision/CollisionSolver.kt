@@ -2,6 +2,7 @@ package com.morph.engine.collision
 
 import com.morph.engine.entities.given
 import com.morph.engine.math.Vector2f
+import com.morph.engine.physics.components.RigidBody
 import com.morph.engine.physics.components.Velocity2D
 
 abstract class CollisionSolver {
@@ -11,24 +12,24 @@ abstract class CollisionSolver {
         val a = coll.entity
         val b = coll.hit
 
-        given<Velocity2D>(a) { v2D ->
-            val vel = v2D.velocity
+        given<RigidBody>(a) { rb ->
+            val vel = rb.velocity
             val blockDir = -coll.collisionData.normal
             val remove = blockDir * (blockDir dot vel) * (1.0f - coll.collisionData.time)
 
             val newVelocity = vel - remove + collisionResponse(blockDir, vel)
 
-            v2D.velocity = newVelocity
+            rb.velocity = newVelocity
         }
 
-        given<Velocity2D>(b) { v2D ->
-            val vel = v2D.velocity
+        given<RigidBody>(b) { rb ->
+            val vel = rb.velocity
             val blockDir = coll.collisionData.normal
             val remove = blockDir * (blockDir dot vel) * (1.0f - coll.collisionData.time)
 
             val newVelocity = vel - remove + collisionResponse(blockDir, vel)
 
-            v2D.velocity = newVelocity
+            rb.velocity = newVelocity
         }
     }
 

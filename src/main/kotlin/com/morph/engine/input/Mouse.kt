@@ -54,8 +54,8 @@ object Mouse {
             screenToWorld = camera.projectionMatrix.inverse
         }
 
-        val normalizedMousePos = currentScreenPos.div(Vector2f(width / 2f, height / 2f)) - (Vector2f(1f, 1f)) * (Vector2f(1f, -1f))
-        worldMousePosition = screenToWorld!! * currentScreenPos
+        val normalizedMousePos = currentScreenPos.div(Vector2f(width / 2f, height / 2f)) - (Vector2f(1f, 1f))
+        worldMousePosition = screenToWorld!! * normalizedMousePos
     }
 
     fun queryUpDown(button: Int, action: BinMouseAction): Boolean {
