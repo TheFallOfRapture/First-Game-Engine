@@ -1,9 +1,5 @@
 package com.morph.engine.input
 
-import com.morph.engine.core.Game
-import io.reactivex.rxkotlin.Observables
-import org.lwjgl.glfw.GLFW.*
-
 typealias Action = () -> Unit
 
 class InputMapping {
@@ -22,17 +18,12 @@ class InputMapping {
 
     private val mouseDownCombo = HashMap<IntArray, Action>()
 
-    fun link(game: Game) {
-        Keyboard.standardKeyEvents.subscribe { this.acceptStd(it) }
-        Mouse.standardMouseEvents.subscribe { this.acceptStd(it) }
+    fun update() {
+        Keyboard.standardKeyEvents.forEach { acceptStd(it) }
+        Mouse.standardMouseEvents.forEach { acceptStd(it) }
 
-        (GLFW_KEY_0..GLFW_KEY_LAST)
-                .map { Keyboard.binaryKeyEvents.filter { e -> e.key == it } }
-                .forEach { Observables.combineLatest(it, game.events.filter { it == Game.GameAction.UPDATE }).subscribe { acceptLong(it.first) } }
-
-        (GLFW_MOUSE_BUTTON_1..GLFW_MOUSE_BUTTON_LAST)
-                .map { Mouse.binaryMouseEvents.filter { e -> e.button == it } }
-                .forEach { Observables.combineLatest(it, game.events.filter {it == Game.GameAction.UPDATE }).subscribe { acceptLong(it.first) } }
+        Keyboard.binaryKeyEvents.forEach { acceptLong(it) }
+        Mouse.binaryMouseEvents.forEach { acceptLong(it) }
     }
 
     // JVM Compatibility Methods
@@ -71,16 +62,16 @@ class InputMapping {
     private fun getMapByLongAction(action: BinMouseAction): HashMap<Int, Action> = if (action == MouseUp) mouseUp else mouseDown
     private fun getMapByLongAction(action: BinKeyAction): HashMap<Int, Action> = if (action == KeyUp) keyUp else keyDown
 
-    private fun acceptStd(mouseEvent: StdMouseEvent) = getMapByAction(mouseEvent.action).getOrDefault(mouseEvent.button, { })()
+    private fun acceptStd(mouseEvent: StdMouseEvent) = getMapByAction(mouseEvent.action).getOrDefault(mouseEvent.button) { }()
     private fun acceptStd(keyEvent: StdKeyEvent) = when (keyEvent.action) {
         KeyPress -> {
-            (keyPressed).getOrDefault(keyEvent.key, { })()
-            (keyTyped).getOrDefault(keyEvent.key, { })()
+            (keyPressed).getOrDefault(keyEvent.key) { }()
+            (keyTyped).getOrDefault(keyEvent.key) { }()
         }
-        KeyRepeat -> (keyTyped).getOrDefault(keyEvent.key, { })()
-        KeyRelease -> (keyReleased).getOrDefault(keyEvent.key, { })()
+        KeyRepeat -> (keyTyped).getOrDefault(keyEvent.key) { }()
+        KeyRelease -> (keyReleased).getOrDefault(keyEvent.key) { }()
     }
 
-    private fun acceptLong(mouseEvent: BinMouseEvent) = getMapByLongAction(mouseEvent.action).getOrDefault(mouseEvent.button, { })()
-    private fun acceptLong(keyEvent: BinKeyEvent) = getMapByLongAction(keyEvent.action).getOrDefault(keyEvent.key, { })()
+    private fun acceptLong(mouseEvent: BinMouseEvent) = getMapByLongAction(mouseEvent.action).getOrDefault(mouseEvent.button) { }()
+    private fun acceptLong(keyEvent: BinKeyEvent) = getMapByLongAction(keyEvent.action).getOrDefault(keyEvent.key) { }()
 }

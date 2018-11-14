@@ -3,10 +3,7 @@ package com.morph.engine.graphics
 import com.morph.engine.core.Game
 import com.morph.engine.core.GameSystem
 import com.morph.engine.entities.Entity
-import com.morph.engine.entities.EntityFactory
 import com.morph.engine.graphics.components.Emitter
-import com.morph.engine.graphics.components.Particle
-import com.morph.engine.math.Vector2f
 import com.morph.engine.physics.components.Transform2D
 
 class EmitterSystem(game : Game) : GameSystem(game) {
@@ -20,20 +17,9 @@ class EmitterSystem(game : Game) : GameSystem(game) {
         val t2d = e.getComponent<Transform2D>()!!
         emitter.acc += dt
 
+        // TODO: Consider moving the spawn loop into Emitter.
         while (emitter.acc >= (1f / emitter.spawnRate)) {
-            val particle = Particle(emitter.color, emitter)
-            val spread = 1f
-            val randomOffset = Vector2f((Math.random() - 0.5).toFloat() * spread, (Math.random() - 0.5).toFloat() * spread)
-            val particlePos = t2d.position + randomOffset
-
-            val entity = EntityFactory.getEntity("Particle-${System.nanoTime()}")
-                    .addComponent(Transform2D(scale = Vector2f(0.05f, 0.05f)))
-                    .addComponent(particle)
-            entity.getComponent<Transform2D>()!!.position = particlePos
-
-            game.world.addEntity(entity)
-            emitter.add(particle)
-
+            emitter.spawnParticle(game.world)
             emitter.acc -= (1f / emitter.spawnRate)
         }
 

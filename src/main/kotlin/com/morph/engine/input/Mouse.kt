@@ -4,30 +4,31 @@ import com.morph.engine.core.Camera
 import com.morph.engine.math.Matrix4f
 import com.morph.engine.math.Vector2f
 import com.morph.engine.math.Vector4f
-import io.reactivex.Observable
-import io.reactivex.subjects.PublishSubject
 import org.lwjgl.BufferUtils
 import org.lwjgl.glfw.GLFW.*
+import java.util.*
+import java.util.stream.Collectors
 
 object Mouse {
-    private val mouseEvents : PublishSubject<StdMouseEvent> = PublishSubject.create()
+    private val mouseEvents : Queue<StdMouseEvent> = LinkedList()
 
-    @JvmStatic val standardMouseEvents : Observable<StdMouseEvent> = mouseEvents
-    @JvmStatic val binaryMouseEvents : Observable<BinMouseEvent> = mouseEvents
+    @JvmStatic val standardMouseEvents : Queue<StdMouseEvent> = mouseEvents
+    @JvmStatic val binaryMouseEvents : Queue<BinMouseEvent> = mouseEvents
+            .stream()
             .map {
                 when (it.action) {
                     MousePress -> BinMouseEvent(MouseDown, it.button, it.mods)
                     MouseRelease -> BinMouseEvent(MouseUp, it.button, it.mods)
                 }
-            }
+            }.collect(Collectors.toCollection { LinkedList<BinMouseEvent>() })
 
-    private val screenMousePosition = PublishSubject.create<Vector2f>()
-    private val worldMousePosition = PublishSubject.create<Vector2f>()
+    var screenMousePosition = Vector2f(); private set
+    var worldMousePosition = Vector2f(); private set
 
-    private var screenToWorld: Matrix4f = Matrix4f.empty
+    private var screenToWorld: Matrix4f? = null
 
     fun handleMouseEvent(window: Long, button: Int, action: Int, mods: Int) {
-        mouseEvents.onNext(StdMouseEvent(getAction(action), button, mods))
+        mouseEvents.add(StdMouseEvent(getAction(action), button, mods))
     }
 
     private fun getAction(action: Int): StdMouseAction {
@@ -47,27 +48,25 @@ object Mouse {
         val height = heightBuffer.get()
 
         val currentScreenPos = Vector2f(v.x, height - v.y)
-        screenMousePosition.onNext(currentScreenPos)
+        screenMousePosition = currentScreenPos
 
-        if (screenToWorld == Matrix4f.empty) {
+        if (screenToWorld == null) {
             screenToWorld = camera.projectionMatrix.inverse
         }
 
         val normalizedMousePos = currentScreenPos.div(Vector2f(width / 2f, height / 2f)) - (Vector2f(1f, 1f)) * (Vector2f(1f, -1f))
-        worldMousePosition.onNext(screenToWorld.times(Vector4f(normalizedMousePos, 0, 1)).xy)
-    }
-
-    fun getScreenMousePosition(): Observable<Vector2f> {
-        return screenMousePosition
-    }
-
-    fun getWorldMousePosition(): Observable<Vector2f> {
-        return worldMousePosition
+        worldMousePosition = screenToWorld!! * currentScreenPos
     }
 
     fun queryUpDown(button: Int, action: BinMouseAction): Boolean {
-        val e = binaryMouseEvents.filter { event -> event.button == button }.lastElement()
-        return e.map { event -> event.action == action }.blockingGet()
+        val e = binaryMouseEvents.last { event -> event.button == button }
+        return e.action == action
+    }
+
+    fun clear() {
+        mouseEvents.clear()
+        standardMouseEvents.clear()
+        binaryMouseEvents.clear()
     }
 }
 

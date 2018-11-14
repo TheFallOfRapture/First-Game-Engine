@@ -55,7 +55,7 @@ public class Engine extends Game {
 		input.mapButton(GLFW_MOUSE_BUTTON_2, MouseActions.PRESS, () -> System.out.println("PRESS RIGHT"));
 		input.mapButton(GLFW_MOUSE_BUTTON_2, MouseActions.RELEASE, () -> System.out.println("RELEASE RIGHT"));
 
-		input.link(this);
+		setInputMapping(input);
 
 		System.err.println("Game initialization complete.");
 	}

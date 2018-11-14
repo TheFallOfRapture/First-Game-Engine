@@ -3,11 +3,10 @@ package com.morph.engine.core;
 import com.morph.engine.core.gui.ConsoleGUI;
 import com.morph.engine.graphics.GLDisplay;
 import com.morph.engine.graphics.GLRenderingEngine;
+import com.morph.engine.input.InputMapping;
+import com.morph.engine.input.KeyPress;
+import com.morph.engine.input.Keyboard;
 import com.morph.engine.input.Mouse;
-import com.morph.engine.input.MousePress;
-import com.morph.engine.input.MouseRelease;
-import com.morph.engine.input.StdMouseEvent;
-import com.morph.engine.math.Vector2f;
 import com.morph.engine.newgui.Container;
 import com.morph.engine.newgui.Element;
 import com.morph.engine.newgui.GUI;
@@ -15,9 +14,7 @@ import com.morph.engine.script.GameBehavior;
 import com.morph.engine.script.ScriptSystem;
 import com.morph.engine.script.debug.Console;
 import com.morph.engine.util.ScriptUtils;
-import io.reactivex.Observable;
-import io.reactivex.subjects.PublishSubject;
-import kotlin.Triple;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,11 +53,7 @@ public abstract class Game {
 
 	private long delta;
 
-	public enum GameAction {
-		INIT, PRE_UPDATE, UPDATE, FIXED_UPDATE, POST_UPDATE, RENDER, CLOSE
-	}
-
-	private PublishSubject<GameAction> events = PublishSubject.create();
+	private InputMapping inputMapping;
 
 	public Game(int width, int height, String title, float fps, boolean fullscreen) {
 		this.width = width;
@@ -70,6 +63,7 @@ public abstract class Game {
 		this.fullscreen = fullscreen;
 		this.console = new Console(Console.ScriptType.KOTLIN, this);
 		this.consoleGUI = new ConsoleGUI(this, console, width, height);
+		this.inputMapping = new InputMapping();
 	}
 
 	public void start() {
@@ -111,18 +105,27 @@ public abstract class Game {
 	}
 
 	private void preUpdate() {
-		events.onNext(GameAction.PRE_UPDATE);
+		Keyboard.INSTANCE.clear();
+		Mouse.INSTANCE.clear();
 
 		preGameUpdate();
 
+		for (GameSystem gs : systems) {
+			gs.preUpdate(this);
+		}
+
+		guis.forEach(GUI::preUpdate);
 		behaviors.values().forEach(GameBehavior::preUpdate);
 	}
 
 	private void postUpdate() {
-		events.onNext(GameAction.POST_UPDATE);
-
 		postGameUpdate();
 
+		for (GameSystem gs : systems) {
+			gs.postUpdate(this);
+		}
+
+		guis.forEach(GUI::postUpdate);
 		behaviors.values().forEach(GameBehavior::postUpdate);
 	}
 
@@ -134,8 +137,6 @@ public abstract class Game {
 	}
 
 	private void init() {
-		events.onNext(GameAction.INIT);
-
 		ScriptUtils.INSTANCE.init(this);
 
 		display = new GLDisplay(width, height, title);
@@ -145,7 +146,7 @@ public abstract class Game {
 		addSystem(renderingEngine);
 		addSystem(scriptSystem);
 
-		display.init(camera);
+		display.init(this);
 		display.show();
 
 		if (fullscreen)
@@ -157,70 +158,76 @@ public abstract class Game {
 
 		consoleGUI.init();
 
-		display.getEvents().filter(e -> e == GLDisplay.GLDisplayAction.CLOSE).subscribe(e -> handleExitEvent());
-
 		// TODO: Oh my god please move this somewhere else this is evil code
-		Observable.combineLatest(
-		        events.filter(e -> e == GameAction.UPDATE),
-                Observable.concat(Observable.just(new StdMouseEvent(MouseRelease.INSTANCE, 0, 0)), Mouse.getStandardMouseEvents()),
-                Mouse.INSTANCE.getScreenMousePosition(),
-                Triple::new).subscribe(vals -> {
-                    GameAction g = vals.getFirst();
-                    StdMouseEvent m = vals.getSecond();
-                    Vector2f mousePos = vals.getThird();
-
-                    if (m.getButton() == 0 && m.getAction() == MousePress.INSTANCE)
-                        System.out.println("pressed");
-
-                    for (GUI gui : guis) {
-                        for (Element e : gui.getElements()) {
-                            switch (e.getState()) {
-                                case "IDLE":
-                                    if (mousePos != null && e.contains(mousePos)) {
-                                        if (m.getButton() == 0 && m.getAction() == MousePress.INSTANCE) {
-                                            e.setState("CLICK");
-                                        } else {
-                                            e.setState("HOVER");
-                                        }
-                                    }
-                                    break;
-                                case "HOVER":
-                                    if (mousePos != null && e.contains(mousePos)) {
-                                        if (m.getButton() == 0 && m.getAction() == MousePress.INSTANCE) {
-                                            e.setState("CLICK");
-                                        }
-                                    } else {
-                                        e.setState("IDLE");
-                                    }
-                                    break;
-                                case "CLICK":
-                                    if (m.getButton() == 0 && m.getAction() == MouseRelease.INSTANCE) {
-                                        if (mousePos != null && e.contains(mousePos))
-                                            e.setState("HOVER");
-                                        else
-                                            e.setState("IDLE");
-                                    }
-                                    break;
-                            }
-                        }
-                    }
-                }
-        );
+//		Observable.combineLatest(
+//		        events.filter(e -> e == GameAction.UPDATE),
+//                Observable.concat(Observable.just(new StdMouseEvent(MouseRelease.INSTANCE, 0, 0)), Mouse.getStandardMouseEvents()),
+//                Mouse.INSTANCE.getScreenMousePosition(),
+//                Triple::new).subscribe(vals -> {
+//                    GameAction g = vals.getFirst();
+//                    StdMouseEvent m = vals.getSecond();
+//                    Vector2f mousePos = vals.getThird();
+//
+//                    if (m.getButton() == 0 && m.getAction() == MousePress.INSTANCE)
+//                        System.out.println("pressed");
+//
+//                    for (GUI gui : guis) {
+//                        for (Element e : gui.getElements()) {
+//                            switch (e.getState()) {
+//                                case "IDLE":
+//                                    if (mousePos != null && e.contains(mousePos)) {
+//                                        if (m.getButton() == 0 && m.getAction() == MousePress.INSTANCE) {
+//                                            e.setState("CLICK");
+//                                        } else {
+//                                            e.setState("HOVER");
+//                                        }
+//                                    }
+//                                    break;
+//                                case "HOVER":
+//                                    if (mousePos != null && e.contains(mousePos)) {
+//                                        if (m.getButton() == 0 && m.getAction() == MousePress.INSTANCE) {
+//                                            e.setState("CLICK");
+//                                        }
+//                                    } else {
+//                                        e.setState("IDLE");
+//                                    }
+//                                    break;
+//                                case "CLICK":
+//                                    if (m.getButton() == 0 && m.getAction() == MouseRelease.INSTANCE) {
+//                                        if (mousePos != null && e.contains(mousePos))
+//                                            e.setState("HOVER");
+//                                        else
+//                                            e.setState("IDLE");
+//                                    }
+//                                    break;
+//                            }
+//                        }
+//                    }
+//                }
+//        );
 	}
 
 	private void update() {
-		events.onNext(GameAction.UPDATE);
+		inputMapping.update();
+
+		for (GameSystem gs : systems) {
+			gs.update(this);
+		}
+
+		guis.forEach(GUI::update);
 		behaviors.values().forEach(GameBehavior::update);
+
+		Keyboard.getStandardKeyEvents().forEach(e -> {
+			if (e.getAction() == KeyPress.INSTANCE && e.getKey() == GLFW.GLFW_KEY_GRAVE_ACCENT) toggleConsole();
+		});
 	}
 
 	public void addSystem(GameSystem gs) {
 		systems.add(gs);
-		gs.link(this);
 	}
 
 	public void removeSystem(GameSystem gs) {
 		systems.remove(gs);
-		gs.unlink();
 	}
 
 	protected void pollEvents() {
@@ -232,7 +239,6 @@ public abstract class Game {
 			return;
 
 		isRunning = false;
-		events.onNext(GameAction.CLOSE);
 	}
 
 	public void run() {
@@ -278,13 +284,11 @@ public abstract class Game {
 	}
 
 	public void fixedUpdate(float dt) {
-		events.onNext(GameAction.FIXED_UPDATE);
-
 		fixedGameUpdate(dt);
 
-//		for (GameSystem gs : systems) {
-//			gs.fixedUpdate(dt);
-//		}
+		for (GameSystem gs : systems) {
+			gs.fixedUpdate(this, dt);
+		}
 
 		guis.forEach(gui -> gui.fixedUpdate(dt));
 
@@ -337,7 +341,6 @@ public abstract class Game {
 	}
 
 	public final void render() {
-		events.onNext(GameAction.RENDER);
 		renderingEngine.render(display);
 	}
 
@@ -371,10 +374,6 @@ public abstract class Game {
 		stop();
 	}
 
-	public Observable<GameAction> getEvents() {
-		return events;
-	}
-
 	public void setCamera(Camera camera) {
 		this.camera = camera;
 		renderingEngine.setCamera(camera);
@@ -390,5 +389,13 @@ public abstract class Game {
 
 	public int getHeight() {
 		return height;
+	}
+
+	public InputMapping getInputMapping() {
+		return inputMapping;
+	}
+
+	public void setInputMapping(InputMapping inputMapping) {
+		this.inputMapping = inputMapping;
 	}
 }

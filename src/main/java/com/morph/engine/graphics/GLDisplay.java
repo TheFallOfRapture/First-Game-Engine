@@ -1,11 +1,10 @@
 package com.morph.engine.graphics;
 
 import com.morph.engine.core.Camera;
+import com.morph.engine.core.Game;
 import com.morph.engine.input.Keyboard;
 import com.morph.engine.input.Mouse;
 import com.morph.engine.math.Vector2f;
-import io.reactivex.Observable;
-import io.reactivex.subjects.PublishSubject;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
@@ -21,12 +20,6 @@ public class GLDisplay {
 	private long window;
 	private int width, height;
 	private String title;
-
-	private PublishSubject<GLDisplayAction> events = PublishSubject.create();
-
-	public enum GLDisplayAction {
-		OPEN, CLOSE
-	}
 	
 	public GLDisplay(int width, int height, String title) {
 		this.width = width;
@@ -34,9 +27,7 @@ public class GLDisplay {
 		this.title = title;
 	}
 	
-	public void init(Camera camera) {
-		events.onNext(GLDisplayAction.OPEN);
-
+	public void init(Game game) {
 		GLFWErrorCallback.createPrint(System.err).set();
 		if (!glfwInit())
 			throw new IllegalStateException("Failed to initialize GLFW");
@@ -51,16 +42,11 @@ public class GLDisplay {
 
 		glfwSetKeyCallback(window, Keyboard.INSTANCE::handleKeyEvent);
 		
-//		glfwSetWindowSizeCallback(window, (window, x, y) -> EventDispatcher.INSTANCE.dispatchEvent(new ResizeEvent(this, x, y, false)));
-		
-		glfwSetCursorPosCallback(window, (window, x, y) -> Mouse.INSTANCE.setMousePosition(window, new Vector2f((float) x, (float) y), camera));
+		glfwSetCursorPosCallback(window, (window, x, y) -> Mouse.INSTANCE.setMousePosition(window, new Vector2f((float) x, (float) y), game.getCamera()));
 		
 		glfwSetMouseButtonCallback(window, Mouse.INSTANCE::handleMouseEvent);
 
-		glfwSetWindowCloseCallback(window, (window) -> {
-			events.onNext(GLDisplayAction.CLOSE);
-			events.onComplete();
-		});
+		glfwSetWindowCloseCallback(window, (window) -> game.handleExitEvent());
 		
 		GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 		
@@ -109,9 +95,5 @@ public class GLDisplay {
 	
 	public long getWindow() {
 		return window;
-	}
-
-	public Observable<GLDisplayAction> getEvents() {
-		return events;
 	}
 }

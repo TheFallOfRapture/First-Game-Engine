@@ -37,7 +37,10 @@ abstract class GUI(val game: Game) {
         return elements.find { it.name == name }
     }
 
-    fun fixedUpdate(dt: Float) {}
+    open fun preUpdate() {}
+    open fun update() {}
+    open fun fixedUpdate(dt: Float) {}
+    open fun postUpdate() {}
 
     fun getElements(): List<Element> {
         return elements

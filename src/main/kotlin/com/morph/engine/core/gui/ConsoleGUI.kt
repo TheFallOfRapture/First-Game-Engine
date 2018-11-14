@@ -38,29 +38,16 @@ class ConsoleGUI(game: Game, private val console: Console, private val width: In
         addElement(consoleInputBG)
         addElement(consoleInput)
         addElement(consoleOutput)
-
-        Keyboard.standardKeyEvents.subscribe { this.onKeyEvent(it) }
-
-        Console.events()
-                .filter { Console.EventType.UPDATE == it }
-                .map { console.lastLine }
-                .filter { Objects.nonNull(it) }
-                .subscribe ({ consoleOutput.addString(it) }) { System.err.println("Error updating the console.") }
-
-
-        Console.events()
-                .filter { Console.EventType.CLEAR == it }
-                .subscribe({ onConsoleClear() }) { System.err.println("Error clearing the console.") }
     }
 
     override fun load() {}
 
     private fun onKeyEvent(e: StdKeyEvent) {
-        if (isOpen) {
-            consoleInput.handleGUIKeyEvent(e)
-        }
+        consoleInput.handleGUIKeyEvent(e)
+    }
 
-        if (e.action === KeyPress && e.key == GLFW.GLFW_KEY_GRAVE_ACCENT) game.toggleConsole()
+    override fun update() {
+        Keyboard.standardKeyEvents.forEach { this.onKeyEvent(it) }
     }
 
     private fun onConsoleUpdate() {

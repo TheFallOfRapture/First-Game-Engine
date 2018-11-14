@@ -4,7 +4,6 @@ import com.morph.engine.collision.components.BoundingBox2D
 import com.morph.engine.collision.components.CollisionComponent
 import com.morph.engine.collision.components.TriggerComponent
 import com.morph.engine.core.Game
-import com.morph.engine.core.Game.GameAction.FIXED_UPDATE
 import com.morph.engine.core.GameSystem
 import com.morph.engine.entities.Entity
 import com.morph.engine.entities.given
@@ -18,11 +17,6 @@ import java.util.*
 // Reference: noonat.github.io/intersect/
 
 class CollisionEngine(game: Game, val collisionSolver: CollisionSolver) : GameSystem(game) {
-    val collisionEvents = game.events.filter { it == FIXED_UPDATE }
-            .map { checkCollision(game.world.entities.filter(::acceptEntity), game.timestep) }
-            .filter { it is Collision.Hit }
-            .share()
-
     override fun fixedUpdate(e: Entity, dt: Float) {
         updateCollider(e.getComponent()!!, e.getComponent()!!)
     }

@@ -1,11 +1,16 @@
 package com.morph.engine.graphics.components
 
 import com.morph.engine.core.Camera
+import com.morph.engine.core.IWorld
 import com.morph.engine.entities.Component
+import com.morph.engine.entities.Entity
+import com.morph.engine.entities.EntityFactory
 import com.morph.engine.graphics.Color
 import com.morph.engine.graphics.Texture
 import com.morph.engine.graphics.shaders.Shader
+import com.morph.engine.math.Vector2f
 import com.morph.engine.math.Vector3f
+import com.morph.engine.physics.components.RigidBody
 import com.morph.engine.physics.components.Transform2D
 import org.lwjgl.opengl.GL11.*
 import org.lwjgl.opengl.GL15.*
@@ -118,4 +123,28 @@ class Emitter(
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer)
         glBindVertexArray(0)
     }
+
+    fun spawnParticle(world : IWorld) {
+        val particle = Particle(color, this)
+        val spread = 1f
+        val randomOffset = Vector2f((Math.random() - 0.5).toFloat() * spread, (Math.random() - 0.5).toFloat() * spread)
+        val particlePos = parent?.getComponent<Transform2D>()?.position!! + randomOffset
+        // TODO: Handle the case where a particle emitter has no parent entity (?)
+
+        val entity = EntityFactory.getEntity("Particle-${System.nanoTime()}")
+                .addComponent(Transform2D(position = particlePos, scale = Vector2f(0.05f, 0.05f)))
+                .addComponent(particle)
+                .addComponent(RigidBody()) // TODO: Remove; generalize
+
+        entity.getComponent<Transform2D>()!!.position = particlePos
+
+        world.addEntity(entity)
+        particles.add(particle)
+    }
+
+//    companion object {
+//        fun withBehavior(spawnFunction : () -> Entity) {
+//            // TODO: Guarantee that the entity produced by spawnFunction has a particle instance.
+//        }
+//    }
 }

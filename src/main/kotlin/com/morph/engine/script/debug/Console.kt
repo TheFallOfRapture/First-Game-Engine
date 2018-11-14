@@ -2,11 +2,9 @@ package com.morph.engine.script.debug
 
 import com.morph.engine.core.Game
 import com.morph.engine.util.ScriptUtils
-import io.reactivex.Observable
-import io.reactivex.subjects.PublishSubject
-import org.jetbrains.annotations.Contract
 import java.io.OutputStream
 import java.io.PrintStream
+import java.util.*
 
 /**
  * Created on 11/24/2017.
@@ -16,10 +14,6 @@ class Console(private val type: Console.ScriptType, game: Game) {
         get() {
             return currentLine
         }
-
-    enum class EventType {
-        UPDATE, CLEAR
-    }
 
     private class ConsoleOutputStream : OutputStream() {
         override fun write(buffer: ByteArray, offset: Int, length: Int) {
@@ -90,8 +84,6 @@ class Console(private val type: Console.ScriptType, game: Game) {
 
     init {
         Console.game = game
-
-        game.events.filter { e -> e == Game.GameAction.CLOSE }.subscribe { events.onComplete() }
     }
 
     fun readIn(line: String) {
@@ -121,13 +113,9 @@ class Console(private val type: Console.ScriptType, game: Game) {
     fun clear() {
         Console.text = ""
         Console.currentLine = ""
-
-        events.onNext(EventType.CLEAR)
     }
 
     companion object {
-        private val events = PublishSubject.create<EventType>()
-
         private var text = ""
         private var currentLine = ""
         private var game: Game? = null
@@ -141,20 +129,11 @@ class Console(private val type: Console.ScriptType, game: Game) {
         private fun print(line: String) {
             Console.currentLine = line
             Console.text += line
-
-            events.onNext(EventType.UPDATE)
         }
 
         private fun newLine() {
             Console.currentLine = "\n"
             Console.text += "\n"
-
-            events.onNext(EventType.UPDATE)
-        }
-
-        @Contract(pure = true)
-        fun events(): Observable<EventType> {
-            return events
         }
     }
 }

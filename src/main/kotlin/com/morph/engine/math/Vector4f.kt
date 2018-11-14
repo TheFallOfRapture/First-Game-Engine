@@ -2,24 +2,12 @@ package com.morph.engine.math
 
 import java.util.function.Function
 
-class Vector4f {
-    var x: Float = 0.toFloat()
-    var y: Float = 0.toFloat()
-    var z: Float = 0.toFloat()
-    var w: Float = 0.toFloat()
-
+class Vector4f(var x : Float = 0f, var y : Float = 0f, var z : Float = 0f, var w : Float = 0f) {
     val xyz: Vector3f
         get() = Vector3f(x, y, z)
 
     val xy: Vector2f
         get() = Vector2f(x, y)
-
-    constructor(x: Float, y: Float, z: Float, w: Float) {
-        this.x = x
-        this.y = y
-        this.z = z
-        this.w = w
-    }
 
     /**
      * Clones a Vector4f.
@@ -30,14 +18,9 @@ class Vector4f {
      * Creates a new Vector4f from a Vector3f and a supplied z value.
      * @param v Vector3f containing new x and y values.
      */
-    @JvmOverloads constructor(v: Vector3f, w: Float = 0f) : this(v.x, v.y, v.z, w) {}
+    @JvmOverloads constructor(v: Vector3f, w: Float = 0f) : this(v.x, v.y, v.z, w)
 
-    constructor(xy: Vector2f, z: Int, w: Int) {
-        this.x = xy.x
-        this.y = xy.y
-        this.z = z.toFloat()
-        this.w = w.toFloat()
-    }
+    constructor(xy: Vector2f, z: Float, w: Float) : this(xy.x, xy.y, z, w)
 
     override fun toString(): String {
         return "Vector4f($x, $y, $z, $w)"

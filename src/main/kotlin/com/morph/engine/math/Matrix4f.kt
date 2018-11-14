@@ -104,7 +104,7 @@ class Matrix4f(
 
     @JvmName("mul")
     operator fun times(v: Vector2f): Vector2f {
-        return times(Vector4f(v, 0, 1)).xy
+        return times(Vector4f(v, 0f, 1f)).xy
     }
 
     @JvmName("mul")
