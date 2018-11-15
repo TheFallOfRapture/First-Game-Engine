@@ -9,10 +9,10 @@ import com.morph.engine.graphics.EmitterSystem
 import com.morph.engine.graphics.ParticleSystem
 import com.morph.engine.math.Vector2f
 
-class PartPhysGame : Game(800, 600, "Particle Physics Testing", 60f, false) {
+class PartPhysGame : Game(1366, 768, "Particle Physics Testing", 60f, false) {
 //    var prevTime = System.nanoTime()
     override fun initGame() {
-        val size = 10f
+        val size = 50f
 
         setWorld(PartPhysWorld(this))
         camera = OrthoCam2D(Vector2f(0f, 0f), 0f, size * (width.toFloat() / height), size)

@@ -1,11 +1,10 @@
 package com.morph.demos.test.particlePhysics
 
-import com.morph.demos.test.particlePhysics.PartPhysGame
 import com.morph.engine.core.GameSystem
 import com.morph.engine.entities.Entity
 import com.morph.engine.graphics.components.Particle
-import com.morph.engine.input.Mouse
 import com.morph.engine.math.Vector2f
+import com.morph.engine.math.Vector3f
 import com.morph.engine.physics.components.RigidBody
 import com.morph.engine.physics.components.Transform2D
 
@@ -17,12 +16,24 @@ class ParticlePhysicsSystem(game : PartPhysGame) : GameSystem(game) {
 
     override fun fixedUpdate(e: Entity, dt: Float) {
         val rb = e.getComponent<RigidBody>()!!
-        val gravitationalCenter = Mouse.worldMousePosition
-//        val gravitationalCenter = Vector2f(Math.cos(time.toDouble()).toFloat(), Math.sin(time.toDouble()).toFloat()) * 5f
-        val gravity = gravityForce(e.getComponent<Transform2D>()!!.position, gravitationalCenter, rb.mass, 2000f)
+        val gravitationalCenter = Vector2f(0f, 0f)
+//        val gravitationalCenter = Vector2f(Math.cos(time.toDouble() * 3).toFloat(), Math.sin(time.toDouble() * 3).toFloat()) * 2f
+//        val gravity = gravityForce(e.getComponent<Transform2D>()!!.position, Vector2f(0f, 0f), rb.mass, 500000f)
+//        val downGravity = Vector2f(0f, -1f * rb.mass)
+        val position = e.getComponent<Transform2D>()!!.position
+//        val centripetalForce = (gravitationalCenter - position).normalize() *
+//                (rb.mass * (rb.velocity dot rb.velocity)) * (1f / (gravitationalCenter - position).length)
+//
+//        rb.applyForce(centripetalForce)
 
-        rb.applyForce(gravity)
+//        rb.applyForce(gravity)
+//        rb.applyForce(downGravity)
+        rb.applyForce(turningForce(position, Vector2f(0f, 0f)) * 2f * rb.mass)
+        rb.applyForce(-position.normalize() * 10f * rb.mass)
     }
+
+    fun turningForce(position : Vector2f, center : Vector2f) : Vector2f =
+            (Vector3f((center - position), 0f) cross Vector3f(0f, 0f, -1f)).xy.normalize()
 
     fun gravityForce(position : Vector2f, center : Vector2f, mass1 : Float, mass2 : Float) : Vector2f {
         val direction = (center - position).normalize()

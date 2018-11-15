@@ -6,7 +6,7 @@ import com.morph.engine.entities.Component
 import com.morph.engine.entities.EntityFactory
 import com.morph.engine.graphics.Color
 import com.morph.engine.graphics.Texture
-import com.morph.engine.graphics.shaders.Shader
+import com.morph.engine.graphics.shaders.InstancedShader
 import com.morph.engine.math.Vector2f
 import com.morph.engine.math.Vector3f
 import com.morph.engine.physics.components.RigidBody
@@ -17,9 +17,12 @@ import org.lwjgl.opengl.GL20.*
 import org.lwjgl.opengl.GL30.*
 import org.lwjgl.opengl.GL33.*
 import java.util.*
+import java.util.concurrent.PriorityBlockingQueue
 
-class Particle(val color : Color, val emitter : Emitter) : Component() {
+class Particle(var color : Color, val emitter : Emitter) : Component(), Comparable<Particle> {
     var age = 0f
+
+    override fun compareTo(other: Particle): Int = ((other.age - this.age) * (60f)).toInt()
 }
 
 class Emitter(
@@ -27,9 +30,9 @@ class Emitter(
         val spawnRate : Float,
         val velocity : Vector3f,
         val lifetime : Float,
-        val shader : Shader<*>,
+        val shader : InstancedShader,
         val texture : Texture = Texture(null),
-        private val particles: Queue<Particle> = LinkedList()
+        private val particles: Queue<Particle> = PriorityBlockingQueue()
 ) : Component(), Queue<Particle> by particles {
     var acc = 0f
     val maxParticles
@@ -124,12 +127,12 @@ class Emitter(
 
     fun spawnParticle(world : IWorld) {
         val particle = Particle(color, this)
-        val spread = 5f
+        val spread = 20f
         val randomOffset = Vector2f((Math.random() - 0.5).toFloat() * spread, (Math.random() - 0.5).toFloat() * spread)
         val particlePos = parent?.getComponent<Transform2D>()?.position!! + randomOffset
         // TODO: Handle the case where a particle emitter has no parent entity (?)
 
-        val size = 0.05f
+        val size = 1f
 
         val entity = EntityFactory.getEntity("Particle-${System.nanoTime()}")
                 .addComponent(Transform2D(position = particlePos, scale = Vector2f(size, size)))

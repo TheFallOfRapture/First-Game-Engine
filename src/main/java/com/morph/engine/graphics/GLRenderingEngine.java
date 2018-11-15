@@ -74,11 +74,13 @@ public class GLRenderingEngine extends GameSystem {
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		emitter.getShader().bind();
+		emitter.getShader().getUniforms().setUniforms(emitter);
 
 		glBindVertexArray(emitter.getVao());
 		glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL, emitter.getSize());
 		glBindVertexArray(0);
 
+		emitter.getShader().getUniforms().unbind();
 		emitter.getShader().unbind();
 	}
 

@@ -19,7 +19,8 @@ abstract class CollisionSolver {
 
             val newVelocity = vel - remove + collisionResponse(blockDir, vel)
 
-            rb.velocity = newVelocity
+            rb.applyImpulse(collisionResponse(blockDir, vel) - remove)
+//            rb.velocity = newVelocity
         }
 
         given<RigidBody>(b) { rb ->
@@ -29,7 +30,8 @@ abstract class CollisionSolver {
 
             val newVelocity = vel - remove + collisionResponse(blockDir, vel)
 
-            rb.velocity = newVelocity
+            rb.applyImpulse(collisionResponse(blockDir, vel) - remove)
+//            rb.velocity = newVelocity
         }
     }
 

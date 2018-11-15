@@ -3,6 +3,7 @@ package com.morph.engine.graphics.shaders
 import com.morph.engine.core.Camera
 import com.morph.engine.graphics.Color
 import com.morph.engine.graphics.Texture
+import com.morph.engine.graphics.components.Emitter
 import com.morph.engine.graphics.components.RenderData
 import com.morph.engine.graphics.components.light.Light
 import com.morph.engine.graphics.components.light.SceneLight
@@ -315,22 +316,32 @@ class BasicLightShaderUniforms : Uniforms() {
 }
 
 class InstancedShaderUniforms : Uniforms() {
-//    private lateinit var diffuse: Texture
+    private lateinit var diffuse: Texture
 
     override fun defineUniforms(shader: Int) {
-//        addUniform("diffuse", shader)
+        addUniform("diffuse", shader)
     }
 
     override fun setUniforms(t: Transform, data: RenderData, camera: Camera, screen: Matrix4f, lights: List<Light>) {
-//        diffuse = data.getTexture(0)
+        diffuse = data.getTexture(0)
 
-//        setUniform1i("diffuse", 0)
+        setUniform1i("diffuse", 0)
 
-//        diffuse.bind()
+        diffuse.bind()
+    }
+
+    fun setUniforms(emitter : Emitter) {
+        diffuse = emitter.texture
+        setUniform1i("diffuse", 0)
+        diffuse.bind()
     }
 
     override fun unbind(t: Transform, data: RenderData) {
-//        diffuse.unbind()
+        diffuse.unbind()
+    }
+
+    fun unbind() {
+        diffuse.unbind()
     }
 }
 

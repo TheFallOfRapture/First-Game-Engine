@@ -14,8 +14,8 @@ class FollowerSystem(game : PartPhysGame) : GameSystem(game) {
 
     override fun fixedUpdate(e: Entity, dt: Float) {
         val t2d = e.getComponent<Transform2D>()!!
-        t2d.position = Mouse.worldMousePosition
-//        t2d.position = Vector2f(Math.cos(time.toDouble()).toFloat(), Math.sin(time.toDouble()).toFloat()) * 5f
+//        t2d.position = Mouse.worldMousePosition
+        t2d.position = Vector2f(Math.cos(time.toDouble() * 3).toFloat(), Math.sin(time.toDouble() * 3).toFloat()) * 10f
     }
 
     override fun systemFixedUpdate(dt: Float) {
