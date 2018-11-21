@@ -80,7 +80,7 @@ dependencies {
 	compile "org.lwjgl:lwjgl-stb:$lwjglVersion:natives-macos"
 	// LWJGL dependencies END
 	compile 'io.reactivex.rxjava2:rxkotlin:2.2.0'
-	implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.24.0'
+	implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.1'
 	compile "org.jetbrains.kotlin:kotlin-compiler"
 	compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 	compile "org.jetbrains.kotlin:kotlin-script-util"

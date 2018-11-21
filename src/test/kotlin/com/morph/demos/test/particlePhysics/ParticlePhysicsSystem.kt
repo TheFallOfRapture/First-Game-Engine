@@ -18,18 +18,28 @@ class ParticlePhysicsSystem(game : PartPhysGame) : GameSystem(game) {
         val rb = e.getComponent<RigidBody>()!!
         val gravitationalCenter = Vector2f(0f, 0f)
 //        val gravitationalCenter = Vector2f(Math.cos(time.toDouble() * 3).toFloat(), Math.sin(time.toDouble() * 3).toFloat()) * 2f
-//        val gravity = gravityForce(e.getComponent<Transform2D>()!!.position, Vector2f(0f, 0f), rb.mass, 500000f)
-//        val downGravity = Vector2f(0f, -1f * rb.mass)
+        val gravity = gravityForce(e.getComponent<Transform2D>()!!.position, gravitationalCenter, rb.mass, 50000f)
+        val downGravity = Vector2f(0f, -9.8f * rb.mass)
         val position = e.getComponent<Transform2D>()!!.position
-//        val centripetalForce = (gravitationalCenter - position).normalize() *
-//                (rb.mass * (rb.velocity dot rb.velocity)) * (1f / (gravitationalCenter - position).length)
-//
+        val centripetalForce = (gravitationalCenter - position).normalize() *
+                (rb.mass * (rb.velocity dot rb.velocity)) * (1f / (gravitationalCenter - position).length)
+
 //        rb.applyForce(centripetalForce)
 
 //        rb.applyForce(gravity)
 //        rb.applyForce(downGravity)
-        rb.applyForce(turningForce(position, Vector2f(0f, 0f)) * 2f * rb.mass)
-        rb.applyForce(-position.normalize() * 10f * rb.mass)
+        val scale = 20f
+        rb.applyForce(turningForce(position, Vector2f(0f, 0f)) * scale * rb.mass)
+        rb.applyForce(-position.normalize() * 25f * scale * rb.mass)
+        val center = Vector2f(0f, 10f)
+        val rest = Vector2f(0f, 10f)
+        val k = 5f
+        val b = 2f
+        val springForce = (position - rest) * -k
+        val frictionForce = rb.velocity * -b
+//        rb.applyForce(springForce)
+//        rb.applyForce(frictionForce)
+//        rb.applyForce(downGravity)
     }
 
     fun turningForce(position : Vector2f, center : Vector2f) : Vector2f =
@@ -56,6 +66,8 @@ class ParticlePhysicsSystem(game : PartPhysGame) : GameSystem(game) {
     }
 
 //    override fun systemFixedUpdate(dt: Float) {
+//        time += dt
+//
 //        val entities = game.world.entities.filter(::acceptEntity)
 //
 //        for (i in 0 until entities.size) {

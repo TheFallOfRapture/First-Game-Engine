@@ -1,6 +1,5 @@
 package com.morph.engine.graphics.components
 
-import com.morph.engine.collision.components.BoundingBox2D
 import com.morph.engine.core.IWorld
 import com.morph.engine.entities.Component
 import com.morph.engine.entities.EntityFactory
@@ -11,18 +10,17 @@ import com.morph.engine.math.Vector2f
 import com.morph.engine.math.Vector3f
 import com.morph.engine.physics.components.RigidBody
 import com.morph.engine.physics.components.Transform2D
-import org.lwjgl.opengl.GL11.*
+import org.lwjgl.opengl.GL11.GL_DOUBLE
 import org.lwjgl.opengl.GL15.*
-import org.lwjgl.opengl.GL20.*
-import org.lwjgl.opengl.GL30.*
-import org.lwjgl.opengl.GL33.*
+import org.lwjgl.opengl.GL20.glEnableVertexAttribArray
+import org.lwjgl.opengl.GL20.glVertexAttribPointer
+import org.lwjgl.opengl.GL30.glBindVertexArray
+import org.lwjgl.opengl.GL30.glGenVertexArrays
+import org.lwjgl.opengl.GL33.glVertexAttribDivisor
 import java.util.*
-import java.util.concurrent.PriorityBlockingQueue
 
-class Particle(var color : Color, val emitter : Emitter) : Component(), Comparable<Particle> {
+class Particle(var color : Color, val emitter : Emitter) : Component() {
     var age = 0f
-
-    override fun compareTo(other: Particle): Int = ((other.age - this.age) * (60f)).toInt()
 }
 
 class Emitter(
@@ -32,7 +30,7 @@ class Emitter(
         val lifetime : Float,
         val shader : InstancedShader,
         val texture : Texture = Texture(null),
-        private val particles: Queue<Particle> = PriorityBlockingQueue()
+        private val particles: Queue<Particle> = LinkedList()
 ) : Component(), Queue<Particle> by particles {
     var acc = 0f
     val maxParticles
@@ -127,18 +125,15 @@ class Emitter(
 
     fun spawnParticle(world : IWorld) {
         val particle = Particle(color, this)
-        val spread = 20f
-        val randomOffset = Vector2f((Math.random() - 0.5).toFloat() * spread, (Math.random() - 0.5).toFloat() * spread)
+        val randomOffset = Vector2f((Math.random() - 0.5).toFloat() * Emitter.spread, (Math.random() - 0.5).toFloat() * Emitter.spread)
         val particlePos = parent?.getComponent<Transform2D>()?.position!! + randomOffset
         // TODO: Handle the case where a particle emitter has no parent entity (?)
 
-        val size = 1f
-
         val entity = EntityFactory.getEntity("Particle-${System.nanoTime()}")
-                .addComponent(Transform2D(position = particlePos, scale = Vector2f(size, size)))
+                .addComponent(Transform2D(position = particlePos, scale = Vector2f(Emitter.size, Emitter.size)))
                 .addComponent(particle)
                 .addComponent(RigidBody(mass = 10f))
-                .addComponent(BoundingBox2D(Vector2f(), Vector2f(size, size) * 0.5f))// TODO: Remove; generalize
+//                .addComponent(BoundingBox2D(Vector2f(), Vector2f(size, size) * 0.5f))// TODO: Remove; generalize
 
         entity.getComponent<Transform2D>()!!.position = particlePos
 
@@ -146,9 +141,8 @@ class Emitter(
         particles.add(particle)
     }
 
-//    companion object {
-//        fun withBehavior(spawnFunction : () -> Entity) {
-//            // TODO: Guarantee that the entity produced by spawnFunction has a particle instance.
-//        }
-//    }
+    companion object {
+        var size = 1f
+        var spread = 3f
+    }
 }

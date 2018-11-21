@@ -16,14 +16,12 @@ import com.morph.engine.physics.components.Transform2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
-import static org.lwjgl.opengl.GL31.glDrawArraysInstanced;
 import static org.lwjgl.opengl.GL31.glDrawElementsInstanced;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
@@ -36,6 +34,7 @@ public class GLRenderingEngine extends GameSystem {
 	private List<Light> lights;
 	private RenderBatcher batcher;
 	private List<Emitter> emitters;
+	private Framebuffer activeFramebuffer;
 
 	public GLRenderingEngine(Game game) {
 		super(game);
@@ -128,9 +127,11 @@ public class GLRenderingEngine extends GameSystem {
 	}
 
 	public void render(GLDisplay display) {
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		if (activeFramebuffer != null) {
+			activeFramebuffer.bindRenderTargets();
+		}
 
-//		gameRenderables.forEach(this::render);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		batcher.forEach((shader, renderBucket) -> {
 			shader.bind();
@@ -144,7 +145,25 @@ public class GLRenderingEngine extends GameSystem {
 			shader.unbind();
 		});
 
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 		emitters.forEach(this::render);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		if (activeFramebuffer != null) {
+			activeFramebuffer.unbindRenderTargets();
+
+			glClear(GL_COLOR_BUFFER_BIT);
+
+			activeFramebuffer.getShader().bind();
+			activeFramebuffer.getShader().getUniforms().setUniforms(activeFramebuffer);
+
+			glBindVertexArray(activeFramebuffer.getVao());
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
+			glBindVertexArray(0);
+
+			activeFramebuffer.getShader().getUniforms().unbind(activeFramebuffer);
+			activeFramebuffer.getShader().unbind();
+		}
 
 		display.update();
 	}
@@ -185,5 +204,9 @@ public class GLRenderingEngine extends GameSystem {
 	@Override
 	protected boolean acceptEntity(Entity e) {
 		return e.hasComponents(RenderData.class, Transform.class);
+	}
+
+	public void setActiveFramebuffer(Framebuffer activeFramebuffer) {
+		this.activeFramebuffer = activeFramebuffer;
 	}
 }

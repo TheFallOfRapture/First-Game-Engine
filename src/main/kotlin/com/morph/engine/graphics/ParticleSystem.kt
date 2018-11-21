@@ -18,7 +18,7 @@ class ParticleSystem(game : Game) : GameSystem(game) {
         val t2d = e.getComponent<Transform2D>()!!
 
         particle.age += dt
-        particle.color = Color(particle.color.red, particle.color.green, particle.color.blue, 1f - particle.age / particle.emitter.lifetime)
+        particle.color = Color(particle.color.red, particle.color.green, particle.color.blue, (1f - particle.age / particle.emitter.lifetime) * 1f)
 
 //        t2d.position -= Vector2f(0f, 0.01f)
     }

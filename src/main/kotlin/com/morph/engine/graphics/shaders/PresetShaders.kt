@@ -11,3 +11,4 @@ class TintShader : Shader<TintShaderUniforms>("shaders/tint", TintShaderUniforms
 class TransitionShader : Shader<TransitionShaderUniforms>("shaders/transition", TransitionShaderUniforms())
 class BasicLightShader : Shader<BasicLightShaderUniforms>("shaders/basicLight", BasicLightShaderUniforms())
 class InstancedShader : Shader<InstancedShaderUniforms>("shaders/instanced", InstancedShaderUniforms())
+class FramebufferShader : Shader<FramebufferShaderUniforms>("shaders/framebuffer", FramebufferShaderUniforms())

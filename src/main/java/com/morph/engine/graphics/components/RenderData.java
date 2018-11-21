@@ -13,6 +13,7 @@ import kotlin.Unit;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -31,7 +32,7 @@ import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 public class RenderData extends Component {
 	protected List<Vertex> vertices;
 	protected List<Integer> indices;
-	protected List<Texture> textures;
+	protected HashMap<Integer, Texture> textures;
 	
 	protected Shader<?> shader;
 	protected Color tint = new Color(1, 1, 1);
@@ -44,11 +45,11 @@ public class RenderData extends Component {
 	public RenderData(Shader<?> shader, Texture texture) {
 		this.vertices = new ArrayList<>();
 		this.indices = new ArrayList<>();
-		this.textures = new ArrayList<>();
+		this.textures = new HashMap<>();
 
 		this.shader = shader;
 
-		this.textures.add(texture);
+		this.textures.put(0, texture);
 
 		shader.init();
 	}
@@ -56,15 +57,15 @@ public class RenderData extends Component {
 	public RenderData(Shader<?> shader, Texture texture, List<Vertex> vertices, List<Integer> indices) {
 		this.vertices = vertices;
 		this.indices = indices;
-		this.textures = new ArrayList<>();
+		this.textures = new HashMap<>();
 
 		this.shader = shader;
-		this.textures.add(texture);
+		this.textures.put(0, texture);
 
 		shader.init();
 	}
 
-	public RenderData(List<Vertex> vertices, List<Integer> indices, Shader<?> shader, List<Texture> textures, int vao) {
+	public RenderData(List<Vertex> vertices, List<Integer> indices, Shader<?> shader, HashMap<Integer, Texture> textures, int vao) {
 		this.vertices = vertices;
 		this.indices = indices;
 		this.textures = textures;
@@ -309,18 +310,11 @@ public class RenderData extends Component {
 	}
 	
 	public Texture getTexture(int index) {
-		if (index >= textures.size()) return null;
 		return textures.get(index);
 	}
 	
 	public void setTexture(Texture texture, int index) {
-		if (textures.size() < index + 1) {
-			for (int i = 0; i < index; i++) {
-				textures.add(null);
-			}
-		}
-
-		textures.set(index, texture);
+		textures.put(index, texture);
 	}
 
 	public float getLerpFactor() {

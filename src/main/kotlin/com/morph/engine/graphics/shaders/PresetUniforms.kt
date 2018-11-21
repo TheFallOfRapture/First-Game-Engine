@@ -2,6 +2,7 @@ package com.morph.engine.graphics.shaders
 
 import com.morph.engine.core.Camera
 import com.morph.engine.graphics.Color
+import com.morph.engine.graphics.Framebuffer
 import com.morph.engine.graphics.Texture
 import com.morph.engine.graphics.components.Emitter
 import com.morph.engine.graphics.components.RenderData
@@ -342,6 +343,31 @@ class InstancedShaderUniforms : Uniforms() {
 
     fun unbind() {
         diffuse.unbind()
+    }
+}
+
+class FramebufferShaderUniforms : Uniforms() {
+    private lateinit var diffuse: Texture
+
+    override fun defineUniforms(shader: Int) {
+        addUniform("diffuse", shader)
+    }
+
+    override fun setUniforms(t: Transform, data: RenderData, camera: Camera, screen: Matrix4f, lights: List<Light>) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun unbind(t: Transform, data: RenderData) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    fun setUniforms(framebuffer : Framebuffer) {
+        setUniform1i("diffuse", 0)
+        framebuffer.bindTexture(0)
+    }
+
+    fun unbind(framebuffer : Framebuffer) {
+        framebuffer.unbindTextures()
     }
 }
 

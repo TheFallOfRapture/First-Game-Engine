@@ -17,9 +17,11 @@ object Keyboard {
             }
 
     fun handleKeyEvent(window: Long, key: Int, scancode: Int, action: Int, mods: Int) {
-        keyEvents.add(StdKeyEvent(getKeyAction(action), key, mods))
-        if (action == GLFW_PRESS) keyDowns[key - GLFW_KEY_SPACE] = true to mods
-        if (action == GLFW_RELEASE) keyDowns[key - GLFW_KEY_SPACE] = false to 0
+        if (key - GLFW_KEY_SPACE >= 0) {
+            keyEvents.add(StdKeyEvent(getKeyAction(action), key, mods))
+            if (action == GLFW_PRESS) keyDowns[key - GLFW_KEY_SPACE] = true to mods
+            if (action == GLFW_RELEASE) keyDowns[key - GLFW_KEY_SPACE] = false to 0
+        }
     }
 
     private fun getKeyAction(action: Int): StdKeyAction = when (action) {
