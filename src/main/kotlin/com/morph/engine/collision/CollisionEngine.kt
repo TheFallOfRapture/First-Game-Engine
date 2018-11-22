@@ -10,8 +10,8 @@ import com.morph.engine.entities.given
 import com.morph.engine.math.MathUtils
 import com.morph.engine.math.Vector2f
 import com.morph.engine.math.Vector3f
+import com.morph.engine.physics.components.RigidBody
 import com.morph.engine.physics.components.Transform2D
-import com.morph.engine.physics.components.Velocity2D
 import java.util.*
 
 // Reference: noonat.github.io/intersect/
@@ -33,7 +33,7 @@ class CollisionEngine(game: Game, val collisionSolver: CollisionSolver) : GameSy
         checkCollision(collidables, dt)
     }
 
-    private fun checkCollision(entities: List<Entity>, dt: Float) : Collision {
+    private fun checkCollision(entities: List<Entity>, dt: Float) {
         for (i in entities.indices) {
             for (j in i + 1 until entities.size) {
                 val a = entities[i]
@@ -60,15 +60,11 @@ class CollisionEngine(game: Game, val collisionSolver: CollisionSolver) : GameSy
                                 a.addComponent(TriggerComponent(b, normal))
                             else
                                 a.addComponent(CollisionComponent(b, normal, distance, coll.time))
-
-                           return Collision.Hit(a, b, coll.collisionData)
                         }
                     }
                 }
             }
         }
-
-        return Collision.NoHit()
     }
 
     fun update(entities: List<Entity>, dt: Float) {
@@ -85,8 +81,8 @@ class CollisionEngine(game: Game, val collisionSolver: CollisionSolver) : GameSy
 
         entities.forEach { e ->
             given<BoundingBox2D>(e) {
-                val vel2D = e.getComponent<Velocity2D>()
-                val velocity = if (vel2D == null) Vector2f(0f, 0f) else vel2D.velocity * dt
+                val rb = e.getComponent<RigidBody>()
+                val velocity = if (rb == null) Vector2f(0f, 0f) else rb.velocity * dt
 
                 val moving = velocity != Vector2f(0f, 0f)
 
@@ -269,8 +265,8 @@ class CollisionEngine(game: Game, val collisionSolver: CollisionSolver) : GameSy
 
             for (entity in entities) {
                 given<BoundingBox2D>(entity) { boxB ->
-                    val vel2D = entity.getComponent<Velocity2D>()
-                    val velB = vel2D?.velocity ?: Vector2f(0f, 0f)
+                    val rb = entity.getComponent<RigidBody>()
+                    val velB = rb?.velocity ?: Vector2f(0f, 0f)
 
                     val coll: CollisionData?
 
@@ -293,16 +289,19 @@ class CollisionEngine(game: Game, val collisionSolver: CollisionSolver) : GameSy
         }
 
         private fun checkCollision(a: Entity, b: Entity, dt: Float): SweepCollision {
-            val velA = a.getComponent<Velocity2D>()
-            val velB = b.getComponent<Velocity2D>()
+            val velA = a.getComponent<RigidBody>()
+            val velB = b.getComponent<RigidBody>()
 
             given<BoundingBox2D>(a) { boxA ->
                 given<BoundingBox2D>(b) { boxB ->
                     val vA = velA?.velocity ?: Vector2f(0f, 0f)
                     val vB = velB?.velocity ?: Vector2f(0f, 0f)
 
-                    if (vA.x == 0f && vA.y == 0f) { // A STILL
-                        if (vB.x == 0f && vB.y == 0f) { // A STILL | B STILL
+                    val aStill = velA == null || velA.velocity == Vector2f(0f, 0f)
+                    val bStill = velB == null || velB.velocity == Vector2f(0f, 0f)
+
+                    if (aStill) { // A STILL
+                        if (bStill) { // A STILL | B STILL
                             val c = checkDoubleStatic(boxA, boxB)
                             return if (c != null) SweepCollision.Hit(a, b, c, boxB.center, 0f) else SweepCollision.NoHit()
                         }
@@ -313,7 +312,7 @@ class CollisionEngine(game: Game, val collisionSolver: CollisionSolver) : GameSy
                         return getSweepCollision(a, b, boxB, delta, c)
                     }
 
-                    if (vB.x == 0f && vB.y == 0f) { // A MOVING | B STILL
+                    if (bStill) { // A MOVING | B STILL
                         val delta = vA * dt
                         val c = checkStaticDynamic(boxB, boxA, delta)
                         return getSweepCollision(b, a, boxA, delta, c)

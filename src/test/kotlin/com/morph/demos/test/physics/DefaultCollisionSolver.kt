@@ -1,4 +1,4 @@
-package com.morph.demos.test.particlePhysics
+package com.morph.demos.test.physics
 
 import com.morph.engine.collision.CollisionSolver
 import com.morph.engine.math.Vector2f

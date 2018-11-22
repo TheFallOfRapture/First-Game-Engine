@@ -3,7 +3,6 @@ package com.morph.engine.collision
 import com.morph.engine.entities.given
 import com.morph.engine.math.Vector2f
 import com.morph.engine.physics.components.RigidBody
-import com.morph.engine.physics.components.Velocity2D
 
 abstract class CollisionSolver {
     fun solveCollision(coll: SweepCollision) {
@@ -19,8 +18,8 @@ abstract class CollisionSolver {
 
             val newVelocity = vel - remove + collisionResponse(blockDir, vel)
 
-            rb.applyImpulse(collisionResponse(blockDir, vel) - remove)
-//            rb.velocity = newVelocity
+            rb.velocity = newVelocity
+            rb.applyForce(-blockDir * (blockDir dot rb.netForce))
         }
 
         given<RigidBody>(b) { rb ->
@@ -30,8 +29,8 @@ abstract class CollisionSolver {
 
             val newVelocity = vel - remove + collisionResponse(blockDir, vel)
 
-            rb.applyImpulse(collisionResponse(blockDir, vel) - remove)
-//            rb.velocity = newVelocity
+            rb.velocity = newVelocity
+            rb.applyForce(-blockDir * (blockDir dot rb.netForce))
         }
     }
 

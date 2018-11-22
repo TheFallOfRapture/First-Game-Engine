@@ -15,19 +15,20 @@ class EmitterSystem(game : Game) : GameSystem(game) {
         super.fixedUpdate(e, dt)
         val emitter = e.getComponent<Emitter>()!!
         val t2d = e.getComponent<Transform2D>()!!
-        emitter.acc += dt
 
         // TODO: Consider moving the spawn loop into Emitter.
-        while (emitter.acc >= (1f / emitter.spawnRate)) {
-            emitter.spawnParticle(game.world)
-            emitter.acc -= (1f / emitter.spawnRate)
+        if (emitter.enabled) {
+            emitter.acc += dt
+
+            while (emitter.acc >= (1f / emitter.spawnRate)) {
+                emitter.spawnParticle(game.world)
+                emitter.acc -= (1f / emitter.spawnRate)
+            }
         }
 
-        emitter.peek()?.let {
-            while (emitter.peek().age >= emitter.lifetime) {
-                emitter.peek().parent?.apply { game.world.removeEntity(this) }
-                emitter.remove()
-            }
+        while (emitter.peek() != null && emitter.peek().age >= emitter.lifetime) {
+            emitter.peek().parent?.apply { game.world.removeEntity(this) }
+            emitter.remove()
         }
     }
 }

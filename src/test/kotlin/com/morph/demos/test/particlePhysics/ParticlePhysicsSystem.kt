@@ -29,8 +29,8 @@ class ParticlePhysicsSystem(game : PartPhysGame) : GameSystem(game) {
 //        rb.applyForce(gravity)
 //        rb.applyForce(downGravity)
         val scale = 20f
-        rb.applyForce(turningForce(position, Vector2f(0f, 0f)) * scale * rb.mass)
-        rb.applyForce(-position.normalize() * 25f * scale * rb.mass)
+//        rb.applyForce(turningForce(position, Vector2f(0f, 0f)) * scale * rb.mass)
+//        rb.applyForce(-position.normalize() * 25f * scale * rb.mass)
         val center = Vector2f(0f, 10f)
         val rest = Vector2f(0f, 10f)
         val k = 5f
@@ -40,6 +40,14 @@ class ParticlePhysicsSystem(game : PartPhysGame) : GameSystem(game) {
 //        rb.applyForce(springForce)
 //        rb.applyForce(frictionForce)
 //        rb.applyForce(downGravity)
+
+        val locusP = game.world.getEntityByName("locus")?.getComponent<Transform2D>()?.position!!
+//        val denom = (locusP - position).length
+        val tolerance = 0.01f
+        val power = 0.0
+
+        val locusGravity = (locusP - position).normalize() * 200f
+        rb.applyForce(locusGravity)
     }
 
     fun turningForce(position : Vector2f, center : Vector2f) : Vector2f =

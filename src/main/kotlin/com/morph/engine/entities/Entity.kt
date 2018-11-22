@@ -1,7 +1,5 @@
 package com.morph.engine.entities
 
-import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
-
 data class Entity @JvmOverloads constructor(
         val name: String,
         val id: Int,
@@ -57,5 +55,5 @@ data class Entity @JvmOverloads constructor(
 }
 
 // TODO: Remove
-inline fun <reified T: Component> given(e: Entity, block: (T) -> Unit) = e.getComponent<T>()?.let(block) ?: println("No component found.")
-inline fun <reified T: Component> withComponent(e: Entity, block: T.() -> Unit) = e.getComponent<T>()?.apply(block) ?: println("No component found.")
+inline fun <reified T: Component> given(e: Entity, block: (T) -> Unit) = e.getComponent<T>()?.let(block)
+inline fun <reified T: Component> withComponent(e: Entity, block: T.() -> Unit) = e.getComponent<T>()?.apply(block)

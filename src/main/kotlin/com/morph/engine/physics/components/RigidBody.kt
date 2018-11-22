@@ -4,8 +4,8 @@ import com.morph.engine.entities.Component
 import com.morph.engine.math.Vector2f
 
 class RigidBody(val mass : Float = 1f, var velocity : Vector2f = Vector2f(), var acceleration : Vector2f = Vector2f()) : Component() {
-    private var netForce : Vector2f = Vector2f()
-    private var netImpulse : Vector2f = Vector2f()
+    var netForce : Vector2f = Vector2f(); private set
+    var netImpulse : Vector2f = Vector2f(); private set
 
     /*
 	 * Leapfrog Integration

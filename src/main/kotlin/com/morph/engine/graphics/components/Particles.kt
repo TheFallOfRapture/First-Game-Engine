@@ -30,6 +30,7 @@ class Emitter(
         val lifetime : Float,
         val shader : InstancedShader,
         val texture : Texture = Texture(null),
+        var enabled : Boolean = true,
         private val particles: Queue<Particle> = LinkedList()
 ) : Component(), Queue<Particle> by particles {
     var acc = 0f
