@@ -1,5 +1,6 @@
 package com.morph.engine.graphics.components
 
+import com.morph.engine.collision.components.BoundingBox2D
 import com.morph.engine.core.IWorld
 import com.morph.engine.entities.Component
 import com.morph.engine.entities.EntityFactory
@@ -134,7 +135,7 @@ class Emitter(
                 .addComponent(Transform2D(position = particlePos, scale = Vector2f(Emitter.size, Emitter.size)))
                 .addComponent(particle)
                 .addComponent(RigidBody(mass = 10f))
-//                .addComponent(BoundingBox2D(Vector2f(), Vector2f(size, size) * 0.5f))// TODO: Remove; generalize
+//                .addComponent(BoundingBox2D(Vector2f(), Vector2f(Emitter.size, Emitter.size) * 0.5f))// TODO: Remove; generalize
 
         entity.getComponent<Transform2D>()!!.position = particlePos
 

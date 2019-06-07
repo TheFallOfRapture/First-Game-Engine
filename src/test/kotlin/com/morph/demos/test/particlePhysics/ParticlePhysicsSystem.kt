@@ -33,11 +33,11 @@ class ParticlePhysicsSystem(game : PartPhysGame) : GameSystem(game) {
 //        rb.applyForce(-position.normalize() * 25f * scale * rb.mass)
         val center = Vector2f(0f, 10f)
         val rest = Vector2f(0f, 10f)
-        val k = 5f
-        val b = 2f
+        val k = 20f
+        val b = 0.75f
         val springForce = (position - rest) * -k
         val frictionForce = rb.velocity * -b
-//        rb.applyForce(springForce)
+        rb.applyForce(springForce)
 //        rb.applyForce(frictionForce)
 //        rb.applyForce(downGravity)
 
@@ -47,7 +47,7 @@ class ParticlePhysicsSystem(game : PartPhysGame) : GameSystem(game) {
         val power = 0.0
 
         val locusGravity = (locusP - position).normalize() * 200f
-        rb.applyForce(locusGravity)
+//        rb.applyForce(locusGravity)
     }
 
     fun turningForce(position : Vector2f, center : Vector2f) : Vector2f =
