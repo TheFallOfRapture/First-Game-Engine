@@ -49,7 +49,7 @@ abstract class TileWorld(override val game: Game, width: Int, height: Int, val t
         if (tmp != null)
             game.renderingEngine.unregister(tmp)
 
-        this[tileX, tileY] = e
+        super.set(tileX, tileY, e)
 
         e?.also {
             given<Transform2D>(e) {
