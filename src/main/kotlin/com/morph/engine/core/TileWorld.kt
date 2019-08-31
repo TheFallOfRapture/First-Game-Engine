@@ -5,6 +5,7 @@ import com.morph.engine.entities.EntityGrid
 import com.morph.engine.entities.given
 import com.morph.engine.math.Vector2f
 import com.morph.engine.physics.components.Transform2D
+import kotlin.math.floor
 
 /**
  * Created by Fernando on 1/19/2017.
@@ -25,7 +26,7 @@ abstract class TileWorld(override val game: Game, width: Int, height: Int, val t
     override fun addEntity(e: Entity): Boolean {
         var ret : Boolean = false
         given<Transform2D>(e) { t2D ->
-            val tilePos = (t2D.position / tileSize).map { x -> Math.floor(x.toDouble()).toFloat() }
+            val tilePos = (t2D.position / tileSize).map { x -> floor(x.toDouble()).toFloat() }
             ret = set(tilePos.x.toInt(), tilePos.y.toInt(), e)
         }
         return ret
@@ -39,7 +40,7 @@ abstract class TileWorld(override val game: Game, width: Int, height: Int, val t
         this.yOffset = yOffset
     }
 
-    override fun set(tileX: Int, tileY: Int, e: Entity?): Boolean {
+    override fun set(tileX: Int, tileY: Int, e: Entity): Boolean {
         if (tileX < 0 || tileX >= width || tileY < 0 || tileY >= height)
             return false
 
@@ -51,7 +52,7 @@ abstract class TileWorld(override val game: Game, width: Int, height: Int, val t
 
         super.set(tileX, tileY, e)
 
-        e?.also {
+        e.also {
             given<Transform2D>(e) {
                 it.position = Vector2f(xOffset + (tileX + 0.5f) * tileSize, yOffset + height * tileSize - (tileY + 0.5f) * tileSize)
                 it.scale = Vector2f(tileSize, tileSize)
@@ -96,8 +97,16 @@ abstract class TileWorld(override val game: Game, width: Int, height: Int, val t
         if (this[endX, endY] != null)
             game.renderingEngine.unregister(this[endX, endY])
 
-        this[endX, endY] = this[startX, startY]
-        this[startX, startY] = null
+        val movedEntity = this[startX, startY]
+        if (movedEntity == null) {
+            removeEntity(endX, endY)
+            return true
+        }
+
+        super.set(endX, endY, movedEntity)
+        super.removeEntity(startX, startY)
+//        this[endX, endY] = this[startX, startY]
+//        this[startX, startY] = null
 
         this[endX, endY]?.getComponent(Transform2D::class.java)!!.position = Vector2f(xOffset + (endX + 0.5f) * tileSize, yOffset + height * tileSize - (endY + 0.5f) * tileSize)
 
@@ -120,7 +129,8 @@ abstract class TileWorld(override val game: Game, width: Int, height: Int, val t
         val temp = this[tileX, tileY]
         game.renderingEngine.unregister(temp)
 
-        this[tileX, tileY] = null
+//        this[tileX, tileY] = null
+        super.removeEntity(tileX, tileY)
 
         return true
     }

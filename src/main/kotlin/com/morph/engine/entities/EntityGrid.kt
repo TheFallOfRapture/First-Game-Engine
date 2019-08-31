@@ -10,7 +10,7 @@ open class EntityGrid(val width: Int, val height: Int) {
         return entities.filterNotNull()
     }
 
-    open operator fun set(tileX: Int, tileY: Int, e: Entity?): Boolean {
+    open operator fun set(tileX: Int, tileY: Int, e: Entity): Boolean {
         if (tileX < 0 || tileX >= width || tileY < 0 || tileY >= height)
             return false
 
@@ -69,10 +69,8 @@ open class EntityGrid(val width: Int, val height: Int) {
         return intArrayOf(-1, -1)
     }
 
-    operator fun get(tileX: Int, tileY: Int): Entity? {
-        return if (tileX >= width || tileY >= height) null else entities[tileX + tileY * width]
-
-    }
+    operator fun get(tileX: Int, tileY: Int): Entity? =
+            if (tileX >= width || tileY >= height) null else entities[tileX + tileY * width]
 
     open fun removeEntity(tileX: Int, tileY: Int): Boolean {
         if (tileX + tileY * width >= entities.size || entities[tileX + tileY * width] == null)
