@@ -40,7 +40,13 @@ abstract class TileWorld(override val game: Game, width: Int, height: Int, val t
         this.yOffset = yOffset
     }
 
-    override fun set(tileX: Int, tileY: Int, e: Entity): Boolean {
+    override fun set(tileX: Int, tileY: Int, e: Entity?): Boolean = if (e == null) {
+        removeEntity(tileX, tileY)
+    } else {
+        setNotNull(tileX, tileY, e)
+    }
+
+    fun setNotNull(tileX: Int, tileY: Int, e: Entity): Boolean {
         if (tileX < 0 || tileX >= width || tileY < 0 || tileY >= height)
             return false
 

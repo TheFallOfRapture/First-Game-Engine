@@ -10,7 +10,7 @@ open class EntityGrid(val width: Int, val height: Int) {
         return entities.filterNotNull()
     }
 
-    open operator fun set(tileX: Int, tileY: Int, e: Entity): Boolean {
+    open operator fun set(tileX: Int, tileY: Int, e: Entity?): Boolean {
         if (tileX < 0 || tileX >= width || tileY < 0 || tileY >= height)
             return false
 
