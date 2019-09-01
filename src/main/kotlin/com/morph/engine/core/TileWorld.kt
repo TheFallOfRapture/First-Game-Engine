@@ -11,8 +11,8 @@ import kotlin.math.floor
  * Created by Fernando on 1/19/2017.
  */
 abstract class TileWorld(override val game: Game, width: Int, height: Int, val tileSize: Float) : EntityGrid(width, height), IWorld {
-    private var xOffset: Float = 0.toFloat()
-    private var yOffset: Float = 0.toFloat()
+    private var xOffset: Float = 0f
+    private var yOffset: Float = 0f
 
     override val entities: List<Entity>
         get() = asList()
@@ -129,7 +129,7 @@ abstract class TileWorld(override val game: Game, width: Int, height: Int, val t
     }
 
     override fun removeEntity(tileX: Int, tileY: Int): Boolean {
-        if (tileX + tileY * width >= asList().size || this[tileX, tileY] == null)
+        if (tileX + tileY * width >= width * height || this[tileX, tileY] == null)
             return false
 
         val temp = this[tileX, tileY]
