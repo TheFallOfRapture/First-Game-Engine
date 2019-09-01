@@ -32,12 +32,12 @@ class StateMachine(private var currentState: State) {
     fun changeState(endState: String) {
         if (currentState.name == endState) return
 
-        var transition: (() -> Unit)? = transitions[currentState.name + " > " + endState]
+        val transition: (() -> Unit)? = transitions[currentState.name + " > " + endState]
 
         if (transition != null) {
             transition()
         } else {
-            transition = transitions["* > $endState"]
+            transitions["* > $endState"]?.invoke()
         }
 
         currentState = possibleStates[endState] ?: throw IllegalArgumentException("End state does not exist")
