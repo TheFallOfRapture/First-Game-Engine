@@ -8,22 +8,22 @@ abstract class GameSystem(val game: Game) {
     abstract fun initSystem()
 
     fun preUpdate(game: Game) {
-        game.getWorld().entities.filter(this::acceptEntity).forEach(this::preUpdate)
+        game.world.entities.filter(this::acceptEntity).forEach(this::preUpdate)
         systemPreUpdate()
     }
 
     fun update(game: Game) {
-        game.getWorld().entities.filter(this::acceptEntity).forEach(this::update)
+        game.world.entities.filter(this::acceptEntity).forEach(this::update)
         systemUpdate()
     }
 
     fun fixedUpdate(game: Game, dt: Float) {
-        game.getWorld().entities.filter(this::acceptEntity).forEach { fixedUpdate(it, dt) }
+        game.world.entities.filter(this::acceptEntity).forEach { fixedUpdate(it, dt) }
         systemFixedUpdate(dt)
     }
 
     fun postUpdate(game: Game) {
-        game.getWorld().entities.filter(this::acceptEntity).forEach(this::postUpdate)
+        game.world.entities.filter(this::acceptEntity).forEach(this::postUpdate)
         systemPostUpdate()
     }
 

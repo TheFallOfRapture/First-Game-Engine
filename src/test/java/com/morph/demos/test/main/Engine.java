@@ -29,14 +29,14 @@ public class Engine extends Game {
 		OrthoCam2D camera;
 
 		setWorld(new EngineWorld(this));
-		renderingEngine.setClearColor(0, 0, 0, 0);
-		setCamera(camera = new OrthoCam2D(new Vector2f(0, 0), 0f, 10f * ((float) width / height), 10f));
+		getRenderingEngine().setClearColor(0, 0, 0, 0);
+		setCamera(camera = new OrthoCam2D(new Vector2f(0, 0), 0f, 10f * ((float) getWidth() / getHeight()), 10f));
 
-		renderingEngine.addLight(light1);
-		renderingEngine.addLight(light2);
-		renderingEngine.addLight(light3);
+		getRenderingEngine().addLight(light1);
+		getRenderingEngine().addLight(light2);
+		getRenderingEngine().addLight(light3);
 
-		testGUI = new EngineGUI(this, width, height);
+		testGUI = new EngineGUI(this, getWidth(), getHeight());
 		testGUI.init();
 
 		addGUI(testGUI);
