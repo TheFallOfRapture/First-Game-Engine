@@ -49,7 +49,7 @@ object ScriptUtils {
                 .subscribe ({ behavior ->
                     when (behavior) {
                         is EntityBehavior -> scriptedEntities[behavior.name]?.forEach { entity -> entity.getComponent<ScriptContainer>()?.replaceBehavior(behavior.name!!, behavior) }
-                        else -> game.replaceBehavior(behavior.name, behavior)
+                        else -> game.replaceBehavior(behavior.name!!, behavior)
                     }
                 })
     }

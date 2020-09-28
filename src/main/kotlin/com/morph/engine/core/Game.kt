@@ -30,7 +30,7 @@ abstract class Game(
     private var isRunning = false
     val timestep: Float = 1.0f / fps
 
-    var world: IWorld
+    var world: IWorld? = null
         set(nextWorld) {
             if (world != null) {
                 world!!.entities.forEach { renderingEngine.unregister(it) }
@@ -73,9 +73,6 @@ abstract class Game(
         get() = consoleGUI.isOpen
 
     init {
-        this.width = width
-        this.height = height
-        this.timestep = 1.0f / fps
         this.console = Console(Console.ScriptType.KOTLIN, this)
         this.consoleGUI = ConsoleGUI(this, console, width, height)
         this.inputMapping = InputMapping()
@@ -129,8 +126,8 @@ abstract class Game(
             gs.preUpdate(this)
         }
 
-        guis.forEach(Consumer<GUI> { it.preUpdate() })
-        behaviors.values.forEach(Consumer<GameBehavior> { it.preUpdate() })
+        guis.forEach { it.preUpdate() }
+        behaviors.values.forEach { it.preUpdate() }
     }
 
     private fun postUpdate() {
@@ -140,8 +137,8 @@ abstract class Game(
             gs.postUpdate(this)
         }
 
-        guis.forEach(Consumer<GUI> { it.postUpdate() })
-        behaviors.values.forEach(Consumer<GameBehavior> { it.postUpdate() })
+        guis.forEach { it.postUpdate() }
+        behaviors.values.forEach { it.postUpdate() }
     }
 
     protected fun destroy() {
